@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand backgrounds */
+  --color-rg-base: #0d1317;
+  --color-rg-base-deep: #080c0e;
+  --color-rg-base-alt: #0f191b;
+  --color-rg-surface: #162026;
+  --color-rg-surface-elevated: #1a262e;
+
+  /* Sheet / light overlay */
+  --color-rg-sheet: #d1dcda;
+  --color-rg-sheet-light: #dce4e2;
+
+  /* Accents */
+  --color-rg-red: #ff3b30;
+  --color-rg-red-bright: #ff453a;
+  --color-rg-red-cta: #ff3b3b;
+  --color-rg-lime: #00ff55;
+  --color-rg-lime-alt: #70ff00;
+  --color-rg-success: #30d158;
+  --color-rg-active: #84bca4;
+  --color-rg-amber: #ff9f0a;
+
+  /* Text */
+  --color-rg-text: #ffffff;
+  --color-rg-text-muted: #bacbc9;
+  --color-rg-text-dim: #6b7f7c;
+  --color-rg-text-on-accent: #0f191b;
+  --color-rg-border: #365466;
+  --color-rg-surface-card: #1c2a33;
+  --color-rg-go: #7cff00;
+
+  /* Typography */
+  --font-display: "Unbounded", system-ui, sans-serif;
+  --font-sans: "Albert Sans", system-ui, sans-serif;
+  --font-action: "Rajdhani", system-ui, sans-serif;
+
+  /* Device frame */
+  --breakpoint-device: 430px;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    background-color: var(--color-rg-base-deep);
+    color: var(--color-rg-text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+}
+
+.session-length-slider {
+  appearance: none;
+  height: 14px;
+  border-radius: 999px;
+  background: #0f191b;
+  outline: none;
+}
+
+.session-length-slider::-webkit-slider-runnable-track {
+  height: 14px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    #ff3b3b 0%,
+    #ff3b3b var(--session-progress, 0%),
+    #0f191b var(--session-progress, 0%),
+    #0f191b 100%
+  );
+}
+
+.session-length-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 28px;
+  height: 14px;
+  margin-top: 0;
+  border-radius: 999px;
+  background: #ff3b3b;
+  cursor: pointer;
+}
+
+.session-length-slider::-moz-range-track {
+  height: 14px;
+  border-radius: 999px;
+  background: #0f191b;
+}
+
+.session-length-slider::-moz-range-progress {
+  height: 14px;
+  border-radius: 999px;
+  background: #ff3b3b;
+}
+
+.session-length-slider::-moz-range-thumb {
+  width: 28px;
+  height: 14px;
+  border: 0;
+  border-radius: 999px;
+  background: #ff3b3b;
+  cursor: pointer;
+}
