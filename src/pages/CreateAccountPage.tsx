@@ -1,10 +1,14 @@
-import { Eye, EyeOff, LockKeyhole, Mail } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { PressableButton } from '../components/ui/PressableButton'
 import { TextField } from '../components/ui/TextField'
+import { OAuthButton } from '../components/ui/OAuthButtons'
+import {
+  EmailFieldIcon,
+  EyeToggleIcon,
+  PasswordFieldIcon,
+} from '../components/ui/AuthIcons'
 import { VerificationSheet } from '../components/onboarding/VerificationSheet'
-import { NameCaptureSheet } from '../components/onboarding/NameCaptureSheet'
 import {
   getPasswordChecks,
   isValidEmail,
@@ -15,14 +19,12 @@ import { useReadyGoStore } from '../store/useReadyGoStore'
 export function CreateAccountPage() {
   const navigate = useNavigate()
   const setUserEmail = useReadyGoStore((state) => state.setUserEmail)
-  const setAuthenticated = useReadyGoStore((state) => state.setAuthenticated)
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [emailTouched, setEmailTouched] = useState(false)
   const [verifyOpen, setVerifyOpen] = useState(false)
-  const [nameOpen, setNameOpen] = useState(false)
   const [pendingEmail, setPendingEmail] = useState('')
 
   const checks = useMemo(() => getPasswordChecks(password), [password])
@@ -33,44 +35,45 @@ export function CreateAccountPage() {
 
   const canSubmit = isValidEmail(email) && passwordIsValid(password)
 
-  const openNameStep = (nextEmail: string) => {
-    setPendingEmail(nextEmail)
+  const goToAccountCreated = (nextEmail: string) => {
     setUserEmail(nextEmail)
     setVerifyOpen(false)
-    setNameOpen(true)
+    navigate('/setup/account-created')
   }
 
   return (
-    <div className="relative flex h-full flex-col overflow-y-auto bg-rg-base-alt px-5 pb-8 pt-12">
-      <div className="mb-6">
-        <h1 className="font-display text-3xl font-bold uppercase tracking-[-0.02em] text-rg-text">
+    <div className="relative flex h-full flex-col overflow-y-auto bg-[#0F1918] px-5 pb-8 pt-[83px]">
+      <div className="mb-6 flex flex-col gap-[5px] uppercase">
+        <h1 className="font-display text-2xl font-bold leading-8 tracking-[-0.02em] text-[#BACBC9]">
           Create account
         </h1>
-        <p className="mt-1 text-lg font-bold uppercase text-rg-text">Welcome!</p>
+        <p className="font-sans text-lg font-bold leading-[26px] tracking-[-0.01em] text-[#BACBC9]">
+          Welcome!
+        </p>
       </div>
 
-      <div className="flex flex-col gap-3">
-        <PressableButton
-          variant="secondary"
-          onClick={() => openNameStep('apple@readygo.app')}
+      <div className="flex flex-col gap-5">
+        <OAuthButton
+          provider="apple"
+          onClick={() => goToAccountCreated('apple@readygo.app')}
         >
           Continue with Apple
-        </PressableButton>
-        <PressableButton
-          variant="secondary"
-          onClick={() => openNameStep('google@readygo.app')}
+        </OAuthButton>
+        <OAuthButton
+          provider="google"
+          onClick={() => goToAccountCreated('google@readygo.app')}
         >
           Continue with Google
-        </PressableButton>
+        </OAuthButton>
       </div>
 
-      <div className="my-5 flex items-center gap-3">
-        <div className="h-px flex-1 bg-rg-text-dim/40" />
-        <span className="text-xs font-bold text-rg-text-dim">Or</span>
-        <div className="h-px flex-1 bg-rg-text-dim/40" />
+      <div className="my-5 flex items-center justify-center gap-2.5">
+        <div className="h-px w-[100px] bg-[#BACBC9]/50" />
+        <span className="font-sans text-base text-[#BACBC9]">Or</span>
+        <div className="h-px w-[100px] bg-[#BACBC9]/50" />
       </div>
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1">
         <TextField
           label="Email Address"
           type="email"
@@ -81,44 +84,44 @@ export function CreateAccountPage() {
           onBlur={() => setEmailTouched(true)}
           hint="Use a valid email address"
           error={emailError}
-          leadingIcon={<Mail size={18} />}
+          leadingIcon={<EmailFieldIcon />}
         />
 
-        <TextField
-          label="Password"
-          type={showPassword ? 'text' : 'password'}
-          autoComplete="new-password"
-          placeholder="Type a new password"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          leadingIcon={<LockKeyhole size={18} />}
-          trailingIcon={
-            <button
-              type="button"
-              aria-label={showPassword ? 'Hide password' : 'Show password'}
-              onClick={() => setShowPassword((value) => !value)}
-              className="text-rg-text-dim"
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-          }
-        />
+        <div className="mt-2">
+          <TextField
+            label="Password"
+            type={showPassword ? 'text' : 'password'}
+            autoComplete="new-password"
+            placeholder="Type a new password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            leadingIcon={<PasswordFieldIcon />}
+            trailingIcon={
+              <button
+                type="button"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                onClick={() => setShowPassword((value) => !value)}
+              >
+                <EyeToggleIcon hidden={showPassword} />
+              </button>
+            }
+          />
+        </div>
 
-        <ul className="space-y-1 text-xs font-bold">
-          <li className={checkColour(password, checks.minLength)}>
+        <ul className="mt-1 space-y-[5px] px-5 text-xs font-normal tracking-[0.01em]">
+          <li className={checkColour(checks.minLength)}>
             Minimum 8 characters
           </li>
-          <li className={checkColour(password, checks.hasLetter)}>
-            At least one letter
-          </li>
-          <li className={checkColour(password, checks.hasNumberOrSymbol)}>
+          <li className={checkColour(checks.hasLetter)}>At least one letter</li>
+          <li className={checkColour(checks.hasNumberOrSymbol)}>
             At least one number or special character (@, #, $, %)
           </li>
         </ul>
       </div>
 
-      <div className="mt-8 flex flex-col gap-4">
+      <div className="mt-auto flex flex-col gap-4 pt-8">
         <PressableButton
+          variant="cta"
           disabled={!canSubmit}
           onClick={() => {
             setPendingEmail(email.trim())
@@ -127,9 +130,12 @@ export function CreateAccountPage() {
         >
           Create account
         </PressableButton>
-        <p className="text-center text-sm font-bold text-rg-text-muted">
+        <p className="text-center font-sans text-base leading-6 tracking-[-0.01em] text-[#BACBC9]">
           Already have an account?{' '}
-          <Link to="/auth/login" className="underline underline-offset-2">
+          <Link
+            to="/auth/login"
+            className="font-bold underline underline-offset-2"
+          >
             Sign in
           </Link>
         </p>
@@ -139,22 +145,12 @@ export function CreateAccountPage() {
         open={verifyOpen}
         email={pendingEmail || email}
         onClose={() => setVerifyOpen(false)}
-        onConfirmed={() => openNameStep(email.trim())}
-      />
-
-      <NameCaptureSheet
-        open={nameOpen}
-        onComplete={() => {
-          setAuthenticated(true)
-          navigate('/')
-        }}
+        onConfirmed={() => goToAccountCreated(email.trim())}
       />
     </div>
   )
 }
 
-function checkColour(password: string, passed: boolean) {
-  if (!password) return 'text-rg-text-dim'
-  if (passed) return 'text-rg-success'
-  return 'text-rg-red-bright'
+function checkColour(passed: boolean) {
+  return passed ? 'text-[#84BCA4]' : 'text-[#BC757D]'
 }

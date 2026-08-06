@@ -5,12 +5,19 @@ import { PressableButton } from '../components/ui/PressableButton'
 import { PaginationDots } from '../components/ui/PaginationDots'
 import { TermsSheet } from '../components/onboarding/TermsSheet'
 import { useReadyGoStore } from '../store/useReadyGoStore'
+import intro2 from '../assets/intro/intro-2.jpg'
+import intro3 from '../assets/intro/intro-3.jpg'
+
+const INTRO_1_IMAGE = '/images/intro/intro-1.png'
 
 const slides = [
   {
     id: 'ready',
     hero: 'READY',
-    heroClass: 'text-rg-red-cta',
+    heroColor: '#FF3B30',
+    image: INTRO_1_IMAGE,
+    /** Align to image top so heads stay fully visible in the 45% hero frame */
+    objectPosition: 'object-top',
     title: 'What is ReadyGo',
     subtitle: 'Your session, sorted.',
     body: [
@@ -22,7 +29,9 @@ const slides = [
   {
     id: 'set',
     hero: 'SET',
-    heroClass: 'text-rg-text',
+    heroColor: '#BACBC9',
+    image: intro2,
+    objectPosition: 'object-center',
     title: 'Location access',
     subtitle: 'Why we need to know.',
     body: [
@@ -34,7 +43,9 @@ const slides = [
   {
     id: 'go',
     hero: 'GO',
-    heroClass: 'text-[#7CFF00]',
+    heroColor: '#70FF00',
+    image: intro3,
+    objectPosition: 'object-[center_30%]',
     title: 'Setting up',
     subtitle: 'Profile & session setup.',
     body: [
@@ -51,14 +62,21 @@ export function IntroPage() {
   const isAuthenticated = useReadyGoStore((state) => state.isAuthenticated)
   const [index, setIndex] = useState(0)
   const [termsOpen, setTermsOpen] = useState(false)
-  const [dragOffset, setDragOffset] = useState(0)
 
   const slide = slides[index]
-  const progressLabel = useMemo(() => `${index + 1} of ${slides.length}`, [index])
+  const progressLabel = useMemo(
+    () => `${index + 1} of ${slides.length}`,
+    [index],
+  )
+
+  const goToIndex = (next: number) => {
+    if (next < 0 || next >= slides.length || next === index) return
+    setIndex(next)
+  }
 
   const goNext = () => {
     if (index < slides.length - 1) {
-      setIndex((current) => current + 1)
+      goToIndex(index + 1)
       return
     }
     setTermsOpen(true)
@@ -69,21 +87,10 @@ export function IntroPage() {
     navigate(isAuthenticated ? '/' : '/auth/create')
   }
 
-  const requestLocation = async () => {
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        () => goNext(),
-        () => goNext(),
-        { timeout: 4000 },
-      )
-      return
-    }
-    goNext()
-  }
-
   const handlePrimary = () => {
     if (slide.id === 'set') {
-      void requestLocation()
+      // Prototype: advance to slide 3 without blocking on system settings
+      goToIndex(2)
       return
     }
     if (slide.id === 'go') {
@@ -94,77 +101,130 @@ export function IntroPage() {
   }
 
   return (
-    <div className="relative flex h-full flex-col bg-rg-base-alt px-5 pb-6 pt-10">
+    <div className="relative flex h-full flex-col overflow-hidden bg-[#0F1918]">
       <p className="sr-only">{progressLabel}</p>
 
-      <div className="relative min-h-0 flex-1 overflow-hidden">
-        <AnimatePresence mode="wait" custom={dragOffset}>
-          <motion.div
-            key={slide.id}
-            custom={dragOffset}
-            initial={{ x: dragOffset >= 0 ? 80 : -80, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: dragOffset >= 0 ? -80 : 80, opacity: 0 }}
-            transition={{ duration: 0.28 }}
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.2}
-            onDragEnd={(_, info) => {
-              if (info.offset.x < -80) {
-                setDragOffset(1)
-                if (index < slides.length - 1) setIndex((current) => current + 1)
-              } else if (info.offset.x > 80) {
-                setDragOffset(-1)
-                if (index > 0) setIndex((current) => current - 1)
-              }
-            }}
-            className="flex h-full flex-col"
-          >
-            <div className="flex min-h-[180px] items-center justify-center rounded-[18px] bg-[radial-gradient(circle_at_top,#1c2a33_0%,#0f191b_70%)]">
-              <h1
-                className={`font-display text-6xl font-bold tracking-tight uppercase ${slide.heroClass}`}
-              >
-                {slide.hero}
-              </h1>
+      <div
+        className="flex min-h-0 flex-1 flex-col"
+        style={{ touchAction: 'pan-y' }}
+      >
+        <motion.div
+          className="flex min-h-0 flex-1 flex-col"
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.18}
+          onDragEnd={(_, info) => {
+            if (info.offset.x < -64 || info.velocity.x < -400) {
+              goToIndex(index + 1)
+            } else if (info.offset.x > 64 || info.velocity.x > 400) {
+              goToIndex(index - 1)
+            }
+          }}
+        >
+          {/* TOP HERO — 45% */}
+          <div className="relative h-[45%] min-h-0 w-full shrink-0 overflow-hidden">
+            <AnimatePresence mode="sync" initial={false}>
+              <motion.img
+                key={`img-${slide.id}`}
+                src={slide.image}
+                alt=""
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.35, ease: 'easeInOut' }}
+                className={`absolute inset-0 h-full w-full object-cover ${slide.objectPosition}`}
+                draggable={false}
+              />
+            </AnimatePresence>
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 mix-blend-multiply opacity-40"
+              style={{
+                background:
+                  'radial-gradient(ellipse at 50% 42%, rgba(186,203,201,0.9) 0%, rgba(54,84,102,0.55) 76%)',
+              }}
+            />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#0F1918]/50" />
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center px-5">
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.h1
+                  key={`hero-${slide.id}`}
+                  initial={{ opacity: 0, scale: 0.92 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 1.04 }}
+                  transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+                  className="font-display text-center text-2xl font-bold uppercase leading-8 tracking-[-0.02em]"
+                  style={{ color: slide.heroColor }}
+                >
+                  {slide.hero}
+                </motion.h1>
+              </AnimatePresence>
             </div>
+          </div>
 
-            <div className="mt-8 flex flex-col gap-2">
-              <h2 className="font-display text-2xl font-bold uppercase tracking-[-0.02em] text-rg-text">
-                {slide.title}
-              </h2>
-              <p className="text-lg font-bold uppercase tracking-[-0.01em] text-rg-text-muted">
-                {slide.subtitle}
-              </p>
-              <div className="mt-3 flex flex-col gap-3 text-sm leading-5 text-rg-text-muted">
-                {slide.body.map((paragraph) => (
-                  <p key={paragraph}>{paragraph}</p>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        </AnimatePresence>
+          {/* MIDDLE COPY — opacity fade */}
+          <div className="relative min-h-0 flex-1 overflow-hidden px-5 pt-5">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={`copy-${slide.id}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.28, ease: 'easeInOut' }}
+                className="flex h-full flex-col gap-2.5"
+              >
+                <div className="flex flex-col gap-[5px]">
+                  <h2 className="font-display text-2xl font-bold uppercase leading-8 tracking-[-0.02em] text-[#BACBC9]">
+                    {slide.title}
+                  </h2>
+                  <p className="font-sans text-lg font-bold uppercase leading-[26px] tracking-[-0.01em] text-[#BACBC9]">
+                    {slide.subtitle}
+                  </p>
+                </div>
+                <div className="mt-0 flex flex-col gap-2.5 font-sans text-base leading-normal text-[#BACBC9]">
+                  {slide.body.map((paragraph) => (
+                    <p key={paragraph}>{paragraph}</p>
+                  ))}
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </motion.div>
       </div>
 
-      <div className="mt-6 flex flex-col items-center gap-4">
-        <PaginationDots count={slides.length} activeIndex={index} />
-        <PressableButton onClick={handlePrimary}>{slide.cta}</PressableButton>
-        {slide.id === 'go' ? (
-          <button
-            type="button"
-            onClick={() => setTermsOpen(true)}
-            className="text-center text-sm font-bold text-rg-text-muted underline underline-offset-2"
-          >
-            By clicking Get Started, you agree to our Terms of Service.
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={skip}
-            className="text-base font-bold text-rg-text underline underline-offset-2"
-          >
-            Skip
-          </button>
-        )}
+      {/* FIXED BOTTOM CONTROLS */}
+      <div className="flex shrink-0 flex-col items-center gap-4 px-5 pb-[30px] pt-3">
+        <PaginationDots
+          count={slides.length}
+          activeIndex={index}
+          activeWidth={28}
+          inactiveColor="#4F6163"
+          onDotClick={goToIndex}
+        />
+
+        <PressableButton
+          onClick={handlePrimary}
+          variant="ghost"
+          whileTap={{ scale: 1 }}
+          className="!no-underline hover:!no-underline active:bg-[#1E2729]"
+          style={{
+            height: 52,
+            borderRadius: 12,
+            backgroundColor: '#2D3739',
+            color: '#BACBC9',
+            textDecoration: 'none',
+          }}
+          aria-label={slide.cta}
+        >
+          {slide.cta}
+        </PressableButton>
+        <button
+          type="button"
+          onClick={skip}
+          className="font-sans text-base font-bold leading-6 tracking-[-0.01em] text-[#BACBC9] underline underline-offset-2"
+        >
+          Skip
+        </button>
       </div>
 
       <TermsSheet

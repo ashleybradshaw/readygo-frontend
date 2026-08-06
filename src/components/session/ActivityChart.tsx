@@ -23,35 +23,44 @@ export function ActivityChart({
   const total = Math.round(values.reduce((sum, value) => sum + value, 0) * 10) / 10
 
   return (
-    <section className="rounded-[12px] bg-rg-surface p-4 outline outline-1 outline-[#365466]">
+    <section className="rounded-[10px] border border-[#39484A] bg-[#182629] p-4">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <p className="text-sm font-bold text-rg-text-muted">
+        <p className="text-sm font-bold tracking-[-0.01em] text-[#BACBC9]">
           [{total}] Total Miles
         </p>
         <div className="flex items-center gap-3 text-xs font-bold">
-          <span className="flex items-center gap-1.5 text-rg-text-muted">
-            <span className="size-2.5 rounded-full bg-[#7CFF00]" />
+          <span className="flex items-center gap-1.5 text-[#BACBC9]">
+            <span className="size-2.5 rounded-full bg-[#84BCA4]" aria-hidden="true" />
             Most
           </span>
-          <span className="flex items-center gap-1.5 text-rg-text-muted">
-            <span className="size-2.5 rounded-full bg-[#C5A075]" />
+          <span className="flex items-center gap-1.5 text-[#BACBC9]">
+            <span className="size-2.5 rounded-full bg-[#BC9C75]" aria-hidden="true" />
             Least
           </span>
         </div>
       </div>
 
-      <div className="mb-4 flex rounded-full bg-rg-base-alt p-1">
+      <div className="mb-4 flex rounded-full bg-[#0F1918] p-1">
         {ranges.map((item) => {
           const active = item.id === range
           return (
             <button
               key={item.id}
               type="button"
+              tabIndex={0}
+              aria-label={`Show ${item.label} activity`}
+              aria-pressed={active}
               onClick={() => onRangeChange(item.id)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault()
+                  onRangeChange(item.id)
+                }
+              }}
               className={`flex-1 rounded-full py-2 text-xs font-bold uppercase tracking-wide transition-colors ${
                 active
-                  ? 'bg-rg-sheet text-rg-text-on-accent'
-                  : 'text-rg-text-muted'
+                  ? 'bg-[#DCE4E2] text-[#0F191B]'
+                  : 'text-[#BACBC9]/70'
               }`}
             >
               {item.label}
@@ -60,7 +69,7 @@ export function ActivityChart({
         })}
       </div>
 
-      <div className="flex h-36 items-end justify-between gap-2">
+      <div className="flex h-36 items-end justify-between gap-1.5">
         {points.map((point) => {
           const height = Math.max(12, (point.miles / max) * 100)
           const isMost = point.miles === max
@@ -70,19 +79,19 @@ export function ActivityChart({
               key={point.label}
               className="flex h-full flex-1 flex-col items-center justify-end gap-2"
             >
-              <div className="flex w-full flex-1 items-end rounded-[10px] bg-rg-base-alt px-1 pb-1 pt-2">
+              <div className="flex w-full flex-1 items-end justify-center rounded-[10px] bg-[#0F1918] px-1 pb-1.5 pt-2">
                 <div
-                  className={`w-full rounded-[8px] ${
+                  className={`w-3.5 rounded-full ${
                     isMost
-                      ? 'bg-[#7CFF00]'
+                      ? 'bg-[#84BCA4]'
                       : isLeast
-                        ? 'bg-[#C5A075]'
-                        : 'bg-rg-text-muted/35'
+                        ? 'bg-[#BC9C75]'
+                        : 'bg-[#BACBC9]/35'
                   }`}
                   style={{ height: `${height}%` }}
                 />
               </div>
-              <span className="text-[10px] font-bold uppercase text-rg-text-muted">
+              <span className="text-[10px] font-bold uppercase text-[#BACBC9]/70">
                 {point.label}
               </span>
             </div>

@@ -4,8 +4,24 @@ import { buildSessionManifest } from '../lib/session'
 export type ActivityType = 'Run' | 'Cycle'
 export type ActiveTab = 'basecamp' | 'saved' | 'settings'
 export type PreferredTime = 'Morning' | 'Afternoon' | 'Evening'
-export type FitnessLevel = 'Easy' | 'Steady' | 'Hard' | 'Mixed'
-export type WeatherChoice = 'Dry only' | 'Light drizzle' | 'Any weather'
+export type FitnessLevel =
+  | 'Just starting out'
+  | 'Been doing this a while'
+  | 'Redline pace'
+  | 'Yellow jersey'
+export type WeatherChoice =
+  | 'Only sunshine'
+  | 'Only when dry'
+  | 'Bit of drizzle'
+  | 'Light rain'
+  | 'Cats and dogs'
+  | 'Cold or snow'
+export type SessionDuration =
+  | 'Under an hour'
+  | 'Under two hours'
+  | 'Under three hours'
+  | 'Over three hours'
+  | 'Surprise me'
 export type MapStyle = 'Minimap' | 'Full navigation'
 export type LocationMode = 'gps' | 'home' | 'postcode'
 export type ChartRange = 'week' | 'month' | 'year'
@@ -16,7 +32,12 @@ export type SessionStatus =
   | 'active'
   | 'summary'
 export type SavedTab = 'sessions' | 'profiles'
-export type NotificationTone = 'blip' | 'ouch' | 'success' | 'weather'
+export type NotificationTone =
+  | 'blip'
+  | 'ouch'
+  | 'success'
+  | 'weather'
+  | 'location'
 export type NotificationKind = 'toast' | 'modal'
 
 export interface ProfilePreferences {
@@ -29,8 +50,12 @@ export interface ProfilePreferences {
   fitnessLevel: FitnessLevel
   weatherChoices: WeatherChoice[]
   clothingSuggestions: boolean
+  showGearLinks: boolean
   mapStyle: MapStyle
-  sessionDuration: string
+  showSimpleMaps: boolean
+  showTraffic: boolean
+  loopOrSingleDestination: boolean
+  sessionDuration: SessionDuration
 }
 
 export interface ReadyGoProfile {
@@ -107,6 +132,7 @@ export interface AppNotification {
   tone: NotificationTone
   title: string
   body?: string
+  subtitle?: string
   primaryLabel?: string
   secondaryLabel?: string
 }
@@ -117,12 +143,16 @@ export const defaultPreferences = (): ProfilePreferences => ({
   usePhoneLocation: false,
   setCurrentLocation: false,
   postcode: '',
-  preferredTimes: ['Morning'],
-  fitnessLevel: 'Steady',
-  weatherChoices: ['Light drizzle'],
-  clothingSuggestions: true,
+  preferredTimes: [],
+  fitnessLevel: 'Just starting out',
+  weatherChoices: [],
+  clothingSuggestions: false,
+  showGearLinks: false,
   mapStyle: 'Minimap',
-  sessionDuration: '45–60 minutes',
+  showSimpleMaps: false,
+  showTraffic: false,
+  loopOrSingleDestination: false,
+  sessionDuration: 'Under an hour',
 })
 
 export const defaultProfileDraft = (): ProfileDraft => ({

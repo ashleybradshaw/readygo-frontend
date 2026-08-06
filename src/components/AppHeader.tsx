@@ -1,4 +1,5 @@
 import { MoreHorizontal } from 'lucide-react'
+import { ReadyGoWordmark } from './ui/BasecampIcons'
 import { formatWeatherLine } from '../lib/session'
 import { useReadyGoStore } from '../store/useReadyGoStore'
 
@@ -7,6 +8,8 @@ interface AppHeaderProps {
   temperatureC?: number | null
   condition?: string
   onMenuClick?: () => void
+  showMenu?: boolean
+  showWeather?: boolean
 }
 
 export function AppHeader({
@@ -14,6 +17,8 @@ export function AppHeader({
   temperatureC,
   condition,
   onMenuClick,
+  showMenu = true,
+  showWeather = true,
 }: AppHeaderProps) {
   const weather = useReadyGoStore((state) => state.weather)
 
@@ -23,43 +28,37 @@ export function AppHeader({
     condition: condition ?? weather.condition,
   })
 
+  const showWeatherRow = showWeather || (showMenu && Boolean(onMenuClick))
+
   return (
-    <header className="shrink-0 px-5 pt-3 pb-2">
-      <div className="flex h-[72px] items-center justify-center">
-        <ReadyGoLogo />
+    <header className="shrink-0 px-5 pt-[65px] pb-2">
+      <div className={`flex items-center justify-center ${showWeatherRow ? 'pb-5' : 'pb-2'}`}>
+        <ReadyGoWordmark />
       </div>
 
-      <div className="flex h-10 items-center gap-2.5 px-5">
-        <p className="min-w-0 flex-1 truncate text-sm font-bold leading-[18px] text-rg-text-muted">
-          {weatherLine}
-        </p>
-        <button
-          type="button"
-          aria-label="More options"
-          onClick={onMenuClick}
-          className="flex h-[22px] w-10 shrink-0 items-center justify-center rounded-full bg-rg-surface text-rg-text-muted transition-colors hover:text-rg-text"
-        >
-          <MoreHorizontal size={16} strokeWidth={2.25} />
-        </button>
-      </div>
+      {showWeatherRow ? (
+        <div className="relative flex min-h-6 items-center justify-center px-2">
+          {showWeather ? (
+            <p className="truncate text-center text-sm font-bold leading-[18px] tracking-[-0.01em] text-[#BACBC9]">
+              {weatherLine}
+            </p>
+          ) : null}
+          {showMenu && onMenuClick ? (
+            <button
+              type="button"
+              aria-label="More options"
+              onClick={onMenuClick}
+              className="absolute right-0 flex h-[22px] w-10 shrink-0 items-center justify-center rounded-full bg-[#182629] text-[#BACBC9] transition-colors hover:text-white"
+            >
+              <MoreHorizontal size={16} strokeWidth={2.25} />
+            </button>
+          ) : null}
+        </div>
+      ) : null}
     </header>
   )
 }
 
 export function ReadyGoLogo() {
-  return (
-    <div
-      className="flex items-center gap-0.5 font-display text-[28px] font-semibold tracking-tight text-rg-text uppercase"
-      aria-label="ReadyGo"
-    >
-      <span>Ready</span>
-      <span className="relative inline-flex items-center">
-        <span>G</span>
-        <span className="relative ml-0.5 inline-flex h-[0.72em] w-[0.72em] items-center justify-center">
-          <span className="absolute h-[2px] w-full rotate-[-28deg] rounded-full bg-rg-lime" />
-          <span className="absolute h-[2px] w-full translate-y-[5px] rotate-[-28deg] rounded-full bg-rg-red" />
-        </span>
-      </span>
-    </div>
-  )
+  return <ReadyGoWordmark />
 }

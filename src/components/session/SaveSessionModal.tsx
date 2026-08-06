@@ -1,6 +1,6 @@
-import { Check } from 'lucide-react'
 import { BottomSheet } from '../ui/BottomSheet'
 import { PressableButton } from '../ui/PressableButton'
+import { SuccessBadgeIcon } from '../overlays/OverlayBadges'
 
 interface SaveSessionModalProps {
   open: boolean
@@ -17,8 +17,8 @@ export function SaveSessionModal({
     <BottomSheet open={open} onClose={onClose} tone="light">
       <div className="flex flex-col items-center gap-4 pt-2 pb-2 text-center">
         <div className="w-full rounded-[18px] bg-rg-base-alt px-5 py-8 text-rg-text">
-          <div className="mx-auto flex size-[60px] items-center justify-center rounded-[14px] bg-[#7CFF00] text-rg-text-on-accent">
-            <Check size={28} strokeWidth={3} />
+          <div className="mx-auto flex justify-center">
+            <SuccessBadgeIcon />
           </div>
           <h2 className="mt-5 font-display text-2xl font-bold uppercase">
             Session saved

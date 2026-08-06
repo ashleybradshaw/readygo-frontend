@@ -1,8 +1,8 @@
-import { KeyRound, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { BottomSheet } from '../ui/BottomSheet'
+import { AnimatePresence, motion } from 'framer-motion'
 import { PressableButton } from '../ui/PressableButton'
 import { TextField } from '../ui/TextField'
+import { CloseBoxedIcon, KeyFieldIcon } from '../ui/AuthIcons'
 import { formatCountdown } from '../../lib/onboarding'
 
 interface VerificationSheetProps {
@@ -39,6 +39,8 @@ export function VerificationSheet({
     return () => window.clearInterval(timer)
   }, [open, secondsLeft])
 
+  const canConfirm = code.trim().length === 6 && secondsLeft > 0
+
   const confirm = () => {
     if (code.trim().length !== 6) {
       setError('Enter your 6-digit code')
@@ -52,72 +54,98 @@ export function VerificationSheet({
   }
 
   return (
-    <BottomSheet open={open} onClose={onClose} tone="dark">
-      <div className="relative flex flex-col gap-5 pt-2">
-        <button
-          type="button"
-          aria-label="Close"
-          onClick={onClose}
-          className="absolute top-0 right-0 rounded-full bg-rg-surface p-2 text-rg-text-muted"
+    <AnimatePresence>
+      {open ? (
+        <motion.div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="verification-title"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="absolute inset-0 z-50 flex flex-col bg-[#0F1918] px-5 pb-8 pt-[70px]"
         >
-          <X size={18} />
-        </button>
-
-        <div className="pr-10">
-          <h2 className="font-display text-2xl font-bold uppercase tracking-[-0.02em] text-rg-text">
-            Verification code
-          </h2>
-          <p className="mt-1 text-lg font-bold uppercase text-rg-text">
-            Let&apos;s get you in securely.
-          </p>
-          <p className="mt-3 text-sm text-rg-text-muted">
-            We&apos;ve sent a verification code to {email || 'your email'}. Check
-            your inbox – it won&apos;t take long.
-          </p>
-        </div>
-
-        <TextField
-          label="Verification code"
-          inputMode="numeric"
-          maxLength={6}
-          placeholder="Enter your 6-digit code"
-          value={code}
-          onChange={(event) => {
-            setCode(event.target.value.replace(/\D/g, '').slice(0, 6))
-            setError(undefined)
-          }}
-          error={error}
-          leadingIcon={<KeyRound size={18} />}
-        />
-
-        <p
-          className={`text-sm font-bold ${
-            secondsLeft <= 60 ? 'text-rg-red-bright' : 'text-rg-amber'
-          }`}
-        >
-          Valid for {formatCountdown(secondsLeft)}
-        </p>
-
-        <div className="mt-2 flex flex-col items-center gap-3">
           <button
             type="button"
-            onClick={() => {
-              setSecondsLeft(INITIAL_SECONDS)
-              setError(undefined)
-            }}
-            className="text-sm font-bold text-rg-text underline underline-offset-2"
+            aria-label="Close"
+            onClick={onClose}
+            className="absolute top-[55px] right-5 flex size-11 items-center justify-center"
           >
-            Send new code
+            <CloseBoxedIcon shape="circle" />
           </button>
-          <PressableButton onClick={confirm}>Confirm code</PressableButton>
-          <button
-            type="button"
-            className="text-sm font-bold text-rg-text underline underline-offset-2"
-          >
-            Need help?
-          </button>
-        </div>
-      </div>
-    </BottomSheet>
+
+          <div className="pr-12">
+            <div className="flex flex-col gap-[5px] uppercase">
+              <h2
+                id="verification-title"
+                className="font-display text-2xl font-bold leading-8 tracking-[-0.02em] text-[#BACBC9]"
+              >
+                Verification code
+              </h2>
+              <p className="font-sans text-lg font-bold leading-[26px] tracking-[-0.01em] text-[#BACBC9]">
+                Let&apos;s get you in securely.
+              </p>
+            </div>
+            <p className="mt-2.5 font-sans text-base leading-normal text-[#BACBC9]">
+              We&apos;ve sent a verification code to {email || 'your email'}. Check
+              your inbox – it won&apos;t take long.
+            </p>
+          </div>
+
+          <div className="mt-6">
+            <TextField
+              label="Verification code"
+              inputMode="numeric"
+              maxLength={6}
+              placeholder="Enter your 6-digit code"
+              value={code}
+              onChange={(event) => {
+                setCode(event.target.value.replace(/\D/g, '').slice(0, 6))
+                setError(undefined)
+              }}
+              error={error}
+              leadingIcon={<KeyFieldIcon />}
+            />
+            {!error ? (
+              <div className="mt-1 flex flex-col items-end gap-1 px-5">
+                <p
+                  className={`text-xs tracking-[0.01em] ${
+                    secondsLeft <= 60 ? 'text-[#BC757D]' : 'text-[#BC9C75]'
+                  }`}
+                >
+                  Valid for {formatCountdown(secondsLeft)}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSecondsLeft(INITIAL_SECONDS)
+                    setError(undefined)
+                  }}
+                  className="font-sans text-xs font-normal tracking-[0.01em] text-[#BC9C75] underline underline-offset-2"
+                >
+                  Send a new code
+                </button>
+              </div>
+            ) : null}
+          </div>
+
+          <div className="mt-auto flex flex-col items-center gap-1 pt-8">
+            <PressableButton
+              variant="cta"
+              disabled={!canConfirm}
+              onClick={confirm}
+            >
+              Confirm code
+            </PressableButton>
+            <button
+              type="button"
+              className="px-5 py-5 font-sans text-base font-bold tracking-[-0.01em] text-[#BACBC9] underline underline-offset-2"
+            >
+              Need help?
+            </button>
+          </div>
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
   )
 }

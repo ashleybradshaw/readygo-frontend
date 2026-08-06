@@ -1,29 +1,33 @@
-import {
-  Bike,
-  ChevronLeft,
-  ChevronRight,
-  CloudSun,
-  Map,
-  PersonStanding,
-  Shirt,
-  X,
-} from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useMemo, useState, type ReactNode } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Bike, Clock, MapPin, Navigation2, PersonStanding, Shirt, Sun } from 'lucide-react'
 import { PressableButton } from '../components/ui/PressableButton'
 import { PaginationDots } from '../components/ui/PaginationDots'
 import { ProgressBar } from '../components/ui/ProgressBar'
-import { SegmentedOptions } from '../components/ui/SegmentedOptions'
 import { ToggleSwitch } from '../components/ui/ToggleSwitch'
-import { TextField } from '../components/ui/TextField'
+import { CancelProfileModal } from '../components/onboarding/CancelProfileModal'
+import {
+  QuestionHeaderCard,
+  QuestionSectionDivider,
+  QuestionSectionStack,
+  QuestionToggleRow,
+  WeatherConditionBadge,
+} from '../components/setup/QuestionStepCard'
+import { calculateSetupProgress } from '../lib/onboarding'
 import {
   type FitnessLevel,
-  type MapStyle,
   type PreferredTime,
+  type ProfilePreferences,
+  type SessionDuration,
   type WeatherChoice,
   useReadyGoStore,
 } from '../store/useReadyGoStore'
+import iconClose from '../assets/setup/icon-close.svg'
+import iconArrowLeft from '../assets/setup/icon-arrow-left.svg'
+import iconArrowRight from '../assets/setup/icon-arrow-right.svg'
+import iconPostcode from '../assets/setup/icon-postcode.svg'
+import iconGoai from '../assets/basecamp/icon-goai.svg'
 
 const STEPS = [
   'location',
@@ -36,6 +40,59 @@ const STEPS = [
 
 type StepId = (typeof STEPS)[number]
 
+const TIME_OPTIONS: { value: PreferredTime; label: string }[] = [
+  { value: 'Morning', label: 'The Morning' },
+  { value: 'Afternoon', label: 'The Afternoon' },
+  { value: 'Evening', label: 'In The Evening' },
+]
+
+const FITNESS_BASE: { value: FitnessLevel; label: string }[] = [
+  { value: 'Just starting out', label: 'Just Starting Out' },
+  { value: 'Been doing this a while', label: 'Been Doing This A While' },
+]
+
+const DURATION_OPTIONS: { value: SessionDuration; label: string }[] = [
+  { value: 'Under an hour', label: 'Under An Hour' },
+  { value: 'Under two hours', label: 'Under Two Hours' },
+  { value: 'Under three hours', label: 'Under Three Hours' },
+  { value: 'Over three hours', label: 'Over Three Hours' },
+  { value: 'Surprise me', label: 'Surprise Me ( Within Five Hours)' },
+]
+
+const WEATHER_OPTIONS: { value: WeatherChoice; label: string }[] = [
+  { value: 'Only sunshine', label: 'Only Sunshine' },
+  { value: 'Only when dry', label: "Only When It's Dry" },
+  { value: 'Bit of drizzle', label: 'A Bit Of Drizzle Is Fine' },
+  { value: 'Light rain', label: 'Light Rain – No Problem' },
+  { value: 'Cats and dogs', label: 'Cats And Dogs (Any)' },
+  { value: 'Cold or snow', label: 'Cold Weather Or Snow' },
+]
+
+const MaskedIcon = ({
+  src,
+  className = 'size-5',
+  toneClass = 'bg-[#0F191B]',
+}: {
+  src: string
+  className?: string
+  toneClass?: string
+}) => (
+  <span
+    className={`inline-block shrink-0 ${className} ${toneClass}`}
+    style={{
+      maskImage: `url(${src})`,
+      WebkitMaskImage: `url(${src})`,
+      maskSize: 'contain',
+      WebkitMaskSize: 'contain',
+      maskRepeat: 'no-repeat',
+      WebkitMaskRepeat: 'no-repeat',
+      maskPosition: 'center',
+      WebkitMaskPosition: 'center',
+    }}
+    aria-hidden="true"
+  />
+)
+
 export function SetupProfilePage() {
   const navigate = useNavigate()
   const userName = useReadyGoStore((state) => state.userName)
@@ -44,177 +101,219 @@ export function SetupProfilePage() {
   const updateDraftPreferences = useReadyGoStore(
     (state) => state.updateDraftPreferences,
   )
+  const resetProfileDraft = useReadyGoStore((state) => state.resetProfileDraft)
 
   const [stepIndex, setStepIndex] = useState(0)
+  const [cancelOpen, setCancelOpen] = useState(false)
   const step = STEPS[stepIndex]
-  const progress = Math.round(((stepIndex + 1) / STEPS.length) * 100)
 
-  const greeting = useMemo(
-    () => `Hello, ${userName || 'there'}`,
-    [userName],
+  const progress = useMemo(
+    () => calculateSetupProgress(draft.preferences),
+    [draft.preferences],
   )
 
-  const goNext = () => {
-    if (stepIndex < STEPS.length - 1) {
-      setStepIndex((value) => value + 1)
-      return
+  const greeting = `Hello, ${userName || 'there'}`
+  const isCycle = draft.activityType === 'Cycle'
+
+  const handleActivityToggle = (toCycle: boolean) => {
+    const nextType = toCycle ? 'Cycle' : 'Run'
+    updateProfileDraft({ activityType: nextType })
+
+    const fitness = draft.preferences.fitnessLevel
+    if (nextType === 'Run' && fitness === 'Yellow jersey') {
+      updateDraftPreferences({ fitnessLevel: 'Redline pace' })
     }
-    navigate('/setup/review')
+    if (nextType === 'Cycle' && fitness === 'Redline pace') {
+      updateDraftPreferences({ fitnessLevel: 'Yellow jersey' })
+    }
+  }
+
+  const goNext = () => {
+    if (stepIndex < STEPS.length - 1) setStepIndex((value) => value + 1)
   }
 
   const goPrev = () => {
-    if (stepIndex === 0) {
-      navigate('/')
-      return
-    }
-    setStepIndex((value) => value - 1)
+    if (stepIndex > 0) setStepIndex((value) => value - 1)
   }
 
   return (
-    <div className="flex h-full flex-col bg-rg-base-alt px-5 pb-6 pt-10">
-      <div className="mb-4 flex items-start justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <h1 className="font-display text-2xl font-bold uppercase tracking-[-0.02em] text-rg-text-muted">
-            {greeting}
-          </h1>
-          <p className="mt-1 text-base font-bold uppercase tracking-[-0.01em] text-rg-text-muted">
-            Setting up · {progress}% complete
-          </p>
-          <div className="mt-3">
-            <ProgressBar value={progress} />
-          </div>
+    <div className="relative flex h-full flex-col overflow-hidden bg-[#0F191B] px-5 pb-6 pt-[39px]">
+      <button
+        type="button"
+        aria-label="Close setup"
+        onClick={() => setCancelOpen(true)}
+        className="absolute top-[39px] right-5 flex size-11 items-center justify-center"
+      >
+        <img src={iconClose} alt="" width={44} height={44} className="size-11" />
+      </button>
+
+      <div className="mb-5 pr-12">
+        <h1 className="font-display text-2xl font-bold uppercase leading-8 tracking-[-0.02em] text-[#BACBC9]">
+          {greeting}
+        </h1>
+        <p className="mt-[5px] font-sans text-lg font-bold uppercase leading-[26px] tracking-[-0.01em] text-[#BACBC9]">
+          Setting up · {progress}% complete
+        </p>
+        <div className="mt-[5px]">
+          <ProgressBar value={progress} />
         </div>
-        <button
-          type="button"
-          aria-label="Close setup"
-          onClick={() => navigate('/')}
-          className="rounded-full bg-rg-surface p-2.5 text-rg-text-muted"
-        >
-          <X size={18} />
-        </button>
       </div>
 
-      <div className="mb-4 flex items-center justify-between rounded-[12px] bg-rg-surface px-4 py-2.5 outline outline-1 outline-[#365466]">
-        <div className="flex items-center gap-4">
-          <span
-            className={`flex items-center gap-1.5 text-sm font-bold ${
-              draft.activityType === 'Run'
-                ? 'text-[#7CFF00]'
-                : 'text-rg-text-dim'
+      <div className="mb-2 flex items-center justify-between rounded-[10px] bg-[#182629] px-5 py-2.5">
+        <div className="flex items-center">
+          <button
+            type="button"
+            onClick={() => handleActivityToggle(false)}
+            className={`flex items-center gap-[5px] p-2.5 ${
+              !isCycle ? 'text-[#70FF00]' : 'text-[#647A7C]'
             }`}
           >
-            <PersonStanding size={18} />
-            Run
-          </span>
-          <span
-            className={`flex items-center gap-1.5 text-sm font-bold ${
-              draft.activityType === 'Cycle'
-                ? 'text-[#7CFF00]'
-                : 'text-rg-text-dim'
+            <PersonStanding size={24} strokeWidth={1.75} aria-hidden="true" />
+            <span className="text-base font-bold tracking-[-0.01em]">Run</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleActivityToggle(true)}
+            className={`flex items-center gap-[5px] p-2.5 ${
+              isCycle ? 'text-[#70FF00]' : 'text-[#647A7C]'
             }`}
           >
-            <Bike size={18} />
-            Cycle
-          </span>
+            <Bike size={24} strokeWidth={1.75} aria-hidden="true" />
+            <span className="text-base font-bold tracking-[-0.01em]">Cycle</span>
+          </button>
         </div>
         <ToggleSwitch
           label="Activity type"
-          checked={draft.activityType === 'Cycle'}
-          onChange={(checked) =>
-            updateProfileDraft({ activityType: checked ? 'Cycle' : 'Run' })
-          }
+          checked={isCycle}
+          onChange={handleActivityToggle}
         />
       </div>
 
-      <div className="mb-3 flex items-center justify-center gap-4">
+      <div className="mb-2 flex items-center justify-center gap-[15px] py-[15px]">
         <button
           type="button"
           aria-label="Previous step"
           onClick={goPrev}
-          className="text-rg-text-muted"
+          disabled={stepIndex === 0}
+          className="disabled:opacity-35"
         >
-          <ChevronLeft size={22} />
+          <img
+            src={iconArrowLeft}
+            alt=""
+            width={24}
+            height={24}
+            className="size-6"
+          />
         </button>
-        <PaginationDots count={STEPS.length} activeIndex={stepIndex} />
+        <PaginationDots
+          count={STEPS.length}
+          activeIndex={stepIndex}
+          activeWidth={28}
+          inactiveColor="#4F6163"
+          onDotClick={setStepIndex}
+        />
         <button
           type="button"
           aria-label="Next step"
           onClick={goNext}
-          className="text-rg-text-muted"
+          disabled={stepIndex === STEPS.length - 1}
+          className="disabled:opacity-35"
         >
-          <ChevronRight size={22} />
+          <img
+            src={iconArrowRight}
+            alt=""
+            width={24}
+            height={24}
+            className="size-6"
+          />
         </button>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="min-h-0 flex-1 overflow-y-auto pb-4">
         <AnimatePresence mode="wait">
           <motion.div
             key={step}
             initial={{ opacity: 0, x: 24 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -24 }}
-            transition={{ duration: 0.22 }}
+            transition={{ type: 'spring', stiffness: 380, damping: 34 }}
           >
             <StepPanel
               step={step}
-              draft={draft}
+              activityType={draft.activityType}
+              prefs={draft.preferences}
               updateDraftPreferences={updateDraftPreferences}
             />
           </motion.div>
         </AnimatePresence>
       </div>
 
-      <div className="mt-4">
-        <PressableButton onClick={goNext}>
-          {stepIndex === STEPS.length - 1 ? 'Review and Go' : 'Continue'}
+      <div className="pt-2">
+        <PressableButton
+          variant="cta"
+          onClick={() => navigate('/setup/gathering')}
+        >
+          Review and Go
         </PressableButton>
       </div>
+
+      <CancelProfileModal
+        open={cancelOpen}
+        onStay={() => setCancelOpen(false)}
+        onCancel={() => {
+          resetProfileDraft()
+          setCancelOpen(false)
+          navigate('/')
+        }}
+      />
     </div>
   )
 }
 
 function StepPanel({
   step,
-  draft,
+  activityType,
+  prefs,
   updateDraftPreferences,
 }: {
   step: StepId
-  draft: ReturnType<typeof useReadyGoStore.getState>['profileDraft']
-  updateDraftPreferences: (
-    partial: Partial<
-      ReturnType<typeof useReadyGoStore.getState>['profileDraft']['preferences']
-    >,
-  ) => void
+  activityType: 'Run' | 'Cycle'
+  prefs: ProfilePreferences
+  updateDraftPreferences: (partial: Partial<ProfilePreferences>) => void
 }) {
-  const prefs = draft.preferences
+  const advancedFitness: FitnessLevel =
+    activityType === 'Run' ? 'Redline pace' : 'Yellow jersey'
+  const advancedLabel =
+    activityType === 'Run' ? 'Redline Pace Mode' : 'Yellow Jersey Mode'
+
+  const toggleMulti = <T extends string>(
+    list: T[],
+    value: T,
+    key: 'preferredTimes' | 'weatherChoices',
+  ) => {
+    const next = list.includes(value)
+      ? list.filter((item) => item !== value)
+      : [...list, value]
+    updateDraftPreferences({ [key]: next } as Partial<ProfilePreferences>)
+  }
 
   if (step === 'location') {
     return (
-      <section className="overflow-hidden rounded-[12px] bg-rg-surface outline outline-1 outline-[#365466]">
-        <div className="flex gap-3 p-4">
-          <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-rg-base-alt text-rg-text">
-            <Map size={16} />
-          </div>
-          <div>
-            <h2 className="text-sm font-bold text-rg-text">
-              Set location for routes
-            </h2>
-            <p className="mt-1 text-sm text-rg-text-muted">
-              ReadyGo needs a starting point to build your route. Use your
-              current GPS, set a home location, or drop a postcode.
-            </p>
-          </div>
-        </div>
-
-        <ToggleRow
-          label="Turn on location settings"
+      <QuestionSectionStack>
+        <QuestionHeaderCard
+          icon={<Navigation2 size={20} strokeWidth={2} />}
+          title="Set Location For Routes"
+          body="ReadyGo needs a starting point to build your route. Use your current GPS, set a home location, or enter a postcode."
+        />
+        <QuestionToggleRow
+          label="Turn On Location Settings"
           checked={prefs.locationSettingsOn}
           onChange={(checked) =>
             updateDraftPreferences({ locationSettingsOn: checked })
           }
         />
-        <ToggleRow
-          label="Use phone's location"
+        <QuestionToggleRow
+          label="Use Phone's Location"
           checked={prefs.usePhoneLocation}
           onChange={(checked) =>
             updateDraftPreferences({
@@ -223,8 +322,8 @@ function StepPanel({
             })
           }
         />
-        <ToggleRow
-          label="Set current location"
+        <QuestionToggleRow
+          label="Set Current Location"
           checked={prefs.setCurrentLocation}
           onChange={(checked) =>
             updateDraftPreferences({
@@ -233,9 +332,17 @@ function StepPanel({
             })
           }
         />
-        <div className="border-t border-[#365466] p-3">
-          <TextField
-            label="Postcode"
+        <div className="flex h-[54px] items-center gap-2.5 rounded-b-[10px] rounded-t-none bg-[#182629] px-5">
+          <img
+            src={iconPostcode}
+            alt=""
+            width={24}
+            height={24}
+            className="size-6 shrink-0"
+          />
+          <input
+            type="text"
+            aria-label="Postcode"
             placeholder="Type your post code (Optional)"
             value={prefs.postcode}
             onChange={(event) =>
@@ -244,168 +351,156 @@ function StepPanel({
                 locationMode: 'postcode',
               })
             }
+            className="min-w-0 flex-1 bg-transparent text-base font-bold tracking-[-0.01em] text-[#BACBC9] outline-none placeholder:text-[#BACBC9]/70"
           />
         </div>
-      </section>
+      </QuestionSectionStack>
     )
   }
 
   if (step === 'times') {
     return (
-      <StepCard
-        icon={<CloudSun size={16} />}
-        title="Preferred times"
-        body="Morning runner? Evening cyclist? Let us know when you usually head out so your plan fits your day."
-      >
-        <SegmentedOptions<PreferredTime>
-          multiple
-          options={[
-            { value: 'Morning', label: 'Morning' },
-            { value: 'Afternoon', label: 'Afternoon' },
-            { value: 'Evening', label: 'Evening' },
-          ]}
-          value={prefs.preferredTimes}
-          onChange={(value) =>
-            updateDraftPreferences({
-              preferredTimes: value as PreferredTime[],
-            })
-          }
+      <QuestionSectionStack>
+        <QuestionHeaderCard
+          icon={<Clock size={20} strokeWidth={2} />}
+          title="Times"
+          body="When do you usually head out? ReadyGo will tailor session suggestions to fit your schedule."
         />
-      </StepCard>
+        {TIME_OPTIONS.map((option, index) => (
+          <QuestionToggleRow
+            key={option.value}
+            label={option.label}
+            checked={prefs.preferredTimes.includes(option.value)}
+            onChange={() =>
+              toggleMulti(prefs.preferredTimes, option.value, 'preferredTimes')
+            }
+            roundBottom={index === TIME_OPTIONS.length - 1}
+          />
+        ))}
+      </QuestionSectionStack>
     )
   }
 
   if (step === 'fitness') {
+    const fitnessOptions = [
+      ...FITNESS_BASE,
+      { value: advancedFitness, label: advancedLabel },
+    ]
+
     return (
-      <StepCard
-        icon={<PersonStanding size={16} />}
-        title="Fitness levels"
-        body="GOAI takes your preferences and builds your session – route, duration, effort level – every time you tap Ready."
-      >
-        <SegmentedOptions<FitnessLevel>
-          options={[
-            { value: 'Easy', label: 'Easy' },
-            { value: 'Steady', label: 'Steady' },
-            { value: 'Hard', label: 'Hard' },
-            { value: 'Mixed', label: 'Mixed' },
-          ]}
-          value={prefs.fitnessLevel}
-          onChange={(value) =>
-            updateDraftPreferences({ fitnessLevel: value as FitnessLevel })
-          }
+      <QuestionSectionStack>
+        <QuestionHeaderCard
+          icon={<MaskedIcon src={iconGoai} />}
+          title="AI Sessions"
+          body="How would you describe your current fitness level? This helps GOAI set the right starting point."
         />
-      </StepCard>
+        {fitnessOptions.map((option) => (
+          <QuestionToggleRow
+            key={option.value}
+            label={option.label}
+            checked={prefs.fitnessLevel === option.value}
+            onChange={() =>
+              updateDraftPreferences({ fitnessLevel: option.value })
+            }
+          />
+        ))}
+        <QuestionSectionDivider />
+        {DURATION_OPTIONS.map((option, index) => (
+          <QuestionToggleRow
+            key={option.value}
+            label={option.label}
+            checked={prefs.sessionDuration === option.value}
+            onChange={() =>
+              updateDraftPreferences({ sessionDuration: option.value })
+            }
+            roundBottom={index === DURATION_OPTIONS.length - 1}
+          />
+        ))}
+      </QuestionSectionStack>
     )
   }
 
   if (step === 'weather') {
     return (
-      <StepCard
-        icon={<CloudSun size={16} />}
-        title="Weather choices"
-        body="Tell us what weather you'll head out in. Dry only, or fine with a bit of drizzle? ReadyGo will only suggest sessions that match."
-      >
-        <SegmentedOptions<WeatherChoice>
-          multiple
-          options={[
-            { value: 'Dry only', label: 'Dry only' },
-            { value: 'Light drizzle', label: 'Light drizzle' },
-            { value: 'Any weather', label: 'Any weather' },
-          ]}
-          value={prefs.weatherChoices}
-          onChange={(value) =>
-            updateDraftPreferences({
-              weatherChoices: value as WeatherChoice[],
-            })
-          }
+      <QuestionSectionStack>
+        <QuestionHeaderCard
+          icon={<Sun size={20} strokeWidth={2} />}
+          title="Weather"
+          body="Which conditions are you happy heading out in? ReadyGo will only plan sessions in weather that suits you."
         />
-      </StepCard>
+        {WEATHER_OPTIONS.map((option, index) => (
+          <QuestionToggleRow
+            key={option.value}
+            label={option.label}
+            leading={<WeatherConditionBadge choice={option.value} />}
+            checked={prefs.weatherChoices.includes(option.value)}
+            onChange={() =>
+              toggleMulti(prefs.weatherChoices, option.value, 'weatherChoices')
+            }
+            roundBottom={index === WEATHER_OPTIONS.length - 1}
+          />
+        ))}
+      </QuestionSectionStack>
     )
   }
 
   if (step === 'clothing') {
     return (
-      <StepCard
-        icon={<Shirt size={16} />}
-        title="Clothing suggestions"
-        body="ReadyGo can suggest what to wear based on live conditions. Layers, waterproof, base layer – no more standing at the door guessing."
-      >
-        <div className="flex items-center justify-between rounded-[10px] bg-rg-base-alt px-4 py-3">
-          <span className="text-sm font-bold text-rg-text">
-            Suggest kit for conditions
-          </span>
-          <ToggleSwitch
-            label="Clothing suggestions"
-            checked={prefs.clothingSuggestions}
-            onChange={(checked) =>
-              updateDraftPreferences({ clothingSuggestions: checked })
-            }
-          />
-        </div>
-      </StepCard>
+      <QuestionSectionStack>
+        <QuestionHeaderCard
+          icon={<Shirt size={20} strokeWidth={2} />}
+          title="Clothing"
+          body="Want ReadyGo to suggest what to wear? Based on the conditions and your route."
+        />
+        <QuestionToggleRow
+          label="Suggest Clothing"
+          checked={prefs.clothingSuggestions}
+          onChange={(checked) =>
+            updateDraftPreferences({ clothingSuggestions: checked })
+          }
+        />
+        <QuestionToggleRow
+          label="Show Links To New Gear"
+          checked={prefs.showGearLinks}
+          onChange={(checked) =>
+            updateDraftPreferences({ showGearLinks: checked })
+          }
+          roundBottom
+        />
+      </QuestionSectionStack>
     )
   }
 
   return (
-    <StepCard
-      icon={<Map size={16} />}
-      title="Map styles"
-      body="Choose how your route is displayed – simple minimap, or full navigation mode. Loop routes or point-to-point, your call."
-    >
-      <SegmentedOptions<MapStyle>
-        options={[
-          { value: 'Minimap', label: 'Minimap' },
-          { value: 'Full navigation', label: 'Full navigation' },
-        ]}
-        value={prefs.mapStyle}
-        onChange={(value) =>
-          updateDraftPreferences({ mapStyle: value as MapStyle })
+    <QuestionSectionStack>
+      <QuestionHeaderCard
+        icon={<MapPin size={20} strokeWidth={2} />}
+        title="Maps"
+        body="How do you want your route displayed while you're out?"
+      />
+      <QuestionToggleRow
+        label="Show Simple Maps"
+        checked={prefs.showSimpleMaps}
+        onChange={(checked) =>
+          updateDraftPreferences({
+            showSimpleMaps: checked,
+            mapStyle: checked ? 'Minimap' : 'Full navigation',
+          })
         }
       />
-    </StepCard>
-  )
-}
-
-function StepCard({
-  icon,
-  title,
-  body,
-  children,
-}: {
-  icon: ReactNode
-  title: string
-  body: string
-  children: ReactNode
-}) {
-  return (
-    <section className="rounded-[12px] bg-rg-surface p-4 outline outline-1 outline-[#365466]">
-      <div className="mb-4 flex gap-3">
-        <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-rg-base-alt text-rg-text">
-          {icon}
-        </div>
-        <div>
-          <h2 className="text-sm font-bold text-rg-text">{title}</h2>
-          <p className="mt-1 text-sm text-rg-text-muted">{body}</p>
-        </div>
-      </div>
-      {children}
-    </section>
-  )
-}
-
-function ToggleRow({
-  label,
-  checked,
-  onChange,
-}: {
-  label: string
-  checked: boolean
-  onChange: (checked: boolean) => void
-}) {
-  return (
-    <div className="flex items-center justify-between gap-3 border-t border-[#365466] px-4 py-3.5">
-      <span className="text-sm font-bold text-rg-text">{label}</span>
-      <ToggleSwitch label={label} checked={checked} onChange={onChange} />
-    </div>
+      <QuestionToggleRow
+        label="Show Traffic"
+        checked={prefs.showTraffic}
+        onChange={(checked) => updateDraftPreferences({ showTraffic: checked })}
+      />
+      <QuestionToggleRow
+        label="Loop Or Single Destination"
+        checked={prefs.loopOrSingleDestination}
+        onChange={(checked) =>
+          updateDraftPreferences({ loopOrSingleDestination: checked })
+        }
+        roundBottom
+      />
+    </QuestionSectionStack>
   )
 }

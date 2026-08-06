@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 
 type PressableButtonProps = HTMLMotionProps<'button'> & {
   children: ReactNode
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'sheet'
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'sheet' | 'cta'
 }
 
 const variants: Record<NonNullable<PressableButtonProps['variant']>, string> = {
@@ -14,6 +14,7 @@ const variants: Record<NonNullable<PressableButtonProps['variant']>, string> = {
   ghost: 'bg-transparent text-rg-text-muted underline underline-offset-2',
   danger: 'bg-rg-surface text-rg-text-muted',
   sheet: 'bg-rg-base-alt text-rg-text',
+  cta: 'bg-[#2D3739] text-[#BACBC9] hover:bg-[#2D3739] active:bg-[#1E2729]',
 }
 
 export function PressableButton({
@@ -21,13 +22,26 @@ export function PressableButton({
   className = '',
   variant = 'primary',
   type = 'button',
+  style,
+  whileTap,
   ...props
 }: PressableButtonProps) {
+  const isCta = variant === 'cta'
+
   return (
     <motion.button
       type={type}
-      whileTap={{ scale: 0.97 }}
-      className={`flex h-[54px] w-full items-center justify-center rounded-[10px] px-5 font-action text-base font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${variants[variant]} ${className}`}
+      whileTap={whileTap ?? (isCta ? { scale: 1 } : { scale: 0.97 })}
+      style={style}
+      className={`flex w-full items-center justify-center px-5 font-action text-base font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+        style?.height == null ? (isCta ? 'h-[52px]' : 'h-[54px]') : ''
+      } ${
+        style?.borderRadius == null && !className.includes('rounded')
+          ? isCta
+            ? 'rounded-xl'
+            : 'rounded-[10px]'
+          : ''
+      } ${variants[variant]} ${className}`}
       {...props}
     >
       {children}

@@ -1,18 +1,58 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { AlertTriangle, Check, WifiOff, X } from 'lucide-react'
-import { useEffect } from 'react'
+import { X } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useReadyGoStore } from '../../store/useReadyGoStore'
-import { PressableButton } from '../ui/PressableButton'
-import { BottomSheet } from '../ui/BottomSheet'
+import {
+  useReadyGoStore,
+  type AppNotification,
+  type NotificationTone,
+} from '../../store/useReadyGoStore'
+import { FullScreenOverlay } from './FullScreenOverlay'
+import {
+  ErrorBadgeIcon,
+  LocationBadgeIcon,
+  SuccessBadgeIcon,
+  WeatherBadgeIcon,
+} from './OverlayBadges'
+import { SupportSheet } from './SupportSheet'
+
+const overlayIcon = (tone: NotificationTone) => {
+  if (tone === 'success') return <SuccessBadgeIcon />
+  if (tone === 'weather') return <WeatherBadgeIcon />
+  if (tone === 'location') return <LocationBadgeIcon />
+  return <ErrorBadgeIcon />
+}
 
 export function NotificationHost() {
   const notifications = useReadyGoStore((state) => state.notifications)
   const dismissNotification = useReadyGoStore((state) => state.dismissNotification)
   const navigate = useNavigate()
+  const [supportOpen, setSupportOpen] = useState(false)
 
   const toasts = notifications.filter((item) => item.kind === 'toast')
   const modals = notifications.filter((item) => item.kind === 'modal')
+  const activeModal = modals[modals.length - 1]
+
+  const handleLabelAction = (label: string, modal: AppNotification) => {
+    const normalised = label.toLowerCase()
+    dismissNotification(modal.id)
+
+    if (normalised.includes('help')) {
+      setSupportOpen(true)
+      return
+    }
+    if (normalised.includes('basecamp')) {
+      navigate('/')
+      return
+    }
+    if (normalised.includes('postcode') || normalised.includes('another')) {
+      navigate('/setup')
+      return
+    }
+    if (normalised.includes('sign in')) {
+      navigate('/auth/login')
+    }
+  }
 
   return (
     <>
@@ -25,11 +65,9 @@ export function NotificationHost() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               className={`pointer-events-auto rounded-[14px] px-4 py-3 shadow-lg outline outline-1 ${
-                toast.tone === 'weather'
-                  ? 'bg-[#1C2A33] text-rg-text outline-[#365466]'
-                  : toast.tone === 'success'
-                    ? 'bg-[#13261A] text-[#7CFF00] outline-[#7CFF00]/40'
-                    : 'bg-rg-surface text-rg-text outline-[#365466]'
+                toast.tone === 'success'
+                  ? 'bg-[#13261A] text-[#7CFF00] outline-[#7CFF00]/40'
+                  : 'bg-rg-surface text-rg-text outline-[#365466]'
               }`}
             >
               <div className="flex items-start gap-3">
@@ -54,83 +92,31 @@ export function NotificationHost() {
         </AnimatePresence>
       </div>
 
-      {modals.map((modal) => {
-        const isBlip = modal.tone === 'blip'
-        const isOuch = modal.tone === 'ouch'
-        const isSuccess = modal.tone === 'success'
+      {activeModal ? (
+        <FullScreenOverlay
+          key={activeModal.id}
+          open
+          headingId={`overlay-${activeModal.id}`}
+          icon={overlayIcon(activeModal.tone)}
+          heading={activeModal.title}
+          bodyTitle={activeModal.body}
+          bodySub={activeModal.subtitle}
+          primaryLabel={activeModal.primaryLabel}
+          onPrimary={
+            activeModal.primaryLabel
+              ? () => handleLabelAction(activeModal.primaryLabel!, activeModal)
+              : undefined
+          }
+          secondaryLabel={activeModal.secondaryLabel}
+          onSecondary={
+            activeModal.secondaryLabel
+              ? () => handleLabelAction(activeModal.secondaryLabel!, activeModal)
+              : undefined
+          }
+        />
+      ) : null}
 
-        return (
-          <BottomSheet
-            key={modal.id}
-            open
-            onClose={() => dismissNotification(modal.id)}
-            tone={isSuccess ? 'light' : 'dark'}
-          >
-            <div className="flex flex-col items-center gap-4 pt-2 pb-2 text-center">
-              <div
-                className={`w-full rounded-[18px] px-5 py-8 ${
-                  isSuccess
-                    ? 'bg-rg-base-alt text-rg-text'
-                    : 'bg-rg-surface text-rg-text outline outline-1 outline-[#365466]'
-                }`}
-              >
-                <div
-                  className={`mx-auto flex size-[60px] items-center justify-center rounded-[14px] ${
-                    isSuccess
-                      ? 'bg-[#7CFF00] text-rg-text-on-accent'
-                      : isOuch
-                        ? 'bg-rg-red-cta text-white'
-                        : 'bg-rg-amber text-rg-text-on-accent'
-                  }`}
-                >
-                  {isSuccess ? (
-                    <Check size={28} strokeWidth={3} />
-                  ) : isBlip ? (
-                    <WifiOff size={26} />
-                  ) : (
-                    <AlertTriangle size={26} />
-                  )}
-                </div>
-                <h2 className="mt-5 font-display text-2xl font-bold uppercase">
-                  {modal.title}
-                </h2>
-                {modal.body ? (
-                  <p className="mt-2 text-sm text-rg-text-muted">{modal.body}</p>
-                ) : null}
-              </div>
-
-              <div className="flex w-full flex-col gap-3">
-                {modal.primaryLabel ? (
-                  <PressableButton
-                    variant={isSuccess ? 'sheet' : 'primary'}
-                    onClick={() => {
-                      dismissNotification(modal.id)
-                      const label = modal.primaryLabel?.toLowerCase() ?? ''
-                      if (label.includes('basecamp')) navigate('/')
-                      if (label.includes('another')) navigate('/setup')
-                    }}
-                  >
-                    {modal.primaryLabel}
-                  </PressableButton>
-                ) : null}
-                {modal.secondaryLabel ? (
-                  <PressableButton
-                    variant="ghost"
-                    onClick={() => {
-                      dismissNotification(modal.id)
-                      const label = modal.secondaryLabel?.toLowerCase() ?? ''
-                      if (label.includes('basecamp')) navigate('/')
-                      if (label.includes('another')) navigate('/setup')
-                    }}
-                  >
-                    {modal.secondaryLabel}
-                  </PressableButton>
-                ) : null}
-              </div>
-            </div>
-          </BottomSheet>
-        )
-      })}
+      <SupportSheet open={supportOpen} onClose={() => setSupportOpen(false)} />
     </>
   )
 }
@@ -149,7 +135,8 @@ export function showBlipConnectionError() {
     kind: 'modal',
     tone: 'blip',
     title: 'BLIP!',
-    body: "Connection dropped. I'll try again when you're back online.",
+    body: 'Something went wrong building your session.',
+    subtitle: 'Usually a connection blip. Tap below and try again.',
     primaryLabel: 'Try again',
     secondaryLabel: 'Back to Basecamp',
   })
@@ -157,10 +144,27 @@ export function showBlipConnectionError() {
 
 export function showBlipWeatherFallback() {
   useReadyGoStore.getState().pushNotification({
-    kind: 'toast',
+    kind: 'modal',
     tone: 'weather',
     title: 'BLIP!',
-    body: 'Weather data unavailable right now. Session built using recent conditions.',
+    body: 'Something went wrong building your session.',
+    subtitle:
+      'Weather data unavailable right now. Your session has been built using recent conditions.',
+    primaryLabel: 'Ok',
+    secondaryLabel: 'Back to Basecamp',
+  })
+}
+
+export function showBlipLocationFailed() {
+  useReadyGoStore.getState().pushNotification({
+    kind: 'modal',
+    tone: 'location',
+    title: 'BLIP!',
+    body: 'No location. No bother.',
+    subtitle:
+      "ReadyGo works best with your location, but you can set a home postcode instead. We'll build routes from there.",
+    primaryLabel: 'Set a postcode',
+    secondaryLabel: 'Need help?',
   })
 }
 
@@ -169,9 +173,9 @@ export function showOuchSystemError() {
     kind: 'modal',
     tone: 'ouch',
     title: 'OUCH!',
-    body: "It's not your fault — my systems had a moment.",
-    primaryLabel: 'Back to Basecamp',
-    secondaryLabel: 'Try again',
+    body: "It's not your fault – my systems had a moment.",
+    subtitle: 'Close the app and reopen it. If it keeps happening, tap below.',
+    secondaryLabel: 'Need help?',
   })
 }
 
@@ -189,8 +193,8 @@ export function showProfileSavedModal() {
     kind: 'modal',
     tone: 'success',
     title: 'Successful',
-    body: 'Your new profile was saved! Update anytime in Settings.',
+    body: 'Your new profile was saved!',
+    subtitle: 'Update anytime in Settings.',
     primaryLabel: 'Basecamp',
-    secondaryLabel: 'Make another one?',
   })
 }

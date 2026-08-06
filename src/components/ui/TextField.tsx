@@ -1,8 +1,14 @@
-import { forwardRef, type InputHTMLAttributes, type ReactNode } from 'react'
+import {
+  forwardRef,
+  useState,
+  type FocusEvent,
+  type InputHTMLAttributes,
+  type ReactNode,
+} from 'react'
 import { motion } from 'framer-motion'
 
 interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
-  label: string
+  label?: string
   hint?: string
   error?: string
   leadingIcon?: ReactNode
@@ -11,29 +17,64 @@ interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
 
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
   function TextField(
-    { label, hint, error, leadingIcon, trailingIcon, className = '', ...props },
+    {
+      label,
+      hint,
+      error,
+      leadingIcon,
+      trailingIcon,
+      className = '',
+      onFocus,
+      onBlur,
+      ...props
+    },
     ref,
   ) {
+    const [focused, setFocused] = useState(false)
+
+    const borderClass = error
+      ? 'border-[#BC757D]'
+      : focused
+        ? 'border-[#BACBC9]'
+        : 'border-[#39484A]'
+
+    const iconClass = focused ? 'text-[#BACBC9]' : 'text-[#4F6163]'
+    const inputTextClass = focused ? 'text-[#F5F7F7]' : 'text-[#BACBC9]'
+
+    const handleFocus = (event: FocusEvent<HTMLInputElement>) => {
+      setFocused(true)
+      onFocus?.(event)
+    }
+
+    const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
+      setFocused(false)
+      onBlur?.(event)
+    }
+
     return (
       <label className="flex w-full flex-col gap-1.5">
-        <span className="text-sm font-bold text-rg-text-muted">{label}</span>
+        {label ? (
+          <span className="text-sm font-normal text-[#BACBC9]">{label}</span>
+        ) : null}
         <div
-          className={`flex h-[54px] items-center gap-2.5 rounded-[10px] border bg-rg-surface px-4 ${
-            error
-              ? 'border-rg-red-bright'
-              : 'border-[#365466] focus-within:border-rg-text-muted'
-          }`}
+          className={`flex h-[52px] items-center gap-2.5 rounded-xl border bg-[#182629] px-5 ${borderClass}`}
         >
           {leadingIcon ? (
-            <span className="shrink-0 text-rg-text-dim">{leadingIcon}</span>
+            <span className={`inline-flex size-6 shrink-0 items-center justify-center ${iconClass}`}>
+              {leadingIcon}
+            </span>
           ) : null}
           <input
             ref={ref}
-            className={`min-w-0 flex-1 bg-transparent text-base font-bold text-rg-text outline-none placeholder:text-[#4F6163] ${className}`}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            className={`min-w-0 flex-1 bg-transparent text-base font-bold tracking-[-0.01em] outline-none placeholder:text-[#4F6163] ${inputTextClass} ${className}`}
             {...props}
           />
           {trailingIcon ? (
-            <span className="shrink-0 text-rg-text-dim">{trailingIcon}</span>
+            <span className={`inline-flex size-6 shrink-0 items-center justify-center ${iconClass}`}>
+              {trailingIcon}
+            </span>
           ) : null}
         </div>
         {error ? (
@@ -41,12 +82,14 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
             initial={{ x: 0 }}
             animate={{ x: [0, -6, 6, -4, 4, 0] }}
             transition={{ duration: 0.35 }}
-            className="text-xs font-bold text-rg-red-bright"
+            className="px-5 text-xs font-normal tracking-[0.01em] text-[#BC757D]"
           >
             {error}
           </motion.p>
         ) : hint ? (
-          <p className="text-xs font-bold text-rg-text-dim">{hint}</p>
+          <p className="px-5 text-xs font-normal tracking-[0.01em] text-[#4F6163]">
+            {hint}
+          </p>
         ) : null}
       </label>
     )

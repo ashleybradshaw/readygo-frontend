@@ -1,9 +1,13 @@
-import { Eye, EyeOff, LockKeyhole, Mail } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { PressableButton } from '../components/ui/PressableButton'
 import { TextField } from '../components/ui/TextField'
-import { NameCaptureSheet } from '../components/onboarding/NameCaptureSheet'
+import { OAuthButton } from '../components/ui/OAuthButtons'
+import {
+  EmailFieldIcon,
+  EyeToggleIcon,
+  PasswordFieldIcon,
+} from '../components/ui/AuthIcons'
 import { showSuccessToast } from '../components/overlays/NotificationHost'
 import { isValidEmail } from '../lib/onboarding'
 import { useReadyGoStore } from '../store/useReadyGoStore'
@@ -18,7 +22,6 @@ export function LoginPage() {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [emailTouched, setEmailTouched] = useState(false)
-  const [nameOpen, setNameOpen] = useState(false)
 
   const emailError =
     emailTouched && email && !isValidEmail(email)
@@ -28,7 +31,7 @@ export function LoginPage() {
   const finishLogin = (nextEmail: string) => {
     setUserEmail(nextEmail)
     if (!userName) {
-      setNameOpen(true)
+      navigate('/setup/account-created')
       return
     }
     setAuthenticated(true)
@@ -37,17 +40,17 @@ export function LoginPage() {
   }
 
   return (
-    <div className="relative flex h-full flex-col overflow-y-auto bg-rg-base-alt px-5 pb-8 pt-12">
-      <div className="mb-8">
-        <h1 className="font-display text-3xl font-bold uppercase tracking-[-0.02em] text-rg-text">
+    <div className="relative flex h-full flex-col overflow-y-auto bg-[#0F1918] px-5 pb-8 pt-[83px]">
+      <div className="mb-8 flex flex-col gap-[5px] uppercase">
+        <h1 className="font-display text-2xl font-bold leading-8 tracking-[-0.02em] text-[#BACBC9]">
           Login
         </h1>
-        <p className="mt-1 text-lg font-bold uppercase text-rg-text">
+        <p className="font-sans text-lg font-bold leading-[26px] tracking-[-0.01em] text-[#BACBC9]">
           Welcome back!
         </p>
       </div>
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
         <TextField
           label="Email Address"
           type="email"
@@ -58,7 +61,7 @@ export function LoginPage() {
           onBlur={() => setEmailTouched(true)}
           hint="Use a valid email address"
           error={emailError}
-          leadingIcon={<Mail size={18} />}
+          leadingIcon={<EmailFieldIcon />}
         />
 
         <div>
@@ -69,22 +72,21 @@ export function LoginPage() {
             placeholder="Enter your password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
-            leadingIcon={<LockKeyhole size={18} />}
+            leadingIcon={<PasswordFieldIcon />}
             trailingIcon={
               <button
                 type="button"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
                 onClick={() => setShowPassword((value) => !value)}
-                className="text-rg-text-dim"
               >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                <EyeToggleIcon hidden={showPassword} />
               </button>
             }
           />
-          <div className="mt-2 flex justify-end">
+          <div className="mt-1 flex justify-end px-5">
             <Link
               to="/auth/reset"
-              className="text-sm font-bold text-rg-text-muted underline underline-offset-2"
+              className="font-sans text-xs font-normal tracking-[0.01em] text-[#BACBC9] underline underline-offset-2"
             >
               Reset password
             </Link>
@@ -92,49 +94,46 @@ export function LoginPage() {
         </div>
       </div>
 
-      <div className="mt-8 flex flex-col gap-4">
+      <div className="mt-auto flex flex-col gap-0 pt-8">
         <PressableButton
+          variant="cta"
           disabled={!isValidEmail(email) || password.length < 1}
           onClick={() => finishLogin(email.trim())}
         >
           Login
         </PressableButton>
 
-        <div className="flex items-center gap-3">
-          <div className="h-px flex-1 bg-rg-text-dim/40" />
-          <span className="text-xs font-bold text-rg-text-dim">Or</span>
-          <div className="h-px flex-1 bg-rg-text-dim/40" />
+        <div className="flex items-center justify-center gap-2.5 py-5">
+          <div className="h-px w-[100px] bg-[#BACBC9]/50" />
+          <span className="font-sans text-base text-[#BACBC9]">Or</span>
+          <div className="h-px w-[100px] bg-[#BACBC9]/50" />
         </div>
 
-        <PressableButton
-          variant="secondary"
-          onClick={() => finishLogin('apple@readygo.app')}
-        >
-          Continue with Apple
-        </PressableButton>
-        <PressableButton
-          variant="secondary"
-          onClick={() => finishLogin('google@readygo.app')}
-        >
-          Continue with Google
-        </PressableButton>
+        <div className="flex flex-col gap-5">
+          <OAuthButton
+            provider="apple"
+            onClick={() => finishLogin('apple@readygo.app')}
+          >
+            Continue with Apple
+          </OAuthButton>
+          <OAuthButton
+            provider="google"
+            onClick={() => finishLogin('google@readygo.app')}
+          >
+            Continue with Google
+          </OAuthButton>
+        </div>
 
-        <p className="text-center text-sm font-bold text-rg-text-muted">
+        <p className="mt-6 text-center font-sans text-base leading-6 tracking-[-0.01em] text-[#BACBC9]">
           Don&apos;t have an account?{' '}
-          <Link to="/auth/create" className="underline underline-offset-2">
+          <Link
+            to="/auth/create"
+            className="font-bold underline underline-offset-2"
+          >
             Sign up
           </Link>
         </p>
       </div>
-
-      <NameCaptureSheet
-        open={nameOpen}
-        onComplete={() => {
-          setAuthenticated(true)
-          showSuccessToast('Login updated', 'Welcome back.')
-          navigate('/')
-        }}
-      />
     </div>
   )
 }

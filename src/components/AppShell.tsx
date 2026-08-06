@@ -1,11 +1,9 @@
-import { useEffect, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
 import { AppHeader } from './AppHeader'
 import { BottomNav } from './BottomNav'
-import { SessionLengthSheet } from './session/SessionLengthSheet'
-import { GoaiLoader } from './session/GoaiLoader'
+import { BasecampMenuModal } from './session/BasecampMenuModal'
 import { buildSessionManifest } from '../lib/session'
-import { showBlipWeatherFallback } from './overlays/NotificationHost'
 import { useReadyGoStore, type ActiveTab } from '../store/useReadyGoStore'
 
 function tabFromPath(pathname: string): ActiveTab {
@@ -25,14 +23,12 @@ export function AppShell() {
   const sessionMenuOpen = useReadyGoStore((state) => state.sessionMenuOpen)
   const setSessionMenuOpen = useReadyGoStore((state) => state.setSessionMenuOpen)
   const beginSessionBuild = useReadyGoStore((state) => state.beginSessionBuild)
-  const markSessionReady = useReadyGoStore((state) => state.markSessionReady)
-  const [gathering, setGathering] = useState(false)
 
   useEffect(() => {
     setActiveTab(tabFromPath(location.pathname))
   }, [location.pathname, setActiveTab])
 
-  const startReadyFlow = () => {
+  const handleMenuReady = () => {
     if (!currentProfile) return
     const session = buildSessionManifest({
       profile: currentProfile,
@@ -41,35 +37,41 @@ export function AppShell() {
     })
     beginSessionBuild(session)
     setSessionMenuOpen(false)
-    setGathering(true)
-    showBlipWeatherFallback()
-    window.setTimeout(() => {
-      markSessionReady()
-      setGathering(false)
-      navigate('/session')
-    }, 2800)
+    navigate('/session/gathering')
   }
 
+  const isAdminSurface =
+    location.pathname === '/settings' || location.pathname === '/saved'
+
   return (
-    <div className="relative flex h-full min-h-0 flex-col bg-rg-base-alt">
-      <AppHeader
-        onMenuClick={
-          isConfigured && location.pathname === '/'
-            ? () => setSessionMenuOpen(true)
-            : undefined
-        }
-      />
+    <div
+      className={`relative flex h-full min-h-0 flex-col ${
+        isAdminSurface ? 'bg-[#DCE4E2]' : 'bg-rg-base-alt'
+      }`}
+    >
+      {isAdminSurface ? (
+        <div className="shrink-0 pt-[max(1.25rem,env(safe-area-inset-top))]" />
+      ) : (
+        <AppHeader
+          showWeather={Boolean(isConfigured || location.pathname !== '/')}
+          showMenu={Boolean(isConfigured && location.pathname === '/')}
+          onMenuClick={
+            isConfigured && location.pathname === '/'
+              ? () => setSessionMenuOpen(true)
+              : undefined
+          }
+        />
+      )}
       <main className="min-h-0 flex-1 overflow-y-auto px-5 pb-4">
         <Outlet />
       </main>
       <BottomNav />
 
-      <SessionLengthSheet
+      <BasecampMenuModal
         open={sessionMenuOpen}
         onClose={() => setSessionMenuOpen(false)}
-        onReady={startReadyFlow}
+        onReady={handleMenuReady}
       />
-      <GoaiLoader open={gathering} />
     </div>
   )
 }

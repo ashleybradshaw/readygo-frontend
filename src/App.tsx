@@ -10,13 +10,18 @@ import { BasecampPage } from './pages/BasecampPage'
 import { SavedPage } from './pages/SavedPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { IntroPage } from './pages/IntroPage'
+import { OpenScreenPage } from './pages/OpenScreenPage'
 import { CreateAccountPage } from './pages/CreateAccountPage'
 import { LoginPage } from './pages/LoginPage'
 import { ResetPasswordPage } from './pages/ResetPasswordPage'
+import { NewPasswordPage } from './pages/NewPasswordPage'
+import { AccountCreatedPage } from './pages/AccountCreatedPage'
 import { SetupProfilePage } from './pages/SetupProfilePage'
 import { ReviewProfilePage } from './pages/ReviewProfilePage'
 import { GatheringProfilePage } from './pages/GatheringProfilePage'
 import { SessionGoPage } from './pages/SessionGoPage'
+import { GatheringSessionPage } from './pages/GatheringSessionPage'
+import { LoadingSessionPage } from './pages/LoadingSessionPage'
 import { SessionActivePage } from './pages/SessionActivePage'
 import { SessionSummaryPage } from './pages/SessionSummaryPage'
 import { DeleteDataPage } from './pages/DeleteDataPage'
@@ -29,6 +34,7 @@ export default function App() {
       <MobileDeviceWrapper>
         <NotificationHost />
         <Routes>
+          <Route path="/startup" element={<OpenScreenPage />} />
           <Route path="/intro" element={<IntroPage />} />
           <Route
             path="/auth/create"
@@ -54,12 +60,33 @@ export default function App() {
               </RedirectIfAuthenticated>
             }
           />
+          <Route
+            path="/auth/reset/new"
+            element={
+              <RedirectIfAuthenticated>
+                <NewPasswordPage />
+              </RedirectIfAuthenticated>
+            }
+          />
+          <Route
+            path="/setup/account-created"
+            element={<AccountCreatedPage />}
+          />
 
           <Route element={<RequireAuth />}>
             <Route path="/setup" element={<SetupProfilePage />} />
             <Route path="/setup/review" element={<ReviewProfilePage />} />
             <Route path="/setup/gathering" element={<GatheringProfilePage />} />
-            <Route path="/session" element={<SessionGoPage />} />
+            <Route
+              path="/session"
+              element={<Navigate to="/session/go" replace />}
+            />
+            <Route
+              path="/session/gathering"
+              element={<GatheringSessionPage />}
+            />
+            <Route path="/session/go" element={<SessionGoPage />} />
+            <Route path="/session/loading" element={<LoadingSessionPage />} />
             <Route path="/session/active" element={<SessionActivePage />} />
             <Route path="/session/summary" element={<SessionSummaryPage />} />
             <Route path="/settings/delete-data" element={<DeleteDataPage />} />
@@ -76,7 +103,7 @@ export default function App() {
             </Route>
           </Route>
 
-          <Route path="*" element={<Navigate to="/intro" replace />} />
+          <Route path="*" element={<Navigate to="/startup" replace />} />
         </Routes>
       </MobileDeviceWrapper>
     </BrowserRouter>

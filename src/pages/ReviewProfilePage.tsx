@@ -1,24 +1,36 @@
-import { Bike, PersonStanding, X } from 'lucide-react'
+import { Bike, PersonStanding } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { CancelProfileModal } from '../components/onboarding/CancelProfileModal'
+import { SuccessProfileOverlay } from '../components/setup/SuccessProfileOverlay'
+import { SettingsCloseButton } from '../components/settings/SettingsCloseButton'
+import { GoaiCardIcon } from '../components/ui/BasecampIcons'
 import { PressableButton } from '../components/ui/PressableButton'
 import { ProgressBar } from '../components/ui/ProgressBar'
 import { TextField } from '../components/ui/TextField'
-import { buildReviewSummary } from '../lib/onboarding'
+import { buildReviewSummaryParts } from '../lib/onboarding'
 import { useReadyGoStore } from '../store/useReadyGoStore'
 
 export function ReviewProfilePage() {
   const navigate = useNavigate()
   const draft = useReadyGoStore((state) => state.profileDraft)
+  const editingProfileId = useReadyGoStore((state) => state.editingProfileId)
   const updateProfileDraft = useReadyGoStore((state) => state.updateProfileDraft)
+  const completeProfileSetup = useReadyGoStore(
+    (state) => state.completeProfileSetup,
+  )
+  const resetProfileDraft = useReadyGoStore((state) => state.resetProfileDraft)
+
   const [name, setName] = useState(draft.name)
+  const [cancelOpen, setCancelOpen] = useState(false)
+  const [successOpen, setSuccessOpen] = useState(false)
 
   const defaultName =
     draft.activityType === 'Cycle' ? 'Cycle Profile One' : 'Run Profile One'
 
-  const paragraphs = useMemo(
+  const summaryParagraphs = useMemo(
     () =>
-      buildReviewSummary({
+      buildReviewSummaryParts({
         activityType: draft.activityType,
         locationMode: draft.preferences.locationMode,
         postcode: draft.preferences.postcode,
@@ -32,92 +44,139 @@ export function ReviewProfilePage() {
     [draft],
   )
 
+  const ActivityIcon =
+    draft.activityType === 'Cycle' ? Bike : PersonStanding
+
+  const handleSave = () => {
+    const profileName = name.trim() || defaultName
+    updateProfileDraft({ name: profileName })
+
+    completeProfileSetup({
+      id: editingProfileId ?? crypto.randomUUID(),
+      name: profileName,
+      activityType: draft.activityType,
+      timesUsed:
+        useReadyGoStore
+          .getState()
+          .savedProfiles.find((item) => item.id === editingProfileId)
+          ?.timesUsed ?? 0,
+      preferences: { ...draft.preferences },
+    })
+    setSuccessOpen(true)
+  }
+
+  const handleGoBasecamp = () => {
+    setSuccessOpen(false)
+    navigate('/', { replace: true })
+  }
+
+  const handleCancelToBasecamp = () => {
+    resetProfileDraft()
+    setCancelOpen(false)
+    navigate('/', { replace: true })
+  }
+
   return (
-    <div className="flex h-full flex-col bg-rg-base-alt px-5 pb-6 pt-10">
+    <div className="relative flex h-full flex-col bg-[#0F1918] px-6 py-6">
       <div className="mb-4 flex items-start justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <h1 className="font-display text-2xl font-bold uppercase tracking-[-0.02em] text-rg-text-muted">
+        <div className="min-w-0 flex-1 space-y-2">
+          <h1 className="font-display text-2xl font-bold uppercase tracking-[-0.02em] text-[#BACBC9]">
             Ready?
           </h1>
-          <p className="mt-1 text-base font-bold uppercase tracking-[-0.01em] text-rg-text-muted">
+          <p className="text-base font-bold uppercase tracking-[-0.01em] text-[#BACBC9]">
             If everything looks good, let&apos;s go.
           </p>
-          <div className="mt-3">
-            <ProgressBar value={100} />
-          </div>
+          <ProgressBar value={100} />
         </div>
-        <button
-          type="button"
-          aria-label="Close review"
-          onClick={() => navigate('/')}
-          className="rounded-full bg-rg-surface p-2.5 text-rg-text-muted"
-        >
-          <X size={18} />
-        </button>
+        <SettingsCloseButton
+          variant="onDark"
+          onClick={() => setCancelOpen(true)}
+        />
       </div>
 
-      <div className="min-h-0 flex-1 space-y-1 overflow-y-auto">
-        <div className="flex items-center justify-between gap-4 rounded-t-[8px] bg-[#1C2A33] px-4 py-3 outline outline-1 outline-[#365466]">
-          <div className="flex items-center gap-3">
-            <div className="flex size-8 items-center justify-center rounded-md bg-rg-base-alt text-[#7CFF00]">
-              {draft.activityType === 'Cycle' ? (
-                <Bike size={16} />
-              ) : (
-                <PersonStanding size={16} />
-              )}
-            </div>
-            <span className="text-sm font-bold capitalize tracking-[-1px] text-[#DCE4E6]">
-              {name.trim() || defaultName}
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pb-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="inline-flex items-center gap-2 rounded-[10px] bg-[#182629] px-3 py-2">
+            <ActivityIcon
+              size={16}
+              className="shrink-0 text-[#70FF00]"
+              aria-hidden="true"
+            />
+            <span className="text-sm font-bold tracking-[-0.01em] text-[#BACBC9]">
+              {defaultName}
             </span>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="size-8 overflow-hidden rounded-full bg-gradient-to-b from-[#7CFF00] to-[#FF0000]" />
-            <span className="text-sm font-bold capitalize tracking-[-1px] text-[#DCE4E6]">
-              GOAI built
+          <div className="inline-flex items-center gap-2 rounded-[10px] bg-[#182629] px-3 py-2">
+            <GoaiCardIcon size={16} />
+            <span className="text-sm font-bold tracking-[-0.01em] text-[#BACBC9]">
+              GOAI Built
             </span>
           </div>
         </div>
 
-        <div className="bg-[#1C2A33] p-3 outline outline-1 outline-[#365466]">
-          <TextField
-            label="Profile name"
-            placeholder="Name your profile (Optional)"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-          />
-        </div>
+        <TextField
+          label=""
+          aria-label="Name your profile (Optional)"
+          placeholder="Name your profile (Optional)"
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          leadingIcon={
+            <ActivityIcon size={20} strokeWidth={2} aria-hidden="true" />
+          }
+        />
 
-        {paragraphs.map((paragraph, index) => (
+        {summaryParagraphs.map((parts, index) => (
           <div
-            key={paragraph}
-            className={`bg-[#1C2A33] p-5 outline outline-1 outline-[#365466] ${
-              index === paragraphs.length - 1 ? 'rounded-b-[8px]' : ''
-            }`}
+            key={index}
+            className="rounded-[10px] border border-[#39484A] bg-[#182629] p-5"
           >
-            <p className="text-base font-bold capitalize tracking-[-1px] text-[#DCE4E6]">
-              {paragraph}
+            <p className="text-base font-bold leading-relaxed tracking-[-0.01em] text-[#BACBC9]">
+              {parts.map((part, partIndex) =>
+                part.highlight ? (
+                  <span key={partIndex} className="font-bold text-[#84BCA4]">
+                    {part.text}
+                  </span>
+                ) : (
+                  <span key={partIndex}>{part.text}</span>
+                ),
+              )}
             </p>
           </div>
         ))}
       </div>
 
-      <div className="mt-4 flex flex-col items-center gap-3">
-        <PressableButton
-          onClick={() => {
-            updateProfileDraft({ name: name.trim() || defaultName })
-            navigate('/setup/gathering')
-          }}
-        >
+      <div className="flex shrink-0 flex-col items-center gap-3 pt-2">
+        <PressableButton variant="cta" onClick={handleSave}>
           Save
         </PressableButton>
         <button
           type="button"
+          tabIndex={0}
+          aria-label="Back to edit"
           onClick={() => navigate('/setup')}
-          className="text-base font-bold text-rg-text-muted underline underline-offset-2"
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault()
+              navigate('/setup')
+            }
+          }}
+          className="px-5 py-2 font-sans text-base font-bold tracking-[-0.01em] text-[#BACBC9] underline underline-offset-2"
         >
           Back to edit
         </button>
       </div>
+
+      <CancelProfileModal
+        open={cancelOpen}
+        onStay={() => setCancelOpen(false)}
+        onCancel={handleCancelToBasecamp}
+      />
+
+      <SuccessProfileOverlay
+        open={successOpen}
+        onClose={handleGoBasecamp}
+        onBasecamp={handleGoBasecamp}
+      />
     </div>
   )
 }

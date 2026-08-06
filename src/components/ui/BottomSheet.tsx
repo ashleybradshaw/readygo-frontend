@@ -21,7 +21,7 @@ export function BottomSheet({
           <motion.button
             type="button"
             aria-label="Dismiss"
-            className="absolute inset-0 bg-black/55"
+            className="absolute inset-0 bg-black/50 backdrop-blur-[6px]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -42,14 +42,14 @@ export function BottomSheet({
             }}
             className={`relative z-10 flex max-h-[88%] w-full flex-col rounded-t-[28px] ${
               tone === 'light'
-                ? 'bg-rg-sheet text-rg-text-on-accent'
-                : 'bg-rg-base-alt text-rg-text'
+                ? 'bg-rg-sheet-light text-rg-text-on-accent'
+                : 'bg-[#0F1918] text-rg-text'
             }`}
           >
             <div className="flex justify-center pt-3 pb-2">
               <div
                 className={`h-1 w-10 rounded-full ${
-                  tone === 'light' ? 'bg-rg-text-on-accent/25' : 'bg-white/20'
+                  tone === 'light' ? 'bg-[#0F1918]/25' : 'bg-[#BACBC9]/35'
                 }`}
               />
             </div>
