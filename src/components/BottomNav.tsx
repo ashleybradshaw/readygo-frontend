@@ -12,13 +12,15 @@ const tabs: {
   to: string
   icon: LucideIcon
 }[] = [
-  { id: 'basecamp', label: 'Basecamp', to: '/', icon: Home },
+  { id: 'basecamp', label: 'Basecamp', to: '/user/basecamp', icon: Home },
   { id: 'saved', label: 'Saved', to: '/settings/saved-sessions', icon: Trophy },
   { id: 'settings', label: 'Settings', to: '/settings', icon: Settings },
 ]
 
 const isTabActive = (pathname: string, to: string) => {
-  if (to === '/') return pathname === '/' || pathname === '/user/basecamp'
+  if (to === '/user/basecamp') {
+    return pathname === '/user/basecamp'
+  }
   if (to === '/settings/saved-sessions') {
     return (
       pathname.startsWith('/settings/saved') || pathname.startsWith('/saved')

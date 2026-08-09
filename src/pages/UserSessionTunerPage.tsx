@@ -19,12 +19,12 @@ export function UserSessionTunerPage() {
   const progress = ((clampedHours - 1) / 3) * 100
 
   const handleClose = () => {
-    navigate('/', { replace: true })
+    navigate('/user/basecamp', { replace: true })
   }
 
   const handleReady = () => {
     if (!currentProfile) {
-      navigate('/', { replace: true })
+      navigate('/user/basecamp', { replace: true })
       return
     }
 

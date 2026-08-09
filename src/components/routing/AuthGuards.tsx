@@ -33,7 +33,7 @@ export function RedirectIfAuthenticated({
   const isAuthenticated = useReadyGoStore((state) => state.isAuthenticated)
 
   if (isAuthenticated) {
-    return <Navigate to="/" replace />
+    return <Navigate to="/user/basecamp" replace />
   }
 
   return children

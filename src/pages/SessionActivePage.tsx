@@ -11,7 +11,7 @@ export function SessionActivePage() {
   const finishActiveSession = useReadyGoStore((state) => state.finishActiveSession)
 
   useEffect(() => {
-    if (!session) navigate('/', { replace: true })
+    if (!session) navigate('/user/basecamp', { replace: true })
   }, [navigate, session])
 
   if (!session) return null

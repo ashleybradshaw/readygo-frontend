@@ -11,7 +11,7 @@ export function GatheringProfilePage() {
       advanceMs={1500}
       onAdvance={() => {
         showSuccessToast('Profile saved', 'Your Smart Window is ready.')
-        navigate('/', { replace: true })
+        navigate('/user/basecamp', { replace: true })
       }}
     />
   )

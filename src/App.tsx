@@ -52,7 +52,8 @@ export default function App() {
       <MobileDeviceWrapper>
         <NotificationHost />
         <Routes>
-          <Route path="/startup" element={<OpenScreenPage />} />
+          <Route path="/" element={<OpenScreenPage />} />
+          <Route path="/startup" element={<Navigate to="/" replace />} />
           <Route path="/welcome" element={<WelcomeEntryPage />} />
           <Route path="/intro" element={<IntroPage />} />
           <Route path="/guest/activity" element={<GuestActivityPage />} />
@@ -119,7 +120,7 @@ export default function App() {
             />
             <Route
               path="/setup/review"
-              element={<Navigate to="/" replace />}
+              element={<Navigate to="/user/basecamp" replace />}
             />
             <Route path="/setup/gathering" element={<GatheringProfilePage />} />
 
@@ -175,14 +176,13 @@ export default function App() {
               />
 
               <Route element={<AppShell />}>
-                <Route index element={<BasecampPage />} />
                 <Route path="user/basecamp" element={<BasecampPage />} />
                 <Route path="settings" element={<SettingsPage />} />
               </Route>
             </Route>
           </Route>
 
-          <Route path="*" element={<Navigate to="/startup" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </MobileDeviceWrapper>
     </BrowserRouter>

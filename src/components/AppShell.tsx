@@ -32,8 +32,7 @@ export function AppShell() {
   }
 
   const isSettings = location.pathname === '/settings'
-  const isBasecamp =
-    location.pathname === '/' || location.pathname === '/user/basecamp'
+  const isBasecamp = location.pathname === '/user/basecamp'
 
   return (
     <div className="relative flex h-full min-h-0 flex-col bg-rg-base-alt">

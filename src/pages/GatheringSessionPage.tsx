@@ -10,7 +10,7 @@ export function GatheringSessionPage() {
 
   useEffect(() => {
     if (!activeSession) {
-      navigate('/', { replace: true })
+      navigate('/user/basecamp', { replace: true })
     }
   }, [activeSession, navigate])
 

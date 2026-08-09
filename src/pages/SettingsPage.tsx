@@ -126,7 +126,7 @@ export function SettingsPage() {
             Version 1.0.0 (10)
           </p>
         </div>
-        <ClosePillButton onClick={() => navigate('/')} />
+        <ClosePillButton onClick={() => navigate('/user/basecamp')} />
       </div>
 
       <SettingsSection title="General" rows={generalRows} />

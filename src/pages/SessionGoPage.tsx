@@ -71,7 +71,7 @@ export function SessionGoPage() {
       navigate('/guest/basecamp', { replace: true })
       return
     }
-    navigate('/', { replace: true })
+    navigate('/user/basecamp', { replace: true })
   }
 
   const modifierClass =

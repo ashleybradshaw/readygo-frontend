@@ -42,7 +42,7 @@ export function NotificationHost() {
       return
     }
     if (normalised.includes('basecamp')) {
-      navigate('/')
+      navigate('/user/basecamp')
       return
     }
     if (normalised.includes('postcode') || normalised.includes('another')) {

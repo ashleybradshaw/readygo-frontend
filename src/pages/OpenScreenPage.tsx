@@ -1,23 +1,48 @@
 import { motion } from 'framer-motion'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { DotMatrixLoader } from '../components/ui/DotMatrixLoader'
+import { useReadyGoStore } from '../store/useReadyGoStore'
 import readyGoMark from '../assets/readygo-mark.svg'
+
+const AUTO_ADVANCE_MS = 1800
 
 export function OpenScreenPage() {
   const navigate = useNavigate()
+  const isAuthenticated = useReadyGoStore((state) => state.isAuthenticated)
   const [exiting, setExiting] = useState(false)
   const navigatedRef = useRef(false)
 
   const handleContinue = () => {
-    if (exiting) return
+    if (navigatedRef.current || exiting) return
     setExiting(true)
     window.setTimeout(() => {
       if (navigatedRef.current) return
       navigatedRef.current = true
-      navigate('/welcome')
+      navigate(isAuthenticated ? '/user/basecamp' : '/welcome', {
+        replace: true,
+      })
     }, 300)
   }
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigatedRef.current = true
+      navigate('/user/basecamp', { replace: true })
+      return
+    }
+
+    const timer = window.setTimeout(() => {
+      handleContinue()
+    }, AUTO_ADVANCE_MS)
+
+    return () => {
+      window.clearTimeout(timer)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-once auto-advance
+  }, [isAuthenticated, navigate])
+
+  if (isAuthenticated) return null
 
   return (
     <motion.button

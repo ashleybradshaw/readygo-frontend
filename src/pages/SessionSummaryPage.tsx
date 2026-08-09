@@ -35,7 +35,7 @@ export function SessionSummaryPage() {
   const [alreadySaved, setAlreadySaved] = useState(false)
 
   useEffect(() => {
-    if (!session) navigate('/', { replace: true })
+    if (!session) navigate('/user/basecamp', { replace: true })
   }, [navigate, session])
 
   const avgPace = useMemo(() => {
@@ -55,7 +55,7 @@ export function SessionSummaryPage() {
 
   const goBasecamp = () => {
     clearSession()
-    navigate('/', { replace: true })
+    navigate('/user/basecamp', { replace: true })
   }
 
   return (
