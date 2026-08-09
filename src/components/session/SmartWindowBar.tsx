@@ -67,13 +67,13 @@ export const SmartWindowBar = ({
   }, [onIntroComplete, showDayOneIntro])
 
   return (
-    <section className="relative text-center">
+    <section className="relative w-full text-center">
       {tooltipVisible ? (
         <div
-          className="pointer-events-none absolute -top-2 left-1/2 z-10 w-[min(100%,320px)] -translate-x-1/2 -translate-y-full rounded-[4px] bg-[#182629] px-3 py-2 text-left shadow-[0_0_0_1px_rgba(112,255,0,0.35)] animate-smart-tooltip"
+          className="relative mb-3 w-full rounded-[4px] border border-[#70FF00]/40 bg-[#182629] px-3 py-2 text-left text-xs text-[#BACBC9] shadow-lg"
           role="status"
         >
-          <p className="text-[11px] font-medium leading-snug text-[#BACBC9]">
+          <p className="text-xs font-medium leading-snug text-[#BACBC9]">
             ✨ Personalized forecast active! We&apos;ve highlighted your best
             weather windows for the week.
           </p>

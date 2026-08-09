@@ -2,13 +2,12 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PressableButton } from '../components/ui/PressableButton'
 import { TextField } from '../components/ui/TextField'
-import { ProfileFieldIcon } from '../components/ui/AuthIcons'
 import { pickFallbackName } from '../lib/onboarding'
 import { useReadyGoStore } from '../store/useReadyGoStore'
 import successHero from '../assets/auth/success-hero.jpg'
 
 const normalizeHandle = (value: string) => {
-  const cleaned = value.replace(/^@+/, '').replace(/[^a-zA-Z0-9_]/g, '')
+  const cleaned = value.replace(/@+/g, '').replace(/[^a-zA-Z0-9_]/g, '')
   return cleaned.slice(0, 20)
 }
 
@@ -34,8 +33,6 @@ export function HandleClaimPage() {
 
     navigate(destination, { replace: true })
   }
-
-  const displayValue = handle ? `@${handle}` : ''
 
   return (
     <div className="relative flex h-full flex-col overflow-y-auto bg-[#0F1918] px-5 pb-8 pt-[max(2rem,env(safe-area-inset-top))]">
@@ -68,10 +65,14 @@ export function HandleClaimPage() {
         <TextField
           aria-label="Claim your handle"
           autoComplete="username"
-          placeholder="@username"
-          value={displayValue}
+          placeholder="username"
+          value={handle}
           onChange={(event) => setHandle(normalizeHandle(event.target.value))}
-          leadingIcon={<ProfileFieldIcon />}
+          leadingIcon={
+            <span className="font-sans text-base font-bold text-[#BACBC9]" aria-hidden="true">
+              @
+            </span>
+          }
         />
 
         <p className="mt-3 font-sans text-sm leading-relaxed text-[#BACBC9]/80">

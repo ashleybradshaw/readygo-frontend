@@ -2,12 +2,11 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ClosePillButton } from '../components/ui/ClosePillButton'
 import { PressableButton } from '../components/ui/PressableButton'
-import { ProfileFieldIcon } from '../components/ui/AuthIcons'
 import { showSuccessToast } from '../components/overlays/NotificationHost'
 import { useReadyGoStore } from '../store/useReadyGoStore'
 
 const normalizeHandle = (value: string) => {
-  const cleaned = value.replace(/^@+/, '').replace(/[^a-zA-Z0-9_]/g, '')
+  const cleaned = value.replace(/@+/g, '').replace(/[^a-zA-Z0-9_]/g, '')
   return cleaned.slice(0, 20)
 }
 
@@ -18,7 +17,6 @@ export function ChangeHandlePage() {
   const existing = userName.replace(/^@+/, '')
   const [handle, setHandle] = useState(existing)
 
-  const displayValue = handle ? `@${handle}` : ''
   const canSave = handle.length >= 3
 
   const handleSave = () => {
@@ -47,12 +45,14 @@ export function ChangeHandlePage() {
           Your current handle
         </span>
         <div className="flex h-[52px] items-center gap-3 rounded-[4px] border border-[#2D3739] bg-[#182629] px-4">
-          <ProfileFieldIcon />
+          <span className="font-sans text-base font-bold text-[#BACBC9]" aria-hidden="true">
+            @
+          </span>
           <input
             type="text"
-            value={displayValue}
+            value={handle}
             onChange={(event) => setHandle(normalizeHandle(event.target.value))}
-            placeholder="@username"
+            placeholder="username"
             aria-label="Your current handle"
             autoComplete="username"
             className="min-w-0 flex-1 bg-transparent font-sans text-base font-bold text-[#BACBC9] outline-none placeholder:text-[#BACBC9]/50"
