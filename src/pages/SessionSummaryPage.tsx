@@ -6,21 +6,24 @@ import { ViewMapModal } from '../components/session/ViewMapModal'
 import { SaveSessionModal } from '../components/session/SaveSessionModal'
 import { formatDuration } from '../lib/session'
 import { useReadyGoStore } from '../store/useReadyGoStore'
-import {
-  RatingIconBad,
-  RatingIconFine,
-  RatingIconGood,
-  RatingIconOk,
-  RatingIconPoor,
-} from '../components/feedback/RatingIcons'
+import iconPoor from '../assets/feedback/rating-icon-poor-1.svg'
+import iconBad from '../assets/feedback/rating-icon-bad-1.svg'
+import iconOk from '../assets/feedback/rating-icon-ok-1.svg'
+import iconGood from '../assets/feedback/rating-icon-good-1.svg'
+import iconFine from '../assets/feedback/rating-icon-fine-1.svg'
 
 const SENTIMENTS = [
-  { value: 1, Icon: RatingIconBad, label: 'Very bad' },
-  { value: 2, Icon: RatingIconPoor, label: 'Bad' },
-  { value: 3, Icon: RatingIconOk, label: 'Okay' },
-  { value: 4, Icon: RatingIconGood, label: 'Good' },
-  { value: 5, Icon: RatingIconFine, label: 'Very good' },
+  { value: 1, src: iconPoor, label: 'Very bad' },
+  { value: 2, src: iconBad, label: 'Bad' },
+  { value: 3, src: iconOk, label: 'Okay' },
+  { value: 4, src: iconGood, label: 'Good' },
+  { value: 5, src: iconFine, label: 'Very good' },
 ]
+
+const ratingIconClass = (active: boolean) =>
+  active
+    ? 'size-10 opacity-100 [filter:brightness(0)_saturate(100%)_invert(78%)_sepia(64%)_saturate(1015%)_hue-rotate(47deg)_brightness(103%)_contrast(106%)_drop-shadow(0_0_8px_rgba(112,255,0,0.6))]'
+    : 'size-10 opacity-50 grayscale'
 
 export function SessionSummaryPage() {
   const navigate = useNavigate()
@@ -189,7 +192,6 @@ export function SessionSummaryPage() {
             <div className="mt-4 flex items-end justify-between gap-2">
               {SENTIMENTS.map((item) => {
                 const active = sentiment === item.value
-                const Icon = item.Icon
                 return (
                   <button
                     key={item.value}
@@ -198,9 +200,14 @@ export function SessionSummaryPage() {
                     aria-label={item.label}
                     aria-pressed={active}
                     onClick={() => setSentiment(item.value)}
-                    className="flex flex-1 flex-col items-center gap-1 rounded-[4px] py-1"
+                    className="flex flex-1 flex-col items-center gap-1 py-1"
                   >
-                    <Icon active={active} className="size-10" />
+                    <img
+                      src={item.src}
+                      alt=""
+                      aria-hidden="true"
+                      className={ratingIconClass(active)}
+                    />
                   </button>
                 )
               })}
