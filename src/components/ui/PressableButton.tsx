@@ -38,8 +38,8 @@ export function PressableButton({
       } ${
         style?.borderRadius == null && !className.includes('rounded')
           ? isCta
-            ? 'rounded-xl'
-            : 'rounded-[10px]'
+            ? 'rounded-[4px]'
+            : 'rounded-[4px]'
           : ''
       } ${variants[variant]} ${className}`}
       {...props}

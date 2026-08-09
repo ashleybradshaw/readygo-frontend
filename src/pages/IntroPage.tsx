@@ -84,7 +84,7 @@ export function IntroPage() {
 
   const skip = () => {
     setHasSeenIntro(true)
-    navigate(isAuthenticated ? '/' : '/auth/create')
+    navigate(isAuthenticated ? '/' : '/welcome')
   }
 
   const handlePrimary = () => {
@@ -233,7 +233,7 @@ export function IntroPage() {
         onAccept={() => {
           setTermsOpen(false)
           setHasSeenIntro(true)
-          navigate(isAuthenticated ? '/' : '/auth/create')
+          navigate(isAuthenticated ? '/' : '/welcome')
         }}
       />
     </div>

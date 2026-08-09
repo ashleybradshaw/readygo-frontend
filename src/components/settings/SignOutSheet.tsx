@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
+import { ClosePillButton } from '../ui/ClosePillButton'
 import { PressableButton } from '../ui/PressableButton'
-import { SettingsCloseButton } from './SettingsCloseButton'
 import warningIcon from '../../assets/icons/Warning-1.todo.icon 1.svg'
 
 interface SignOutSheetProps {
@@ -24,10 +24,10 @@ export const SignOutSheet = ({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
-        className="absolute inset-0 z-[80] flex flex-col bg-[#0F1918] px-5 pb-8 pt-[65px]"
+        className="absolute inset-0 z-[80] flex flex-col bg-[#0F1918] px-5 pb-8 pt-[max(2.5rem,env(safe-area-inset-top))]"
       >
         <div className="flex justify-end">
-          <SettingsCloseButton variant="onDark" onClick={onClose} />
+          <ClosePillButton onClick={onClose} />
         </div>
 
         <div className="flex flex-1 flex-col items-center justify-center text-center">
@@ -46,16 +46,24 @@ export const SignOutSheet = ({
           >
             Sign out
           </h2>
-          <p className="mt-1 max-w-[300px] font-sans text-base font-bold leading-5 tracking-[-0.01em] text-[#BACBC9]">
-            Did you want to sign out of the app?
-          </p>
-          <p className="mt-1 max-w-[300px] font-sans text-base leading-5 tracking-[-0.01em] text-[#BACBC9]">
-            Log back in whenever you&apos;re ready.
+          <p className="mt-2 max-w-[300px] font-sans text-base leading-5 tracking-[-0.01em] text-[#BACBC9]">
+            Did you want to sign out of the app? Log back in whenever you&apos;re
+            ready.
           </p>
         </div>
 
         <div className="shrink-0">
-          <PressableButton variant="cta" onClick={onConfirm}>
+          <PressableButton
+            onClick={onConfirm}
+            className="rounded-[4px] border-0"
+            style={{
+              height: 52,
+              borderRadius: 4,
+              backgroundColor: '#2D3739',
+              color: '#BACBC9',
+              fontWeight: 700,
+            }}
+          >
             Sign out
           </PressableButton>
         </div>

@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { GatheringLoaderScreen } from '../components/ui/GatheringLoaderScreen'
+import { GlobalLoadingScreen } from '../components/ui/GlobalLoadingScreen'
 import { useReadyGoStore } from '../store/useReadyGoStore'
 
 export function LoadingSessionPage() {
@@ -17,11 +17,12 @@ export function LoadingSessionPage() {
   if (!activeSession) return null
 
   return (
-    <GatheringLoaderScreen
+    <GlobalLoadingScreen
       ariaLabel="Continue to active session"
+      advanceMs={1500}
       onAdvance={() => {
         startActiveSession()
-        navigate('/session/active', { replace: true })
+        navigate('/user/session-active', { replace: true })
       }}
     />
   )

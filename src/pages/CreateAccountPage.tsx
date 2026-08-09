@@ -8,7 +8,6 @@ import {
   EyeToggleIcon,
   PasswordFieldIcon,
 } from '../components/ui/AuthIcons'
-import { VerificationSheet } from '../components/onboarding/VerificationSheet'
 import {
   getPasswordChecks,
   isValidEmail,
@@ -24,8 +23,6 @@ export function CreateAccountPage() {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [emailTouched, setEmailTouched] = useState(false)
-  const [verifyOpen, setVerifyOpen] = useState(false)
-  const [pendingEmail, setPendingEmail] = useState('')
 
   const checks = useMemo(() => getPasswordChecks(password), [password])
   const emailError =
@@ -35,17 +32,16 @@ export function CreateAccountPage() {
 
   const canSubmit = isValidEmail(email) && passwordIsValid(password)
 
-  const goToAccountCreated = (nextEmail: string) => {
+  const handleContinue = (nextEmail: string) => {
     setUserEmail(nextEmail)
-    setVerifyOpen(false)
-    navigate('/setup/account-created')
+    navigate('/auth/verify')
   }
 
   return (
-    <div className="relative flex h-full flex-col overflow-y-auto bg-[#0F1918] px-5 pb-8 pt-[83px]">
+    <div className="relative flex h-full flex-col overflow-y-auto bg-[#0F1918] px-5 pb-8 pt-[max(3.5rem,env(safe-area-inset-top))]">
       <div className="mb-6 flex flex-col gap-[5px] uppercase">
         <h1 className="font-display text-2xl font-bold leading-8 tracking-[-0.02em] text-[#BACBC9]">
-          Create account
+          Create Account
         </h1>
         <p className="font-sans text-lg font-bold leading-[26px] tracking-[-0.01em] text-[#BACBC9]">
           Welcome!
@@ -55,13 +51,13 @@ export function CreateAccountPage() {
       <div className="flex flex-col gap-5">
         <OAuthButton
           provider="apple"
-          onClick={() => goToAccountCreated('apple@readygo.app')}
+          onClick={() => handleContinue('apple@readygo.app')}
         >
           Continue with Apple
         </OAuthButton>
         <OAuthButton
           provider="google"
-          onClick={() => goToAccountCreated('google@readygo.app')}
+          onClick={() => handleContinue('google@readygo.app')}
         >
           Continue with Google
         </OAuthButton>
@@ -99,6 +95,7 @@ export function CreateAccountPage() {
             trailingIcon={
               <button
                 type="button"
+                tabIndex={0}
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
                 onClick={() => setShowPassword((value) => !value)}
               >
@@ -123,10 +120,9 @@ export function CreateAccountPage() {
         <PressableButton
           variant="cta"
           disabled={!canSubmit}
-          onClick={() => {
-            setPendingEmail(email.trim())
-            setVerifyOpen(true)
-          }}
+          onClick={() => handleContinue(email.trim())}
+          className="rounded-[4px]"
+          style={{ borderRadius: 4 }}
         >
           Create account
         </PressableButton>
@@ -140,17 +136,9 @@ export function CreateAccountPage() {
           </Link>
         </p>
       </div>
-
-      <VerificationSheet
-        open={verifyOpen}
-        email={pendingEmail || email}
-        onClose={() => setVerifyOpen(false)}
-        onConfirmed={() => goToAccountCreated(email.trim())}
-      />
     </div>
   )
 }
 
-function checkColour(passed: boolean) {
-  return passed ? 'text-[#84BCA4]' : 'text-[#BC757D]'
-}
+const checkColour = (passed: boolean) =>
+  passed ? 'text-[#84BCA4]' : 'text-[#BC757D]'

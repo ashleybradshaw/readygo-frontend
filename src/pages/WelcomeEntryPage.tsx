@@ -1,0 +1,101 @@
+import { Link, useNavigate } from 'react-router-dom'
+import { PressableButton } from '../components/ui/PressableButton'
+import { useReadyGoStore } from '../store/useReadyGoStore'
+
+const HERO_IMAGE = '/images/intro/intro-1.png'
+
+export function WelcomeEntryPage() {
+  const navigate = useNavigate()
+  const enterGuestMode = useReadyGoStore((state) => state.enterGuestMode)
+  const setHasSeenIntro = useReadyGoStore((state) => state.setHasSeenIntro)
+
+  const handleGuest = () => {
+    setHasSeenIntro(true)
+    enterGuestMode()
+    navigate('/guest/activity')
+  }
+
+  const handleSignup = () => {
+    setHasSeenIntro(true)
+    navigate('/auth/terms')
+  }
+
+  return (
+    <div className="relative flex h-full flex-col overflow-hidden bg-[#0F1918]">
+      <div className="relative h-[55%] shrink-0 overflow-hidden">
+        <img
+          src={HERO_IMAGE}
+          alt=""
+          className="absolute inset-0 size-full object-cover object-top"
+          draggable={false}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-[#0F1918]" />
+        <p
+          className="absolute inset-0 flex items-center justify-center font-display text-[24px] font-bold uppercase tracking-wider text-[#FF3B30]"
+          aria-hidden="true"
+        >
+          Ready
+        </p>
+      </div>
+
+      <div className="flex min-h-0 flex-1 flex-col bg-[#0F1918] px-4 pb-8 pt-2">
+        <div className="mx-auto flex w-full max-w-[360px] flex-1 flex-col items-center text-center">
+          <h1 className="font-display text-2xl font-bold uppercase tracking-[-0.02em] text-[#BACBC9]">
+            Nice meeting you
+          </h1>
+          <p className="mt-1 font-display text-sm font-bold uppercase tracking-[-0.01em] text-[#BACBC9]/80">
+            Let&apos;s get ready
+          </p>
+          <p className="mt-4 font-sans text-sm leading-relaxed tracking-[-0.01em] text-[#BACBC9]">
+            Jump straight in as a{' '}
+            <span className="font-bold text-white">Guest</span> to generate your
+            first instant route. Or tap{' '}
+            <span className="font-bold text-white">Signup</span> to save your
+            preferences, unlock your personalised{' '}
+            <span className="font-bold text-white">7-day weather window</span>,
+            and keep track of your history.{' '}
+            <span className="font-bold text-white">Everything is free.</span>
+          </p>
+
+          <div className="mt-auto grid w-full grid-cols-2 gap-3 pb-4 pt-8">
+            <PressableButton
+              onClick={handleGuest}
+              className="rounded-[4px] border border-[#2D3739] bg-transparent"
+              style={{
+                height: 52,
+                borderRadius: 4,
+                color: '#BACBC9',
+                backgroundColor: 'transparent',
+              }}
+            >
+              Guest
+            </PressableButton>
+            <PressableButton
+              onClick={handleSignup}
+              className="rounded-[4px] border-0"
+              style={{
+                height: 52,
+                borderRadius: 4,
+                backgroundColor: '#BACBC9',
+                color: '#0F1918',
+                fontWeight: 600,
+              }}
+            >
+              Signup
+            </PressableButton>
+          </div>
+
+          <p className="font-sans text-sm tracking-[-0.01em] text-[#BACBC9]">
+            Already have an account?{' '}
+            <Link
+              to="/auth/login"
+              className="font-bold underline underline-offset-2"
+            >
+              Sign in
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}

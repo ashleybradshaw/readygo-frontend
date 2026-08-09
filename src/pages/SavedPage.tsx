@@ -3,25 +3,25 @@ import {
   ChevronLeft,
   ChevronRight,
   Info,
-  List,
+  MapPinned,
   Network,
   PersonStanding,
-  Cloud,
-  Clock3,
-  MapPinned,
 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PressableButton } from '../components/ui/PressableButton'
-import { PaginationDots } from '../components/ui/PaginationDots'
+import { ClosePillButton } from '../components/ui/ClosePillButton'
+import { BottomNav } from '../components/BottomNav'
 import { ViewMapModal } from '../components/session/ViewMapModal'
-import { SettingsCloseButton } from '../components/settings/SettingsCloseButton'
-import { buildReviewSummary } from '../lib/onboarding'
-import { formatDuration, formatWeatherLine } from '../lib/session'
+import { formatDuration } from '../lib/session'
 import { useReadyGoStore } from '../store/useReadyGoStore'
 import { showSuccessToast } from '../components/overlays/NotificationHost'
 
-export function SavedPage() {
+interface SavedPageProps {
+  initialTab?: 'sessions' | 'profiles'
+}
+
+export function SavedPage({ initialTab }: SavedPageProps) {
   const navigate = useNavigate()
   const savedTab = useReadyGoStore((state) => state.savedTab)
   const setSavedTab = useReadyGoStore((state) => state.setSavedTab)
@@ -31,7 +31,6 @@ export function SavedPage() {
   const weather = useReadyGoStore((state) => state.weather)
   const activateProfile = useReadyGoStore((state) => state.activateProfile)
   const deleteProfile = useReadyGoStore((state) => state.deleteProfile)
-  const startEditProfile = useReadyGoStore((state) => state.startEditProfile)
   const deleteSavedRoute = useReadyGoStore((state) => state.deleteSavedRoute)
   const loadSavedRoute = useReadyGoStore((state) => state.loadSavedRoute)
   const activeSession = useReadyGoStore((state) => state.activeSession)
@@ -40,41 +39,43 @@ export function SavedPage() {
   const [sessionIndex, setSessionIndex] = useState(0)
   const [mapOpen, setMapOpen] = useState(false)
 
+  useEffect(() => {
+    if (initialTab) setSavedTab(initialTab)
+  }, [initialTab, setSavedTab])
+
   const profile = savedProfiles[profileIndex]
   const session = savedRoutes[sessionIndex]
-
-  const profileSummary = useMemo(() => {
-    if (!profile) return []
-    return buildReviewSummary({
-      activityType: profile.activityType,
-      locationMode: profile.preferences.locationMode,
-      postcode: profile.preferences.postcode,
-      preferredTimes: profile.preferences.preferredTimes,
-      fitnessLevel: profile.preferences.fitnessLevel,
-      weatherChoices: profile.preferences.weatherChoices,
-      clothingSuggestions: profile.preferences.clothingSuggestions,
-      mapStyle: profile.preferences.mapStyle,
-      sessionDuration: profile.preferences.sessionDuration,
-    })
-  }, [profile])
-
   const isSessions = savedTab === 'sessions'
 
   return (
-    <div className="flex h-full flex-col gap-4 pt-2">
+    <div className="relative flex h-full flex-col bg-[#0F1918]">
+      <div className="flex min-h-0 flex-1 flex-col gap-4 px-5 pt-[max(2.5rem,env(safe-area-inset-top))] pb-4">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-bold uppercase leading-8 tracking-[-0.02em] text-[#0F1918]">
+          <h1 className="font-display text-2xl font-bold uppercase leading-8 tracking-[-0.02em] text-[#BACBC9]">
             {isSessions ? 'Saved Sessions' : 'Saved Profiles'}
           </h1>
-          <p className="mt-1 font-sans text-sm font-bold uppercase tracking-[-0.01em] text-[#0F1918]">
+          <p className="mt-1 font-sans text-sm font-bold uppercase tracking-[-0.01em] text-[#BACBC9]/80">
             {isSessions
               ? `[${savedRoutes.length}]/20 – Saved Routes.`
               : `[${savedProfiles.length}]/5 – Saved Profiles.`}
           </p>
         </div>
-        <SettingsCloseButton onClick={() => navigate('/')} />
+        <ClosePillButton onClick={() => navigate('/settings')} />
       </div>
+
+      <SavedTabSwitcher
+        active={savedTab}
+        onChange={(tab) => {
+          setSavedTab(tab)
+          navigate(
+            tab === 'sessions'
+              ? '/settings/saved-sessions'
+              : '/settings/saved-profiles',
+            { replace: true },
+          )
+        }}
+      />
 
       {isSessions ? (
         <>
@@ -85,75 +86,90 @@ export function SavedPage() {
             />
           ) : session ? (
             <div className="min-h-0 flex-1 space-y-3 overflow-y-auto">
-              <section className="overflow-hidden rounded-[12px] bg-[#182629]">
-                <div className="flex items-center gap-3 border-b border-[#365466] px-4 py-3">
-                  <Cloud size={16} className="text-[#BACBC9]" />
-                  <p className="text-sm font-bold text-[#BACBC9]">
-                    {formatWeatherLine(weather)}
-                  </p>
-                </div>
-                <div className="flex items-center gap-3 border-b border-[#365466] px-4 py-3">
-                  <Clock3 size={16} className="text-[#BACBC9]" />
-                  <p className="text-sm font-bold text-[#BACBC9]">
-                    [{formatDuration(session.durationMinutes)}]
-                  </p>
-                </div>
-                <div className="space-y-1 px-4 py-3">
-                  <div className="flex items-start gap-3">
-                    <MapPinned size={16} className="mt-0.5 text-[#BACBC9]" />
-                    <div className="text-sm font-bold text-[#BACBC9]">
-                      <p className="mb-1 text-base">{session.name}</p>
-                      <p>
-                        Distance:{' '}
-                        <span className="text-[#829695]">
-                          [{session.distanceKm}]km ([{session.distanceMiles}] miles)
-                        </span>
-                      </p>
-                      <p>
-                        Difficulty:{' '}
-                        <span className="text-[#829695]">[{session.difficulty}]</span>
-                      </p>
-                      <p>
-                        Start/Finish:{' '}
-                        <span className="text-[#829695]">
-                          [{session.startLocation || weather.location}] to [
-                          {session.endLocation || weather.location}]
-                        </span>
-                      </p>
-                      <p>
-                        Terrain:{' '}
-                        <span className="text-[#829695]">[{session.terrain}]</span>
-                      </p>
-                    </div>
+              <section className="rounded-[4px] bg-[#182629] p-4">
+                <h2 className="border-b border-[#2D3739] pb-3 text-base font-bold text-[#BACBC9]">
+                  {session.name}
+                </h2>
+                <div className="mt-3 flex items-start gap-3">
+                  <MapPinned
+                    size={18}
+                    className="mt-0.5 shrink-0 text-[#BACBC9]"
+                    aria-hidden="true"
+                  />
+                  <div className="space-y-1 text-sm font-bold text-[#BACBC9]">
+                    <p>
+                      Distance:{' '}
+                      <span className="text-[#BACBC9]/80">
+                        {session.distanceKm}Km ({session.distanceMiles} Miles)
+                      </span>
+                    </p>
+                    <p>
+                      Start/Finish:{' '}
+                      <span className="text-[#BACBC9]/80">
+                        {session.startLocation || weather.location} To{' '}
+                        {session.endLocation || weather.location}
+                      </span>
+                    </p>
+                    <p>
+                      Time:{' '}
+                      <span className="text-[#BACBC9]/80">
+                        {formatDuration(session.durationMinutes)}
+                      </span>
+                    </p>
+                    <p>
+                      Terrain:{' '}
+                      <span className="text-[#BACBC9]/80">{session.terrain}</span>
+                    </p>
                   </div>
                 </div>
               </section>
 
               <div className="grid grid-cols-2 gap-3">
                 <PressableButton
-                  className="bg-[#7CFF00]/85 text-rg-text-on-accent"
                   onClick={() => {
                     const loaded = loadSavedRoute(session.id)
-                    if (loaded) navigate('/session/go')
+                    if (loaded) navigate('/user/session-ready')
+                  }}
+                  className="rounded-[4px] border-0"
+                  style={{
+                    height: 40,
+                    borderRadius: 4,
+                    backgroundColor: '#70FF00',
+                    color: '#0F1918',
+                    fontWeight: 700,
                   }}
                 >
                   Load session
                 </PressableButton>
                 <PressableButton
-                  className="bg-[#182629] text-[#BACBC9]"
                   onClick={() => {
                     loadSavedRoute(session.id)
                     setMapOpen(true)
+                  }}
+                  className="rounded-[4px] border-0"
+                  style={{
+                    height: 40,
+                    borderRadius: 4,
+                    backgroundColor: '#BACBC9',
+                    color: '#0F1918',
+                    fontWeight: 700,
                   }}
                 >
                   View map
                 </PressableButton>
               </div>
               <PressableButton
-                className="bg-[#2D191C] text-[#BC757D] hover:bg-[#3A1E22]"
                 onClick={() => {
                   deleteSavedRoute(session.id)
                   setSessionIndex((value) => Math.max(0, value - 1))
+                }}
+                className="rounded-[4px] border-0"
+                style={{
+                  height: 40,
+                  borderRadius: 4,
+                  backgroundColor: '#3B0000',
+                  color: '#FF3B30',
+                  fontWeight: 700,
                 }}
               >
                 Delete session
@@ -178,103 +194,117 @@ export function SavedPage() {
             />
           ) : profile ? (
             <div className="min-h-0 flex-1 space-y-3 overflow-y-auto">
-              <section className="rounded-[12px] bg-[#182629] p-4">
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (currentProfile?.id === profile.id) return
-                      activateProfile(profile.id)
-                      showSuccessToast(
-                        'Profile activated',
-                        `${profile.name} is now current.`,
-                      )
-                    }}
-                    className={`rounded-full px-3 py-1.5 text-xs font-bold ${
-                      currentProfile?.id === profile.id
-                        ? 'bg-[#7CFF00]/20 text-[#7CFF00]'
-                        : 'bg-rg-amber/20 text-rg-amber'
-                    }`}
-                  >
-                    {currentProfile?.id === profile.id
-                      ? 'Current profile'
-                      : 'Activate profile'}
-                  </button>
-                  <div className="flex items-center gap-2">
-                    <span className="flex size-8 items-center justify-center rounded-md bg-[#0F1918] text-[#7CFF00]">
-                      {profile.activityType === 'Cycle' ? (
-                        <Bike size={16} />
-                      ) : (
-                        <PersonStanding size={16} />
-                      )}
-                    </span>
-                    <p className="text-sm font-bold text-[#BACBC9]">
+              <section className="rounded-[4px] bg-[#182629] p-4">
+                <h2 className="border-b border-[#2D3739] pb-3 text-base font-bold text-[#BACBC9]">
+                  {profile.name}
+                </h2>
+                <div className="mt-3 flex items-center justify-between gap-3 border-b border-[#2D3739] pb-3">
+                  <div className="flex min-w-0 items-center gap-2">
+                    {profile.activityType === 'Cycle' ? (
+                      <Bike size={16} className="text-[#70FF00]" aria-hidden="true" />
+                    ) : (
+                      <PersonStanding
+                        size={16}
+                        className="text-[#70FF00]"
+                        aria-hidden="true"
+                      />
+                    )}
+                    <p className="truncate text-xs font-bold text-[#BACBC9]">
                       {profile.name}
                     </p>
                   </div>
-                </div>
-
-                <div className="mb-3 grid grid-cols-2 gap-2">
-                  <div className="flex items-center gap-2 rounded-[10px] bg-[#0F1918] px-3 py-2">
-                    <Network size={14} className="text-[#829695]" />
-                    <div>
-                      <p className="text-[10px] font-bold text-[#829695]">
-                        Times used
-                      </p>
-                      <p className="text-sm font-bold text-[#BACBC9]">
-                        {profile.timesUsed}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 rounded-[10px] bg-[#0F1918] px-3 py-2">
-                    <List size={14} className="text-[#829695]" />
-                    <div>
-                      <p className="text-[10px] font-bold text-[#829695]">
-                        Saved routes
-                      </p>
-                      <p className="text-sm font-bold text-[#BACBC9]">
-                        {
-                          savedRoutes.filter(
-                            (route) => route.activityType === profile.activityType,
-                          ).length
-                        }
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  {profileSummary.map((paragraph) => (
-                    <p
-                      key={paragraph}
-                      className="rounded-[10px] bg-[#0F1918] px-3 py-3 text-sm font-bold capitalize tracking-[-0.5px] text-[#DCE4E6]"
-                    >
-                      {paragraph}
+                  <div className="flex items-center gap-2">
+                    <Network size={14} className="text-[#78ABCC]" aria-hidden="true" />
+                    <p className="text-xs font-bold text-[#BACBC9]">
+                      Times used {profile.timesUsed}
                     </p>
-                  ))}
+                  </div>
+                </div>
+                <div className="mt-3 flex items-start gap-3">
+                  <MapPinned
+                    size={18}
+                    className="mt-0.5 shrink-0 text-[#BACBC9]"
+                    aria-hidden="true"
+                  />
+                  <div className="space-y-1 text-sm font-bold text-[#BACBC9]">
+                    <p>
+                      Activity:{' '}
+                      <span className="text-[#BACBC9]/80">
+                        {profile.activityType}
+                      </span>
+                    </p>
+                    <p>
+                      Duration:{' '}
+                      <span className="text-[#BACBC9]/80">
+                        {profile.preferences.sessionDuration}
+                      </span>
+                    </p>
+                    <p>
+                      Terrain:{' '}
+                      <span className="text-[#BACBC9]/80">
+                        {profile.preferences.mapStyle}
+                      </span>
+                    </p>
+                  </div>
                 </div>
               </section>
 
               <div className="grid grid-cols-2 gap-3">
                 <PressableButton
-                  className="bg-[#2D191C] text-[#BC757D] hover:bg-[#3A1E22]"
                   onClick={() => {
-                    deleteProfile(profile.id)
-                    setProfileIndex((value) => Math.max(0, value - 1))
+                    if (currentProfile?.id === profile.id) return
+                    activateProfile(profile.id)
+                    showSuccessToast(
+                      'Profile activated',
+                      `${profile.name} is now current.`,
+                    )
+                  }}
+                  className="rounded-[4px] border-0"
+                  style={{
+                    height: 40,
+                    borderRadius: 4,
+                    backgroundColor:
+                      currentProfile?.id === profile.id ? '#84BCA4' : '#BACBC9',
+                    color: '#0F1918',
+                    fontWeight: 700,
                   }}
                 >
-                  Delete profile
+                  {currentProfile?.id === profile.id
+                    ? 'Current profile'
+                    : 'Select profile'}
                 </PressableButton>
                 <PressableButton
-                  className="bg-[#182629] text-[#BACBC9]"
                   onClick={() => {
-                    startEditProfile(profile.id)
-                    navigate('/setup')
+                    showSuccessToast('Map', 'Open a saved session to view the map.')
+                  }}
+                  className="rounded-[4px] border-0"
+                  style={{
+                    height: 40,
+                    borderRadius: 4,
+                    backgroundColor: '#BACBC9',
+                    color: '#0F1918',
+                    fontWeight: 700,
                   }}
                 >
-                  Edit profile
+                  View map
                 </PressableButton>
               </div>
+              <PressableButton
+                onClick={() => {
+                  deleteProfile(profile.id)
+                  setProfileIndex((value) => Math.max(0, value - 1))
+                }}
+                className="rounded-[4px] border-0"
+                style={{
+                  height: 40,
+                  borderRadius: 4,
+                  backgroundColor: '#3B0000',
+                  color: '#FF3B30',
+                  fontWeight: 700,
+                }}
+              >
+                Delete profile
+              </PressableButton>
             </div>
           ) : null}
 
@@ -288,11 +318,6 @@ export function SavedPage() {
         </>
       )}
 
-      <SavedTabSwitcher
-        active={savedTab}
-        onChange={setSavedTab}
-      />
-
       {activeSession && mapOpen ? (
         <ViewMapModal
           open={mapOpen}
@@ -300,20 +325,22 @@ export function SavedPage() {
           onClose={() => setMapOpen(false)}
         />
       ) : null}
+      </div>
+      <BottomNav />
     </div>
   )
 }
 
 const EmptyCard = ({ title, body }: { title: string; body: string }) => (
-  <section className="flex gap-3 rounded-[12px] bg-[#182629] p-4">
-    <div className="flex size-8 shrink-0 items-center justify-center rounded-[8px] bg-[#4C8DFF]/25 text-[#4C8DFF]">
-      <Info size={24} aria-hidden="true" />
+  <section className="flex gap-3 rounded-[4px] bg-[#182629] p-4">
+    <div className="flex size-8 shrink-0 items-center justify-center rounded-[4px] bg-[#4C8DFF]/25 text-[#4C8DFF]">
+      <Info size={20} aria-hidden="true" />
     </div>
     <div>
       <p className="font-sans text-base font-bold leading-5 tracking-[-0.01em] text-[#BACBC9]">
         {title}
       </p>
-      <p className="mt-1 font-sans text-sm leading-5 tracking-[-0.01em] text-[#BACBC9]">
+      <p className="mt-1 font-sans text-sm leading-5 tracking-[-0.01em] text-[#BACBC9]/80">
         {body}
       </p>
     </div>
@@ -327,7 +354,7 @@ const SavedTabSwitcher = ({
   active: 'sessions' | 'profiles'
   onChange: (tab: 'sessions' | 'profiles') => void
 }) => (
-  <div className="mx-auto flex w-full max-w-[280px] rounded-full bg-[#F4F8F7] p-1">
+  <div className="mx-auto flex w-full max-w-[280px] rounded-full bg-[#BACBC9] p-1">
     {([
       { id: 'sessions', label: 'Sessions' },
       { id: 'profiles', label: 'Profiles' },
@@ -343,7 +370,7 @@ const SavedTabSwitcher = ({
           className={`flex-1 rounded-full px-5 py-2.5 font-sans text-xs font-bold uppercase tracking-[-0.01em] transition-colors ${
             isActive
               ? 'bg-[#182629] text-[#BACBC9]'
-              : 'bg-transparent text-[#182629]'
+              : 'bg-transparent text-[#0F1918]'
           }`}
         >
           {tab.label}
@@ -368,17 +395,29 @@ const CarouselControls = ({
       aria-label="Previous"
       disabled={index === 0}
       onClick={() => onChange(Math.max(0, index - 1))}
-      className="text-[#182629] disabled:opacity-30"
+      className="text-[#BACBC9] disabled:opacity-30"
     >
       <ChevronLeft size={22} />
     </button>
-    <PaginationDots count={count} activeIndex={index} />
+    <div className="flex items-center gap-2">
+      {Array.from({ length: count }).map((_, i) => (
+        <span
+          key={i}
+          className={
+            i === index
+              ? 'h-2.5 w-10 rounded-full bg-[#BACBC9]'
+              : 'size-2.5 rounded-full bg-[#BACBC9]/40'
+          }
+          aria-hidden="true"
+        />
+      ))}
+    </div>
     <button
       type="button"
       aria-label="Next"
       disabled={index >= count - 1}
       onClick={() => onChange(Math.min(count - 1, index + 1))}
-      className="text-[#182629] disabled:opacity-30"
+      className="text-[#BACBC9] disabled:opacity-30"
     >
       <ChevronRight size={22} />
     </button>

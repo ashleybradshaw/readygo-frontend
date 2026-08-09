@@ -1,30 +1,14 @@
-import {
-  FileText,
-  HelpCircle,
-  LayoutGrid,
-  LogOut,
-  Shield,
-  Trophy,
-} from 'lucide-react'
-import { useState, type ReactNode } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { SettingsRow } from '../components/settings/SettingsRow'
-import { SettingsCloseButton } from '../components/settings/SettingsCloseButton'
-import { SignOutSheet } from '../components/settings/SignOutSheet'
-import {
-  showBlipConnectionError,
-  showBlipLocationFailed,
-  showBlipWeatherFallback,
-  showOuchSystemError,
-} from '../components/overlays/NotificationHost'
+import { ClosePillButton } from '../components/ui/ClosePillButton'
+import { FeedbackIssueSheet } from '../components/settings/FeedbackIssueSheet'
+import { showSuccessToast } from '../components/overlays/NotificationHost'
 import { useReadyGoStore } from '../store/useReadyGoStore'
-
-const ICON = { size: 24, color: '#182629', strokeWidth: 1.75 } as const
 
 type RowConfig = {
   label: string
   onClick: () => void
-  icon?: ReactNode
   tone?: 'default' | 'data' | 'danger'
 }
 
@@ -36,13 +20,12 @@ const SettingsSection = ({
   rows: RowConfig[]
 }) => (
   <section className="mb-6">
-    <p className="mb-2 font-sans text-sm font-bold text-[#0F1918]">{title}</p>
-    <div className="flex flex-col gap-0 overflow-hidden rounded-[10px]">
+    <p className="mb-2 font-sans text-sm font-bold text-[#BACBC9]">{title}</p>
+    <div className="overflow-hidden rounded-[4px] border border-[#2D3739]">
       {rows.map((row, index) => (
         <SettingsRow
           key={row.label}
           label={row.label}
-          icon={row.icon}
           tone={row.tone}
           index={index}
           totalLength={rows.length}
@@ -56,117 +39,133 @@ const SettingsSection = ({
 export function SettingsPage() {
   const navigate = useNavigate()
   const setSavedTab = useReadyGoStore((state) => state.setSavedTab)
-  const signOut = useReadyGoStore((state) => state.signOut)
-  const [signOutOpen, setSignOutOpen] = useState(false)
+  const resetProfileDraft = useReadyGoStore((state) => state.resetProfileDraft)
+  const authMethod = useReadyGoStore((state) => state.authMethod)
+  const [feedbackOpen, setFeedbackOpen] = useState(false)
+
+  const handleShareApp = async () => {
+    const shareData = {
+      title: 'ReadyGo',
+      text: 'Build smarter sessions with ReadyGo.',
+      url: window.location.origin,
+    }
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData)
+        return
+      }
+    } catch {
+      // user cancelled share
+      return
+    }
+    showSuccessToast('Share ReadyGo', 'Copy this link from your browser address bar.')
+  }
+
+  const handleRateApp = () => {
+    showSuccessToast('Thanks!', 'App Store review prompt would open here.')
+  }
+
+  const generalRows: RowConfig[] = [
+    {
+      label: 'Create new profile',
+      onClick: () => {
+        resetProfileDraft()
+        navigate('/user/location-activity')
+      },
+    },
+    {
+      label: 'Saved profiles',
+      onClick: () => {
+        setSavedTab('profiles')
+        navigate('/settings/saved-profiles')
+      },
+    },
+    {
+      label: 'Saved sessions',
+      onClick: () => {
+        setSavedTab('sessions')
+        navigate('/settings/saved-sessions')
+      },
+    },
+    {
+      label: 'Change handle',
+      onClick: () => navigate('/settings/change-handle'),
+    },
+    ...(authMethod === 'email'
+      ? [
+          {
+            label: 'Change password',
+            onClick: () => navigate('/auth/reset-password'),
+          } satisfies RowConfig,
+        ]
+      : []),
+    {
+      label: 'Rate the App',
+      onClick: handleRateApp,
+    },
+    {
+      label: 'Tell us about an issue',
+      onClick: () => setFeedbackOpen(true),
+    },
+    {
+      label: 'Share App',
+      onClick: () => {
+        void handleShareApp()
+      },
+    },
+  ]
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto pt-2 pb-4">
+    <div className="flex h-full flex-col overflow-y-auto bg-[#0F1918] pt-2 pb-4">
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-bold uppercase leading-8 tracking-[-0.02em] text-[#0F1918]">
+          <h1 className="font-display text-2xl font-bold uppercase leading-8 tracking-[-0.02em] text-[#BACBC9]">
             Settings
           </h1>
-          <p className="mt-1 font-sans text-sm font-bold uppercase tracking-[-0.01em] text-[#0F1918]">
+          <p className="mt-1 font-sans text-xs font-bold uppercase tracking-[-0.01em] text-[#BACBC9]/60">
             Version 1.0.0 (10)
           </p>
         </div>
-        <SettingsCloseButton onClick={() => navigate('/')} />
+        <ClosePillButton onClick={() => navigate('/')} />
       </div>
 
-      <SettingsSection
-        title="General"
-        rows={[
-          {
-            label: 'Create New Profile',
-            icon: <FileText {...ICON} />,
-            onClick: () => navigate('/setup'),
-          },
-          {
-            label: 'Saved Profiles',
-            icon: <LayoutGrid {...ICON} />,
-            onClick: () => {
-              setSavedTab('profiles')
-              navigate('/saved')
-            },
-          },
-          {
-            label: 'Saved Sessions',
-            icon: <Trophy {...ICON} />,
-            onClick: () => {
-              setSavedTab('sessions')
-              navigate('/saved')
-            },
-          },
-          {
-            label: 'Sign Out',
-            icon: <LogOut {...ICON} />,
-            onClick: () => setSignOutOpen(true),
-          },
-        ]}
-      />
-
-      <SettingsSection
-        title="How it works"
-        rows={[
-          {
-            label: 'Walkthrough',
-            icon: <HelpCircle {...ICON} />,
-            onClick: () => navigate('/intro'),
-          },
-          {
-            label: 'Privacy Policy',
-            icon: <Shield {...ICON} />,
-            onClick: () => navigate('/settings/privacy'),
-          },
-        ]}
-      />
+      <SettingsSection title="General" rows={generalRows} />
 
       <SettingsSection
         title="Account"
         rows={[
           {
-            label: 'Delete All My Data',
+            label: 'Delete all my data',
             tone: 'data',
             onClick: () => navigate('/settings/delete-data'),
           },
           {
-            label: 'Delete My Account',
+            label: 'Sign out',
+            onClick: () => navigate('/settings/logout'),
+          },
+          {
+            label: 'Delete my account',
             tone: 'danger',
             onClick: () => navigate('/settings/delete-account'),
           },
         ]}
       />
 
-      <SettingsSection
-        title="Diagnostics"
-        rows={[
-          {
-            label: 'Simulate BLIP! connection',
-            onClick: () => showBlipConnectionError(),
-          },
-          {
-            label: 'Simulate BLIP! weather',
-            onClick: () => showBlipWeatherFallback(),
-          },
-          {
-            label: 'Simulate BLIP! location',
-            onClick: () => showBlipLocationFailed(),
-          },
-          {
-            label: 'Simulate OUCH! system error',
-            onClick: () => showOuchSystemError(),
-          },
-        ]}
-      />
+      <div className="mt-auto flex justify-center pt-4 pb-2">
+        <button
+          type="button"
+          tabIndex={0}
+          aria-label="Privacy Policy"
+          onClick={() => navigate('/settings/privacy')}
+          className="font-sans text-sm font-bold text-[#BACBC9] underline underline-offset-2"
+        >
+          Privacy Policy
+        </button>
+      </div>
 
-      <SignOutSheet
-        open={signOutOpen}
-        onClose={() => setSignOutOpen(false)}
-        onConfirm={() => {
-          setSignOutOpen(false)
-          signOut()
-          navigate('/auth/login')
-        }}
+      <FeedbackIssueSheet
+        open={feedbackOpen}
+        onClose={() => setFeedbackOpen(false)}
       />
     </div>
   )

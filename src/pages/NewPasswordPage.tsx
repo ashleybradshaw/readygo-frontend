@@ -2,11 +2,7 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PressableButton } from '../components/ui/PressableButton'
 import { TextField } from '../components/ui/TextField'
-import {
-  EyeToggleIcon,
-  KeyFieldIcon,
-} from '../components/ui/AuthIcons'
-import { LoginDetailResetModal } from '../components/onboarding/LoginDetailResetModal'
+import { EyeToggleIcon, PasswordFieldIcon } from '../components/ui/AuthIcons'
 import { getPasswordChecks, passwordIsValid } from '../lib/onboarding'
 
 export function NewPasswordPage() {
@@ -16,7 +12,6 @@ export function NewPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
-  const [successOpen, setSuccessOpen] = useState(false)
 
   const checks = useMemo(() => getPasswordChecks(password), [password])
   const passwordsMatch =
@@ -27,11 +22,11 @@ export function NewPasswordPage() {
   const canSubmit = passwordIsValid(password) && passwordsMatch
 
   return (
-    <div className="relative flex h-full flex-col overflow-y-auto bg-[#0F1918] px-5 pb-8 pt-[83px]">
+    <div className="relative flex h-full flex-col overflow-y-auto bg-[#0F1918] px-5 pb-8 pt-[max(3.5rem,env(safe-area-inset-top))]">
       <div className="mb-8 flex flex-col gap-2.5">
         <div className="flex flex-col gap-[5px] uppercase">
           <h1 className="font-display text-2xl font-bold leading-8 tracking-[-0.02em] text-[#BACBC9]">
-            New password
+            New Password
           </h1>
           <p className="font-sans text-lg font-bold leading-[26px] tracking-[-0.01em] text-[#BACBC9]">
             Keeping everything secure.
@@ -50,10 +45,11 @@ export function NewPasswordPage() {
           placeholder="Type a new password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
-          leadingIcon={<KeyFieldIcon />}
+          leadingIcon={<PasswordFieldIcon />}
           trailingIcon={
             <button
               type="button"
+              tabIndex={0}
               aria-label={showPassword ? 'Hide password' : 'Show password'}
               onClick={() => setShowPassword((value) => !value)}
             >
@@ -63,11 +59,13 @@ export function NewPasswordPage() {
         />
 
         <ul className="mt-1 space-y-[5px] px-5 text-xs font-normal tracking-[0.01em]">
-          <li className={checkColour(checks.minLength)}>
+          <li className={checkColour(checks.minLength, 'amber')}>
             Minimum 8 characters
           </li>
-          <li className={checkColour(checks.hasLetter)}>At least one letter</li>
-          <li className={checkColour(checks.hasNumberOrSymbol)}>
+          <li className={checkColour(checks.hasLetter, 'green')}>
+            At least one letter
+          </li>
+          <li className={checkColour(checks.hasNumberOrSymbol, 'red')}>
             At least one number or special character (@, #, $, %)
           </li>
         </ul>
@@ -86,10 +84,11 @@ export function NewPasswordPage() {
               ? "Passwords don't match. Give it another go."
               : undefined
           }
-          leadingIcon={<KeyFieldIcon />}
+          leadingIcon={<PasswordFieldIcon />}
           trailingIcon={
             <button
               type="button"
+              tabIndex={0}
               aria-label={
                 showConfirm ? 'Hide confirm password' : 'Show confirm password'
               }
@@ -105,26 +104,27 @@ export function NewPasswordPage() {
         <PressableButton
           variant="cta"
           disabled={!canSubmit}
-          onClick={() => setSuccessOpen(true)}
+          onClick={() => navigate('/auth/reset-success', { replace: true })}
+          className="rounded-[4px]"
+          style={{ borderRadius: 4 }}
         >
           Save & continue
         </PressableButton>
         <button
           type="button"
+          tabIndex={0}
           className="px-5 py-5 font-sans text-base font-bold tracking-[-0.01em] text-[#BACBC9] underline underline-offset-2"
         >
           Need help?
         </button>
       </div>
-
-      <LoginDetailResetModal
-        open={successOpen}
-        onSignIn={() => navigate('/auth/login', { replace: true })}
-      />
     </div>
   )
 }
 
-function checkColour(passed: boolean) {
-  return passed ? 'text-[#84BCA4]' : 'text-[#BC757D]'
+const checkColour = (passed: boolean, tone: 'amber' | 'green' | 'red') => {
+  if (passed) return 'text-[#84BCA4]'
+  if (tone === 'amber') return 'text-[#BC9C75]'
+  if (tone === 'green') return 'text-[#84BCA4]/50'
+  return 'text-[#BC757D]'
 }

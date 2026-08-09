@@ -90,6 +90,8 @@ export function buildSessionManifest(input: {
   weather: WeatherSnapshot
   hours: number
   rebuildBias?: number
+  distanceMiles?: number
+  terrain?: string
 }): SessionManifest {
   const seed =
     input.profile.name.length +
@@ -99,8 +101,11 @@ export function buildSessionManifest(input: {
   const titles = activityType === 'Cycle' ? CYCLE_TITLES : RUN_TITLES
   const baseKm =
     (activityType === 'Cycle' ? 18 : 8) * input.hours + (input.rebuildBias ?? 0) * 3
-  const distanceKm = Math.max(3, Math.round(baseKm * 10) / 10)
-  const distanceMiles = kmToMiles(distanceKm)
+  const distanceMiles =
+    input.distanceMiles ??
+    kmToMiles(Math.max(3, Math.round(baseKm * 10) / 10))
+  const distanceKm =
+    Math.round((distanceMiles / 0.621371) * 10) / 10
   const estimatedMinutes = Math.round(input.hours * 60)
   const location =
     input.profile.preferences.postcode || input.weather.location || 'Sheffield'
@@ -115,7 +120,7 @@ export function buildSessionManifest(input: {
     distanceKm,
     distanceMiles,
     difficulty: pick(DIFFICULTIES, seed + 1),
-    terrain: pick(TERRAINS, seed + 2),
+    terrain: input.terrain ?? pick(TERRAINS, seed + 2),
     startLocation: location,
     endLocation: location,
     waypoints: buildWaypoints(seed, distanceMiles),

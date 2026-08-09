@@ -46,7 +46,7 @@ export function NotificationHost() {
       return
     }
     if (normalised.includes('postcode') || normalised.includes('another')) {
-      navigate('/setup')
+      navigate('/user/location-activity')
       return
     }
     if (normalised.includes('sign in')) {

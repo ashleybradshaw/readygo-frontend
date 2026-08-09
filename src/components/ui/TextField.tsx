@@ -36,7 +36,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
       ? 'border-[#BC757D]'
       : focused
         ? 'border-[#BACBC9]'
-        : 'border-[#39484A]'
+        : 'border-[#2D3739]'
 
     const iconClass = focused ? 'text-[#BACBC9]' : 'text-[#4F6163]'
     const inputTextClass = focused ? 'text-[#F5F7F7]' : 'text-[#BACBC9]'
@@ -57,7 +57,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
           <span className="text-sm font-normal text-[#BACBC9]">{label}</span>
         ) : null}
         <div
-          className={`flex h-[52px] items-center gap-2.5 rounded-xl border bg-[#182629] px-5 ${borderClass}`}
+          className={`flex h-[52px] items-center gap-2.5 rounded-[4px] border bg-[#182629] px-5 ${borderClass}`}
         >
           {leadingIcon ? (
             <span className={`inline-flex size-6 shrink-0 items-center justify-center ${iconClass}`}>

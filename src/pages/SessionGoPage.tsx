@@ -1,15 +1,14 @@
-import { ChevronDown, ChevronUp, Cloud, Clock3, MapPinned } from 'lucide-react'
+import { Bike, MapPinned, PersonStanding } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppHeader } from '../components/AppHeader'
 import { PressableButton } from '../components/ui/PressableButton'
 import { ToggleSwitch } from '../components/ui/ToggleSwitch'
-import { ProfileOverviewCard } from '../components/session/ProfileOverviewCard'
 import { ViewMapModal } from '../components/session/ViewMapModal'
-import { GoaiLoader } from '../components/session/GoaiLoader'
 import { SessionMenuModal } from '../components/session/SessionMenuModal'
-import { GoaiCardIcon } from '../components/ui/BasecampIcons'
-import { formatDuration, formatWeatherLine, rebuildSession } from '../lib/session'
+import { SaveSessionModal } from '../components/session/SaveSessionModal'
+import { GlobalLoadingScreen } from '../components/ui/GlobalLoadingScreen'
+import { formatDuration, rebuildSession } from '../lib/session'
 import { showSuccessToast } from '../components/overlays/NotificationHost'
 import { useReadyGoStore } from '../store/useReadyGoStore'
 
@@ -17,28 +16,42 @@ export function SessionGoPage() {
   const navigate = useNavigate()
   const session = useReadyGoStore((state) => state.activeSession)
   const currentProfile = useReadyGoStore((state) => state.currentProfile)
-  const savedRoutes = useReadyGoStore((state) => state.savedRoutes)
   const weather = useReadyGoStore((state) => state.weather)
   const updateActiveSession = useReadyGoStore((state) => state.updateActiveSession)
   const clearSession = useReadyGoStore((state) => state.clearSession)
+  const saveCompletedSession = useReadyGoStore(
+    (state) => state.saveCompletedSession,
+  )
+  const isGuest = useReadyGoStore((state) => state.isGuest)
+  const exitGuestMode = useReadyGoStore((state) => state.exitGuestMode)
   const [mapOpen, setMapOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [savedOpen, setSavedOpen] = useState(false)
   const [rebuilding, setRebuilding] = useState(false)
 
   useEffect(() => {
     if (!session || !currentProfile) {
-      navigate('/', { replace: true })
+      navigate(isGuest ? '/guest/activity' : '/', { replace: true })
     }
-  }, [currentProfile, navigate, session])
+  }, [currentProfile, isGuest, navigate, session])
 
   if (!session || !currentProfile) return null
 
-  const handleRebuild = (direction: 'shorter' | 'longer') => {
+  const ActivityIcon =
+    currentProfile.activityType === 'Cycle' ? Bike : PersonStanding
+
+  const handleRebuild = (direction: 'shorter' | 'longer' | 'remix') => {
     setRebuilding(true)
     window.setTimeout(() => {
-      updateActiveSession(rebuildSession(session, direction))
+      if (direction === 'remix') {
+        updateActiveSession(
+          rebuildSession(rebuildSession(session, 'longer'), 'shorter'),
+        )
+      } else {
+        updateActiveSession(rebuildSession(session, direction))
+      }
       setRebuilding(false)
-    }, 900)
+    }, 600)
   }
 
   const handleShareMap = () => {
@@ -48,14 +61,23 @@ export function SessionGoPage() {
 
   const handleSaveSession = () => {
     setMenuOpen(false)
-    showSuccessToast('Session saved', 'Find it anytime in Saved.')
+    saveCompletedSession(4)
+    setSavedOpen(true)
   }
 
   const handleCancelSession = () => {
     setMenuOpen(false)
     clearSession()
+    if (isGuest) {
+      exitGuestMode()
+      navigate('/welcome', { replace: true })
+      return
+    }
     navigate('/', { replace: true })
   }
+
+  const modifierClass =
+    'inline-flex h-8 items-center justify-center rounded-[4px] bg-[#BACBC9] px-3 text-xs font-medium tracking-[-0.01em] text-[#0F1918]'
 
   return (
     <div className="relative flex h-full flex-col bg-[#0F1918]">
@@ -63,156 +85,142 @@ export function SessionGoPage() {
         locationLabel={weather.location}
         temperatureC={weather.temperatureC}
         condition={weather.condition}
+        dryHours={session.weatherStableHours}
         showMenu
         onMenuClick={() => setMenuOpen(true)}
       />
 
       <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-5 pb-5">
-        <ProfileOverviewCard
-          profile={currentProfile}
-          savedRoutesCount={savedRoutes.length}
-          isActive
-        />
-
-        <div className="flex items-center gap-3 rounded-[10px] border border-[#39484A] bg-[#182629] px-4 py-3">
-          <GoaiCardIcon size={28} />
-          <p className="text-sm font-bold tracking-[-0.01em] text-[#BACBC9]">
-            GOAI Built This Session.
-          </p>
-        </div>
-
-        <div className="rounded-[10px] border border-[#39484A] bg-[#182629] px-4 py-3">
-          <p className="text-base font-bold tracking-[-0.01em] text-[#BACBC9]">
+        <section className="rounded-[4px] bg-[#182629] p-4">
+          <h1 className="text-base font-bold tracking-[-0.01em] text-[#BACBC9]">
             {session.title}
-          </p>
-        </div>
-
-        <div className="flex items-start gap-3 rounded-[10px] border border-[#39484A] bg-[#182629] px-4 py-3">
-          <Cloud size={18} className="mt-0.5 shrink-0 text-[#BACBC9]" aria-hidden="true" />
-          <div>
-            <p className="text-sm font-bold tracking-[-0.01em] text-[#BACBC9]">
-              No change for around [{session.weatherStableHours}] hours.
-            </p>
-            <p className="mt-1 text-xs font-bold tracking-[-0.01em] text-[#BACBC9]/80">
-              {formatWeatherLine(weather)}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-start gap-3 rounded-[10px] border border-[#39484A] bg-[#182629] px-4 py-3">
-          <Clock3 size={18} className="mt-0.5 shrink-0 text-[#BACBC9]" aria-hidden="true" />
-          <div>
-            <p className="text-sm font-bold tracking-[-0.01em] text-[#BACBC9]">
-              Estimated:
-            </p>
-            <p className="mt-1 text-base font-bold tracking-[-0.01em] text-[#BACBC9]">
-              [{formatDuration(session.estimatedMinutes)}]
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-start gap-3 rounded-[10px] border border-[#39484A] bg-[#182629] px-4 py-3">
-          <MapPinned size={18} className="mt-0.5 shrink-0 text-[#BACBC9]" aria-hidden="true" />
-          <div className="space-y-1 text-sm font-bold tracking-[-0.01em] text-[#BACBC9]">
-            <p>
-              Distance:{' '}
-              <span className="text-[#BACBC9]/80">
-                [{session.distanceKm}]Km ([{session.distanceMiles}] Miles)
-              </span>
-            </p>
-            <p>
-              Start/Finish:{' '}
-              <span className="text-[#BACBC9]/80">
-                [{session.startLocation}] To [{session.endLocation}]
-              </span>
-            </p>
-            <p>
-              Difficulty:{' '}
-              <span className="text-[#BACBC9]/80">[{session.difficulty}]</span>
-            </p>
-            <p>
-              Terrain:{' '}
-              <span className="text-[#BACBC9]/80">[{session.terrain}]</span>
-            </p>
-          </div>
-        </div>
-
-        <div className="rounded-[10px] border border-[#39484A] bg-[#182629] p-2">
-          <div className="grid grid-cols-2 gap-2">
+          </h1>
+          <div className="mt-3 flex items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-2">
+              <ActivityIcon
+                size={18}
+                className="shrink-0 text-[#70FF00]"
+                aria-hidden="true"
+              />
+              <p className="truncate text-sm font-bold tracking-[-0.01em] text-[#BACBC9]">
+                {currentProfile.name}
+              </p>
+            </div>
             <button
               type="button"
               tabIndex={0}
-              aria-label="Rebuild shorter"
+              aria-label="Switch profile"
+              onClick={() =>
+                showSuccessToast('Profile locked', 'Finish or cancel this session to switch.')
+              }
+              className="inline-flex h-8 shrink-0 items-center justify-center rounded-[4px] bg-[#F5F7F7] px-4 text-xs font-medium text-[#0F1918]"
+            >
+              Switch
+            </button>
+          </div>
+        </section>
+
+        <section className="rounded-[4px] bg-[#182629] p-4">
+          <h2 className="text-base font-bold tracking-[-0.01em] text-[#BACBC9]">
+            {session.title}
+          </h2>
+
+          <div className="mt-4 flex items-start gap-3">
+            <MapPinned
+              size={18}
+              className="mt-0.5 shrink-0 text-[#BACBC9]"
+              aria-hidden="true"
+            />
+            <div className="space-y-1.5 text-sm font-bold tracking-[-0.01em] text-[#BACBC9]">
+              <p>
+                Distance:{' '}
+                <span className="text-[#BACBC9]/80">
+                  {session.distanceKm}Km ({session.distanceMiles} Miles)
+                </span>
+              </p>
+              <p>
+                Start/Finish:{' '}
+                <span className="text-[#BACBC9]/80">
+                  {session.startLocation} To {session.endLocation}
+                </span>
+              </p>
+              <p>
+                Est. Time:{' '}
+                <span className="text-[#BACBC9]/80">
+                  {formatDuration(session.estimatedMinutes)}
+                </span>
+              </p>
+              <p>
+                Terrain:{' '}
+                <span className="text-[#BACBC9]/80">{session.terrain}</span>
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              tabIndex={0}
+              aria-label="Make shorter"
               onClick={() => handleRebuild('shorter')}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                  event.preventDefault()
-                  handleRebuild('shorter')
-                }
-              }}
-              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-full bg-[#DCE4E2] px-3 text-xs font-bold tracking-[-0.01em] text-[#0F191B]"
+              className={modifierClass}
             >
-              <ChevronDown size={14} aria-hidden="true" />
-              Rebuild shorter
+              Make shorter
             </button>
             <button
               type="button"
               tabIndex={0}
-              aria-label="Rebuild longer"
+              aria-label="Make longer"
               onClick={() => handleRebuild('longer')}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                  event.preventDefault()
-                  handleRebuild('longer')
-                }
-              }}
-              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-full bg-[#DCE4E2] px-3 text-xs font-bold tracking-[-0.01em] text-[#0F191B]"
+              className={modifierClass}
             >
-              <ChevronUp size={14} aria-hidden="true" />
-              Rebuild longer
+              Make longer
+            </button>
+            <button
+              type="button"
+              tabIndex={0}
+              aria-label="Remix"
+              onClick={() => handleRebuild('remix')}
+              className={modifierClass}
+            >
+              Remix
+            </button>
+            <button
+              type="button"
+              tabIndex={0}
+              aria-label="View Map"
+              onClick={() => setMapOpen(true)}
+              className={modifierClass}
+            >
+              View Map
             </button>
           </div>
-        </div>
 
-        <button
-          type="button"
-          tabIndex={0}
-          aria-label="View map"
-          onClick={() => setMapOpen(true)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter' || event.key === ' ') {
-              event.preventDefault()
-              setMapOpen(true)
-            }
-          }}
-          className="flex h-8 w-full items-center justify-center rounded-full bg-[#DCE4E2] text-sm font-bold tracking-[-0.01em] text-[#0F191B]"
-        >
-          View map
-        </button>
-
-        <div className="flex items-center justify-between rounded-[10px] border border-[#39484A] bg-[#182629] px-4 py-3">
-          <span className="text-sm font-bold tracking-[-0.01em] text-[#BACBC9]">
-            Show Map While App Is Open
-          </span>
-          <ToggleSwitch
-            label="Show Map While App Is Open"
-            checked={session.showMapWhileOpen}
-            onChange={(checked) =>
-              updateActiveSession({ showMapWhileOpen: checked })
-            }
-          />
-        </div>
+          <div className="mt-4 flex items-center justify-between border-t border-[#39484A] pt-4">
+            <span className="text-sm font-bold tracking-[-0.01em] text-[#BACBC9]">
+              Show Map While App Is Open
+            </span>
+            <ToggleSwitch
+              label="Show Map While App Is Open"
+              checked={session.showMapWhileOpen}
+              onChange={(checked) =>
+                updateActiveSession({ showMapWhileOpen: checked })
+              }
+            />
+          </div>
+        </section>
       </div>
 
       <div className="px-5 pb-6">
         <PressableButton
-          onClick={() => navigate('/session/loading')}
-          className="border-0"
+          onClick={() => navigate('/user/loading')}
+          className="rounded-[4px] border-0"
           style={{
-            height: 52,
-            borderRadius: 12,
+            height: 56,
+            borderRadius: 4,
             backgroundColor: '#70FF00',
-            color: '#0F191B',
+            color: '#0F1918',
+            fontWeight: 700,
           }}
         >
           Go
@@ -231,10 +239,19 @@ export function SessionGoPage() {
         onSaveSession={handleSaveSession}
         onCancelSession={handleCancelSession}
       />
-      <GoaiLoader
+      <SaveSessionModal
+        open={savedOpen}
+        onClose={() => setSavedOpen(false)}
+        onBasecamp={() => {
+          setSavedOpen(false)
+          clearSession()
+          navigate('/', { replace: true })
+        }}
+      />
+      <GlobalLoadingScreen
+        overlay
         open={rebuilding}
-        statusLines={['Adjusting your route...', 'Rechecking distance...']}
-        intervalMs={450}
+        ariaLabel="Rebuilding route"
       />
     </div>
   )

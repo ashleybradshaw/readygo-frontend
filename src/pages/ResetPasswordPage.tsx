@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { AuthCloseButton } from '../components/auth/AuthCloseButton'
 import { PressableButton } from '../components/ui/PressableButton'
 import { TextField } from '../components/ui/TextField'
-import { CloseBoxedIcon, EmailFieldIcon } from '../components/ui/AuthIcons'
+import { EmailFieldIcon } from '../components/ui/AuthIcons'
 import { isValidEmail } from '../lib/onboarding'
 
 export function ResetPasswordPage() {
@@ -17,25 +18,14 @@ export function ResetPasswordPage() {
 
   const canSubmit = isValidEmail(email)
 
-  const handleClose = () => {
-    navigate('/auth/login')
-  }
-
   return (
-    <div className="relative flex h-full flex-col overflow-y-auto bg-[#0F1918] px-5 pb-8 pt-[83px]">
-      <button
-        type="button"
-        aria-label="Close"
-        onClick={handleClose}
-        className="absolute top-[55px] right-5 flex items-center justify-center"
-      >
-        <CloseBoxedIcon shape="square" size={34} strokeWidth={3} />
-      </button>
+    <div className="relative flex h-full flex-col overflow-y-auto bg-[#0F1918] px-5 pb-8 pt-[max(3.5rem,env(safe-area-inset-top))]">
+      <AuthCloseButton onClick={() => navigate('/auth/login')} />
 
-      <div className="mb-8 flex flex-col gap-2.5">
+      <div className="mb-8 flex flex-col gap-2.5 pr-10">
         <div className="flex flex-col gap-[5px] uppercase">
           <h1 className="font-display text-2xl font-bold leading-8 tracking-[-0.02em] text-[#BACBC9]">
-            Reset password
+            Reset Password
           </h1>
           <p className="font-sans text-lg font-bold leading-[26px] tracking-[-0.01em] text-[#BACBC9]">
             Let&apos;s get you back on track.
@@ -65,13 +55,18 @@ export function ResetPasswordPage() {
           variant="cta"
           disabled={!canSubmit}
           onClick={() =>
-            navigate('/auth/reset/new', { state: { email: email.trim() } })
+            navigate('/auth/new-password', {
+              state: { email: email.trim() },
+            })
           }
+          className="rounded-[4px]"
+          style={{ borderRadius: 4 }}
         >
           Send reset link
         </PressableButton>
         <button
           type="button"
+          tabIndex={0}
           className="px-5 py-5 font-sans text-base font-bold tracking-[-0.01em] text-[#BACBC9] underline underline-offset-2"
         >
           Need help?

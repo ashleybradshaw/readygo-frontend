@@ -13,10 +13,10 @@ export function OAuthButton({ onClick, children }: OAuthButtonProps) {
       variant="ghost"
       onClick={onClick}
       whileTap={{ scale: 1 }}
-      className="!no-underline hover:!no-underline border border-[#39484A] bg-transparent text-[#BACBC9] active:bg-[#1E2729]"
+      className="!no-underline hover:!no-underline rounded-[4px] border border-[#2D3739] bg-transparent text-[#BACBC9] active:bg-[#1E2729]"
       style={{
         height: 52,
-        borderRadius: 12,
+        borderRadius: 4,
         textDecoration: 'none',
       }}
     >

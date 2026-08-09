@@ -7,6 +7,7 @@ interface AppHeaderProps {
   locationLabel?: string
   temperatureC?: number | null
   condition?: string
+  dryHours?: number
   onMenuClick?: () => void
   showMenu?: boolean
   showWeather?: boolean
@@ -16,6 +17,7 @@ export function AppHeader({
   locationLabel,
   temperatureC,
   condition,
+  dryHours,
   onMenuClick,
   showMenu = true,
   showWeather = true,
@@ -37,18 +39,25 @@ export function AppHeader({
       </div>
 
       {showWeatherRow ? (
-        <div className="relative flex min-h-6 items-center justify-center px-2">
+        <div className="relative flex min-h-6 items-start justify-center px-2">
           {showWeather ? (
-            <p className="truncate text-center text-sm font-bold leading-[18px] tracking-[-0.01em] text-[#BACBC9]">
-              {weatherLine}
-            </p>
+            <div className="min-w-0 text-center">
+              <p className="truncate text-sm font-bold leading-[18px] tracking-[-0.01em] text-[#BACBC9]">
+                {weatherLine}
+              </p>
+              {typeof dryHours === 'number' ? (
+                <p className="mt-1 text-xs font-bold tracking-[-0.01em] text-[#BACBC9]/80">
+                  Dry for the next [{dryHours}] Hrs
+                </p>
+              ) : null}
+            </div>
           ) : null}
           {showMenu && onMenuClick ? (
             <button
               type="button"
               aria-label="More options"
               onClick={onMenuClick}
-              className="absolute right-0 flex h-[22px] w-10 shrink-0 items-center justify-center rounded-full bg-[#182629] text-[#BACBC9] transition-colors hover:text-white"
+              className="absolute right-0 top-0 flex h-[22px] w-10 shrink-0 items-center justify-center rounded-full bg-[#182629] text-[#BACBC9] transition-colors hover:text-white"
             >
               <MoreHorizontal size={16} strokeWidth={2.25} />
             </button>

@@ -55,6 +55,7 @@ export interface ProfilePreferences {
   showSimpleMaps: boolean
   showTraffic: boolean
   loopOrSingleDestination: boolean
+  preferBikePaths: boolean
   sessionDuration: SessionDuration
 }
 
@@ -152,6 +153,7 @@ export const defaultPreferences = (): ProfilePreferences => ({
   showSimpleMaps: false,
   showTraffic: false,
   loopOrSingleDestination: false,
+  preferBikePaths: true,
   sessionDuration: 'Under an hour',
 })
 
@@ -167,15 +169,36 @@ export const defaultWeather = (): WeatherSnapshot => ({
   condition: 'Light cloud',
 })
 
+export interface GuestSessionDraft {
+  activitySelected: boolean
+  locationGranted: boolean
+  distanceMiles: number
+  terrain: string
+  durationHours: number
+  durationLabel: string
+}
+
+export const defaultGuestSessionDraft = (): GuestSessionDraft => ({
+  activitySelected: false,
+  locationGranted: false,
+  distanceMiles: 10,
+  terrain: 'Paved',
+  durationHours: 1,
+  durationLabel: '1 Hour',
+})
+
 interface ReadyGoState {
   hasSeenIntro: boolean
   hasAcceptedTerms: boolean
   isAuthenticated: boolean
+  isGuest: boolean
   userName: string
   userEmail: string
+  authMethod: 'email' | 'apple' | 'google'
   currentProfile: ReadyGoProfile | null
   savedProfiles: ReadyGoProfile[]
   isConfigured: boolean
+  hasSeenSmartWindowIntro: boolean
   weather: WeatherSnapshot
   chartRange: ChartRange
   activityByRange: Record<ChartRange, ActivityPoint[]>
@@ -189,15 +212,24 @@ interface ReadyGoState {
   savedTab: SavedTab
   profileDraft: ProfileDraft
   editingProfileId: string | null
+  guestSession: GuestSessionDraft
   notifications: AppNotification[]
   setHasSeenIntro: (value: boolean) => void
   setHasAcceptedTerms: (value: boolean) => void
   setAuthenticated: (value: boolean) => void
+  setIsGuest: (value: boolean) => void
+  enterGuestMode: () => void
+  exitGuestMode: () => void
+  promoteGuestToAccount: () => void
+  setGuestSession: (partial: Partial<GuestSessionDraft>) => void
+  resetGuestSession: () => void
   setUserName: (name: string) => void
   setUserEmail: (email: string) => void
+  setAuthMethod: (method: 'email' | 'apple' | 'google') => void
   setCurrentProfile: (profile: ReadyGoProfile | null) => void
   setSavedProfiles: (profiles: ReadyGoProfile[]) => void
   setIsConfigured: (isConfigured: boolean) => void
+  markSmartWindowIntroSeen: () => void
   setWeather: (weather: WeatherSnapshot) => void
   setChartRange: (range: ChartRange) => void
   setOneTimeSessionHours: (hours: number) => void
@@ -265,11 +297,14 @@ export const useReadyGoStore = create<ReadyGoState>((set, get) => ({
   hasSeenIntro: false,
   hasAcceptedTerms: false,
   isAuthenticated: false,
+  isGuest: false,
   userName: '',
   userEmail: '',
+  authMethod: 'email',
   currentProfile: null,
   savedProfiles: [],
   isConfigured: false,
+  hasSeenSmartWindowIntro: true,
   weather: defaultWeather(),
   chartRange: 'week',
   activityByRange: seedActivity(),
@@ -283,15 +318,72 @@ export const useReadyGoStore = create<ReadyGoState>((set, get) => ({
   savedTab: 'sessions',
   profileDraft: defaultProfileDraft(),
   editingProfileId: null,
+  guestSession: defaultGuestSessionDraft(),
   notifications: [],
   setHasSeenIntro: (hasSeenIntro) => set({ hasSeenIntro }),
   setHasAcceptedTerms: (hasAcceptedTerms) => set({ hasAcceptedTerms }),
   setAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
+  setIsGuest: (isGuest) => set({ isGuest }),
+  enterGuestMode: () =>
+    set({
+      isGuest: true,
+      isAuthenticated: false,
+      guestSession: defaultGuestSessionDraft(),
+      profileDraft: defaultProfileDraft(),
+      currentProfile: null,
+      isConfigured: false,
+      activeSession: null,
+      sessionStatus: 'idle',
+    }),
+  exitGuestMode: () =>
+    set({
+      isGuest: false,
+      guestSession: defaultGuestSessionDraft(),
+      profileDraft: defaultProfileDraft(),
+      currentProfile: null,
+      activeSession: null,
+      sessionStatus: 'idle',
+    }),
+  promoteGuestToAccount: () =>
+    set((state) => {
+      const guest = state.guestSession
+      const activityType = state.profileDraft.activityType
+      return {
+        isGuest: false,
+        isAuthenticated: true,
+        isConfigured: false,
+        oneTimeSessionHours: guest.durationHours || state.oneTimeSessionHours,
+        profileDraft: {
+          ...state.profileDraft,
+          activityType,
+          preferences: {
+            ...state.profileDraft.preferences,
+            locationMode: guest.locationGranted
+              ? 'gps'
+              : state.profileDraft.preferences.locationMode,
+            usePhoneLocation: guest.locationGranted,
+            setCurrentLocation: guest.locationGranted,
+            locationSettingsOn: guest.locationGranted,
+            sessionDuration:
+              guest.durationLabel ||
+              state.profileDraft.preferences.sessionDuration,
+          },
+        },
+        guestSession: defaultGuestSessionDraft(),
+      }
+    }),
+  setGuestSession: (partial) =>
+    set((state) => ({
+      guestSession: { ...state.guestSession, ...partial },
+    })),
+  resetGuestSession: () => set({ guestSession: defaultGuestSessionDraft() }),
   setUserName: (userName) => set({ userName }),
   setUserEmail: (userEmail) => set({ userEmail }),
+  setAuthMethod: (authMethod) => set({ authMethod }),
   setCurrentProfile: (currentProfile) => set({ currentProfile }),
   setSavedProfiles: (savedProfiles) => set({ savedProfiles }),
   setIsConfigured: (isConfigured) => set({ isConfigured }),
+  markSmartWindowIntroSeen: () => set({ hasSeenSmartWindowIntro: true }),
   setWeather: (weather) => set({ weather }),
   setChartRange: (chartRange) => set({ chartRange }),
   setOneTimeSessionHours: (oneTimeSessionHours) => set({ oneTimeSessionHours }),
@@ -330,6 +422,7 @@ export const useReadyGoStore = create<ReadyGoState>((set, get) => ({
         currentProfile: profile,
         savedProfiles: nextProfiles,
         isConfigured: true,
+        hasSeenSmartWindowIntro: Boolean(editingId),
         profileDraft: defaultProfileDraft(),
         editingProfileId: null,
       }
@@ -470,6 +563,7 @@ export const useReadyGoStore = create<ReadyGoState>((set, get) => ({
       savedProfiles: [],
       currentProfile: null,
       isConfigured: false,
+      hasSeenSmartWindowIntro: true,
       activeSession: null,
       sessionStatus: 'idle',
       profileDraft: defaultProfileDraft(),
@@ -480,11 +574,15 @@ export const useReadyGoStore = create<ReadyGoState>((set, get) => ({
       hasSeenIntro: false,
       hasAcceptedTerms: false,
       isAuthenticated: false,
+      isGuest: false,
+      guestSession: defaultGuestSessionDraft(),
       userName: '',
       userEmail: '',
+      authMethod: 'email' as const,
       currentProfile: null,
       savedProfiles: [],
       isConfigured: false,
+      hasSeenSmartWindowIntro: true,
       savedRoutes: [],
       sessionHistory: [],
       activeSession: null,
@@ -499,6 +597,8 @@ export const useReadyGoStore = create<ReadyGoState>((set, get) => ({
   signOut: () =>
     set({
       isAuthenticated: false,
+      isGuest: false,
+      guestSession: defaultGuestSessionDraft(),
       activeSession: null,
       sessionStatus: 'idle',
       sessionMenuOpen: false,

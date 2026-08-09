@@ -24,7 +24,7 @@ export function SessionActivePage() {
           showEndHold
           onEndHold={() => {
             finishActiveSession()
-            navigate('/session/summary')
+            navigate('/user/summary')
           }}
         />
 

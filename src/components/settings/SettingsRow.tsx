@@ -1,6 +1,5 @@
 import { ChevronRight } from 'lucide-react'
 import type { ReactNode } from 'react'
-import { motion } from 'framer-motion'
 
 interface SettingsRowProps {
   label: string
@@ -12,67 +11,66 @@ interface SettingsRowProps {
 }
 
 const resolveRadius = (index: number, totalLength: number) => {
-  if (totalLength <= 1) return 'rounded-[10px]'
-  if (index === 0) return 'rounded-t-[10px] rounded-b-none'
-  if (index === totalLength - 1) return 'rounded-b-[10px] rounded-t-none'
+  if (totalLength <= 1) return 'rounded-[4px]'
+  if (index === 0) return 'rounded-t-[4px] rounded-b-none'
+  if (index === totalLength - 1) return 'rounded-b-[4px] rounded-t-none'
   return 'rounded-none'
 }
 
 export const SettingsRow = ({
   label,
   onClick,
-  icon,
   tone = 'default',
   index = 0,
   totalLength = 1,
 }: SettingsRowProps) => {
-  const isLast = index === totalLength - 1
   const radius = resolveRadius(index, totalLength)
+  const showTopBorder = index > 0
 
   const tones = {
     default: {
-      row: 'bg-[#EBF1EF] text-[#0F1918]',
-      chevron: '#0F191B',
-      divider: 'border-[#D2DDD9]',
+      text: 'text-[#BACBC9]',
+      chevron: 'text-[#BACBC9]/50',
     },
     data: {
-      row: 'bg-[#182629] text-[#BACBC9]',
-      chevron: '#BACBC9',
-      divider: 'border-[#D2DDD9]/25',
+      text: 'text-[#C5A059]',
+      chevron: 'text-[#C5A059]',
     },
     danger: {
-      row: 'bg-[#2D191C] text-[#BC757D]',
-      chevron: '#BC757D',
-      divider: 'border-[#D2DDD9]/25',
+      text: 'text-[#FF3B30]',
+      chevron: 'text-[#FF3B30]',
     },
   }
 
   const palette = tones[tone]
 
   return (
-    <motion.button
+    <button
       type="button"
-      whileTap={{ scale: 0.98 }}
+      tabIndex={0}
       onClick={onClick}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          onClick?.()
+        }
+      }}
       aria-label={label}
-      className={`flex w-full items-center gap-3 px-4 py-3.5 text-left ${radius} ${palette.row} ${
-        !isLast ? `border-b ${palette.divider}` : ''
+      className={`flex h-11 w-full items-center gap-3 bg-[#182629] px-4 text-left ${radius} ${
+        showTopBorder ? 'border-t border-[#2D3739]/50' : ''
       }`}
     >
-      {icon ? (
-        <span className="inline-flex size-6 shrink-0 items-center justify-center [&_svg]:text-current">
-          {icon}
-        </span>
-      ) : null}
-      <span className="min-w-0 flex-1 font-sans text-base font-bold tracking-[-0.01em]">
+      <span
+        className={`min-w-0 flex-1 font-sans text-sm font-bold tracking-[-0.01em] ${palette.text}`}
+      >
         {label}
       </span>
-      <span
-        className="inline-flex size-8 shrink-0 items-center justify-center"
+      <ChevronRight
+        size={24}
+        strokeWidth={1.75}
+        className={`shrink-0 ${palette.chevron}`}
         aria-hidden="true"
-      >
-        <ChevronRight size={32} strokeWidth={1.5} color={palette.chevron} />
-      </span>
-    </motion.button>
+      />
+    </button>
   )
 }
