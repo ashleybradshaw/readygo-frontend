@@ -51,7 +51,7 @@ export function DeleteAccountPage() {
           disabled={!canDelete}
           onClick={() => {
             deleteAccount()
-            navigate('/welcome', { replace: true })
+            navigate('/', { replace: true })
           }}
           className="rounded-[4px] border-0"
           style={{

@@ -6,18 +6,20 @@ import { ViewMapModal } from '../components/session/ViewMapModal'
 import { SaveSessionModal } from '../components/session/SaveSessionModal'
 import { formatDuration } from '../lib/session'
 import { useReadyGoStore } from '../store/useReadyGoStore'
-import ratingBad from '../assets/feedback/rating-bad.png'
-import ratingPoor from '../assets/feedback/rating-poor.png'
-import ratingOk from '../assets/feedback/rating-ok.png'
-import ratingGood from '../assets/feedback/rating-good.png'
-import ratingFine from '../assets/feedback/rating-fine.png'
+import {
+  RatingIconBad,
+  RatingIconFine,
+  RatingIconGood,
+  RatingIconOk,
+  RatingIconPoor,
+} from '../components/feedback/RatingIcons'
 
 const SENTIMENTS = [
-  { value: 1, src: ratingBad, label: 'Very bad' },
-  { value: 2, src: ratingPoor, label: 'Bad' },
-  { value: 3, src: ratingOk, label: 'Okay' },
-  { value: 4, src: ratingGood, label: 'Good' },
-  { value: 5, src: ratingFine, label: 'Very good' },
+  { value: 1, Icon: RatingIconBad, label: 'Very bad' },
+  { value: 2, Icon: RatingIconPoor, label: 'Bad' },
+  { value: 3, Icon: RatingIconOk, label: 'Okay' },
+  { value: 4, Icon: RatingIconGood, label: 'Good' },
+  { value: 5, Icon: RatingIconFine, label: 'Very good' },
 ]
 
 export function SessionSummaryPage() {
@@ -187,6 +189,7 @@ export function SessionSummaryPage() {
             <div className="mt-4 flex items-end justify-between gap-2">
               {SENTIMENTS.map((item) => {
                 const active = sentiment === item.value
+                const Icon = item.Icon
                 return (
                   <button
                     key={item.value}
@@ -195,20 +198,9 @@ export function SessionSummaryPage() {
                     aria-label={item.label}
                     aria-pressed={active}
                     onClick={() => setSentiment(item.value)}
-                    className={`flex flex-1 flex-col items-center gap-1 rounded-[4px] py-1 ${
-                      active
-                        ? 'bg-[#70FF00]/15 outline outline-1 outline-[#70FF00]'
-                        : ''
-                    }`}
+                    className="flex flex-1 flex-col items-center gap-1 rounded-[4px] py-1"
                   >
-                    <img
-                      src={item.src}
-                      alt=""
-                      aria-hidden="true"
-                      className={`size-10 rounded-[4px] object-cover ${
-                        active ? '' : 'opacity-55 grayscale'
-                      }`}
-                    />
+                    <Icon active={active} className="size-10" />
                   </button>
                 )
               })}

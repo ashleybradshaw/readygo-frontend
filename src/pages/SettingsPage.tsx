@@ -5,6 +5,7 @@ import { ClosePillButton } from '../components/ui/ClosePillButton'
 import { FeedbackIssueSheet } from '../components/settings/FeedbackIssueSheet'
 import { showSuccessToast } from '../components/overlays/NotificationHost'
 import { useReadyGoStore } from '../store/useReadyGoStore'
+import { getCreateProfilePath } from '../lib/profileRouting'
 
 type RowConfig = {
   label: string
@@ -69,8 +70,10 @@ export function SettingsPage() {
     {
       label: 'Create new profile',
       onClick: () => {
+        const state = useReadyGoStore.getState()
+        const destination = getCreateProfilePath(state)
         resetProfileDraft()
-        navigate('/user/location-activity')
+        navigate(destination)
       },
     },
     {

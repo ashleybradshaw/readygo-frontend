@@ -33,6 +33,7 @@ import { AccountCreatedPage } from './pages/AccountCreatedPage'
 import { UserBasecampSetupPage } from './pages/UserBasecampSetupPage'
 import { UserLoadingPage } from './pages/UserLoadingPage'
 import { UserSessionTunerPage } from './pages/UserSessionTunerPage'
+import { UserLocationActivityPage } from './pages/UserLocationActivityPage'
 import { UserProfileBuilderPage } from './pages/UserProfileBuilderPage'
 import { GatheringProfilePage } from './pages/GatheringProfilePage'
 import { SessionGoPage } from './pages/SessionGoPage'
@@ -97,6 +98,10 @@ export default function App() {
           <Route element={<RequireAuth />}>
             <Route
               path="/user/location-activity"
+              element={<UserLocationActivityPage />}
+            />
+            <Route
+              path="/user/profile-builder"
               element={<UserProfileBuilderPage />}
             />
             <Route

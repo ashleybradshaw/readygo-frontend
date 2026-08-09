@@ -8,14 +8,20 @@ import {
   ReadyGoWordmark,
 } from '../components/ui/BasecampIcons'
 import { useReadyGoStore } from '../store/useReadyGoStore'
+import { getCreateProfilePath } from '../lib/profileRouting'
 
 export function UserBasecampSetupPage() {
   const navigate = useNavigate()
   const userName = useReadyGoStore((state) => state.userName)
+  const guestSession = useReadyGoStore((state) => state.guestSession)
+  const profileDraft = useReadyGoStore((state) => state.profileDraft)
   const handle = userName.startsWith('@')
     ? userName
     : `@${userName || 'username'}`
 
+  const handleCompleteProfile = () => {
+    navigate(getCreateProfilePath({ guestSession, profileDraft }))
+  }
   return (
     <div className="relative flex h-full flex-col bg-[#0F1918]">
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-5 pb-4 pt-[max(2.5rem,env(safe-area-inset-top))]">
@@ -53,7 +59,7 @@ export function UserBasecampSetupPage() {
         <div className="mt-auto pt-8">
           <PressableButton
             variant="cta"
-            onClick={() => navigate('/user/location-activity')}
+            onClick={handleCompleteProfile}
             className="rounded-[4px]"
             style={{ borderRadius: 4 }}
           >

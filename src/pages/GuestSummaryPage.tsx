@@ -1,16 +1,23 @@
 import { MapPinned, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import {
+  RatingIconBad,
+  RatingIconFine,
+  RatingIconGood,
+  RatingIconOk,
+  RatingIconPoor,
+} from '../components/feedback/RatingIcons'
 import { PressableButton } from '../components/ui/PressableButton'
 import { formatDuration } from '../lib/session'
 import { useReadyGoStore } from '../store/useReadyGoStore'
 
 const SENTIMENTS = [
-  { value: 1, emoji: '😠', label: 'Very bad' },
-  { value: 2, emoji: '😕', label: 'Bad' },
-  { value: 3, emoji: '😐', label: 'Okay' },
-  { value: 4, emoji: '🙂', label: 'Good' },
-  { value: 5, emoji: '😄', label: 'Very good' },
+  { value: 1, Icon: RatingIconBad, label: 'Very bad' },
+  { value: 2, Icon: RatingIconPoor, label: 'Bad' },
+  { value: 3, Icon: RatingIconOk, label: 'Okay' },
+  { value: 4, Icon: RatingIconGood, label: 'Good' },
+  { value: 5, Icon: RatingIconFine, label: 'Very good' },
 ]
 
 export function GuestSummaryPage() {
@@ -94,9 +101,10 @@ export function GuestSummaryPage() {
           <div className="mt-4 grid grid-cols-2 gap-3">
             <PressableButton
               onClick={() => navigate('/auth/terms')}
-              className="rounded-[4px] border-0"
+              className="rounded-[4px] border-0 px-4 py-3 text-sm whitespace-nowrap"
               style={{
-                height: 48,
+                minHeight: 48,
+                height: 'auto',
                 borderRadius: 4,
                 backgroundColor: '#B59473',
                 color: '#0F1918',
@@ -107,9 +115,10 @@ export function GuestSummaryPage() {
             </PressableButton>
             <PressableButton
               onClick={() => navigate('/guest/map-preview')}
-              className="rounded-[4px] border-0"
+              className="rounded-[4px] border-0 px-4 py-3 text-sm whitespace-nowrap"
               style={{
-                height: 48,
+                minHeight: 48,
+                height: 'auto',
                 borderRadius: 4,
                 backgroundColor: '#BACBC9',
                 color: '#0F1918',
@@ -122,7 +131,7 @@ export function GuestSummaryPage() {
         </section>
 
         {feedbackOpen ? (
-          <section className="relative rounded-[12px] bg-[#1A1524] p-4">
+          <section className="relative rounded-[4px] bg-[#1A1524] p-4">
             <button
               type="button"
               tabIndex={0}
@@ -141,6 +150,7 @@ export function GuestSummaryPage() {
             <div className="mt-4 flex items-end justify-between gap-2">
               {SENTIMENTS.map((item) => {
                 const active = sentiment === item.value
+                const Icon = item.Icon
                 return (
                   <button
                     key={item.value}
@@ -149,15 +159,9 @@ export function GuestSummaryPage() {
                     aria-label={item.label}
                     aria-pressed={active}
                     onClick={() => setSentiment(item.value)}
-                    className={`flex flex-1 flex-col items-center gap-1 rounded-[10px] py-2 ${
-                      active ? 'bg-[#70FF00]/15 outline outline-1 outline-[#70FF00]' : ''
-                    }`}
+                    className="flex flex-1 flex-col items-center gap-1 rounded-[4px] py-1"
                   >
-                    <span
-                      className={`text-2xl ${active ? '' : 'opacity-50 grayscale'}`}
-                    >
-                      {item.emoji}
-                    </span>
+                    <Icon active={active} className="size-10" />
                   </button>
                 )
               })}

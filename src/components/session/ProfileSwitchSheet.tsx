@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { BottomSheet } from '../ui/BottomSheet'
 import { ClosePillButton } from '../ui/ClosePillButton'
 import { useReadyGoStore, type ReadyGoProfile } from '../../store/useReadyGoStore'
+import { getCreateProfilePath } from '../../lib/profileRouting'
 
 interface ProfileSwitchSheetProps {
   open: boolean
@@ -23,9 +24,10 @@ export const ProfileSwitchSheet = ({
   const isSingle = profiles.length <= 1
 
   const handleCreateProfile = () => {
+    const destination = getCreateProfilePath(useReadyGoStore.getState())
     resetProfileDraft()
     onClose()
-    navigate('/user/location-activity')
+    navigate(destination)
   }
 
   const handleEditProfile = () => {
@@ -33,7 +35,7 @@ export const ProfileSwitchSheet = ({
       startEditProfile(currentProfile.id)
     }
     onClose()
-    navigate('/user/location-activity')
+    navigate('/user/profile-builder')
   }
 
   const handleSelectProfile = (profileId: string) => {

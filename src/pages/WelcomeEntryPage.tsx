@@ -1,8 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { PressableButton } from '../components/ui/PressableButton'
 import { useReadyGoStore } from '../store/useReadyGoStore'
-
-const HERO_IMAGE = '/images/intro/intro-1.png'
+import welcomeHero from '../assets/intro/welcome-hero.png.jpg'
 
 export function WelcomeEntryPage() {
   const navigate = useNavigate()
@@ -24,12 +23,11 @@ export function WelcomeEntryPage() {
     <div className="relative flex h-full flex-col overflow-hidden bg-[#0F1918]">
       <div className="relative h-[55%] shrink-0 overflow-hidden">
         <img
-          src={HERO_IMAGE}
+          src={welcomeHero}
           alt=""
           className="absolute inset-0 size-full object-cover object-top"
           draggable={false}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-[#0F1918]" />
         <p
           className="absolute inset-0 flex items-center justify-center font-display text-[24px] font-bold uppercase tracking-wider text-[#FF3B30]"
           aria-hidden="true"

@@ -10,7 +10,7 @@ import bgRunning from '../assets/intro/bg-running.png'
 
 type ActivityChoice = 'Cycle' | 'Run' | null
 
-export function GuestActivityPage() {
+export function UserLocationActivityPage() {
   const navigate = useNavigate()
   const weather = useReadyGoStore((state) => state.weather)
   const setWeather = useReadyGoStore((state) => state.setWeather)
@@ -54,7 +54,6 @@ export function GuestActivityPage() {
   const handleEnableLocation = () => {
     if (locationGranted) return
 
-    // Prototype: mock grant without a native/browser permissions prompt
     setLocationGranted(true)
     setGuestSession({ locationGranted: true })
     updateDraftPreferences({
@@ -71,7 +70,7 @@ export function GuestActivityPage() {
 
   const handleContinue = () => {
     if (!canContinue) return
-    navigate('/guest/session')
+    navigate('/user/profile-builder')
   }
 
   const activityButtonClass = (optionId: 'Cycle' | 'Run') => {
@@ -174,9 +173,7 @@ export function GuestActivityPage() {
                 : 'bg-[#2D3739] text-[#BACBC9]'
             }`}
           >
-            {locationGranted
-              ? 'Location Enabled'
-              : 'Enable Location Access'}
+            {locationGranted ? 'Location Enabled' : 'Enable Location Access'}
           </button>
 
           <PressableButton

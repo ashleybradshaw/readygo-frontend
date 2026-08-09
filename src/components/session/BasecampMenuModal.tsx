@@ -3,6 +3,7 @@ import { BottomSheet } from '../ui/BottomSheet'
 import { PressableButton } from '../ui/PressableButton'
 import { ClosePillButton } from '../ui/ClosePillButton'
 import { useReadyGoStore } from '../../store/useReadyGoStore'
+import { getCreateProfilePath } from '../../lib/profileRouting'
 
 const HOUR_PRESETS = [1, 2, 3, 4] as const
 
@@ -27,9 +28,10 @@ export function BasecampMenuModal({
   const progress = ((clampedHours - 1) / 3) * 100
 
   const handleCreateProfile = () => {
+    const destination = getCreateProfilePath(useReadyGoStore.getState())
     resetProfileDraft()
     onClose()
-    navigate('/user/location-activity')
+    navigate(destination)
   }
 
   const handleEditProfile = () => {
@@ -37,7 +39,7 @@ export function BasecampMenuModal({
       startEditProfile(currentProfile.id)
     }
     onClose()
-    navigate('/user/location-activity')
+    navigate('/user/profile-builder')
   }
 
   const handleSave = () => {

@@ -1,8 +1,8 @@
-import { AnimatePresence, motion } from 'framer-motion'
 import { Bike, Footprints } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PressableButton } from '../components/ui/PressableButton'
+import { SegmentedPillRow } from '../components/ui/SegmentedPillRow'
 import { ToggleSwitch } from '../components/ui/ToggleSwitch'
 import { ClosePillButton } from '../components/ui/ClosePillButton'
 import { formatWeatherLine, buildSessionManifest } from '../lib/session'
@@ -13,14 +13,7 @@ import activityRun from '../assets/guest/activity-run.png'
 const CYCLE_TERRAINS = ['Paved', 'Rolling', 'Climbs', 'Off Road'] as const
 const RUN_TERRAINS = ['Flat', 'Trail', 'Hills', 'Mixed'] as const
 
-const CYCLE_DURATIONS = [
-  { label: '1 Hour', hours: 1 },
-  { label: '2 Hours', hours: 2 },
-  { label: '3 Hours', hours: 3 },
-  { label: '4 Hours', hours: 4 },
-] as const
-
-const RUN_DURATIONS = [
+const DURATION_OPTIONS = [
   { label: '20/30 Mins', hours: 0.5 },
   { label: '1 Hour', hours: 1 },
   { label: '1.5 Hours', hours: 1.5 },
@@ -43,25 +36,14 @@ export function GuestSessionPage() {
   const exitGuestMode = useReadyGoStore((state) => state.exitGuestMode)
 
   const isCycle = profileDraft.activityType === 'Cycle'
-  const [exitOpen, setExitOpen] = useState(false)
 
   const minMiles = 1
   const maxMiles = isCycle ? 60 : 20
   const terrains = isCycle ? CYCLE_TERRAINS : RUN_TERRAINS
-  const durations = isCycle ? CYCLE_DURATIONS : RUN_DURATIONS
 
   const distanceMiles = Math.min(
     maxMiles,
     Math.max(minMiles, guestSession.distanceMiles),
-  )
-
-  const terrainIndex = Math.max(
-    0,
-    terrains.findIndex((item) => item === guestSession.terrain),
-  )
-  const durationIndex = Math.max(
-    0,
-    durations.findIndex((item) => item.label === guestSession.durationLabel),
   )
 
   useEffect(() => {
@@ -80,8 +62,8 @@ export function GuestSessionPage() {
     updateProfileDraft({ activityType: nextType })
     setGuestSession({
       terrain: nextType === 'Cycle' ? 'Paved' : 'Flat',
-      durationHours: nextType === 'Cycle' ? 1 : 0.5,
-      durationLabel: nextType === 'Cycle' ? '1 Hour' : '20/30 Mins',
+      durationHours: 0.5,
+      durationLabel: '20/30 Mins',
       distanceMiles: nextType === 'Cycle' ? 15 : 5,
     })
   }
@@ -115,18 +97,17 @@ export function GuestSessionPage() {
     navigate('/guest/session-ready', { replace: true })
   }
 
-  const handleConfirmExit = () => {
+  const handleExit = () => {
     exitGuestMode()
-    setExitOpen(false)
     navigate('/welcome', { replace: true })
   }
 
   const distanceProgress =
     ((distanceMiles - minMiles) / (maxMiles - minMiles)) * 100
-  const terrainProgress =
-    terrains.length > 1 ? (terrainIndex / (terrains.length - 1)) * 100 : 0
-  const durationProgress =
-    durations.length > 1 ? (durationIndex / (durations.length - 1)) * 100 : 0
+
+  const durationValue =
+    DURATION_OPTIONS.find((item) => item.label === guestSession.durationLabel)
+      ?.label ?? DURATION_OPTIONS[0].label
 
   return (
     <div className="relative flex h-full flex-col overflow-hidden bg-[#0F1918]">
@@ -149,7 +130,7 @@ export function GuestSessionPage() {
             </p>
           </div>
           <div className="absolute right-0 top-0">
-            <ClosePillButton onClick={() => setExitOpen(true)} />
+            <ClosePillButton onClick={handleExit} />
           </div>
         </div>
 
@@ -165,7 +146,10 @@ export function GuestSessionPage() {
                 isCycle ? 'text-[#BACBC9]' : 'text-[#70FF00]'
               }`}
             >
-              <Footprints className="h-5 w-5" aria-hidden="true" />
+              <Footprints
+                className={`h-5 w-5 ${isCycle ? 'text-[#BACBC9]' : 'text-[#70FF00]'}`}
+                aria-hidden="true"
+              />
               Run
             </button>
             <button
@@ -178,7 +162,10 @@ export function GuestSessionPage() {
                 isCycle ? 'text-[#70FF00]' : 'text-[#BACBC9]'
               }`}
             >
-              <Bike className="h-5 w-5" aria-hidden="true" />
+              <Bike
+                className={`h-5 w-5 ${isCycle ? 'text-[#70FF00]' : 'text-[#BACBC9]'}`}
+                aria-hidden="true"
+              />
               Cycle
             </button>
           </div>
@@ -212,13 +199,13 @@ export function GuestSessionPage() {
               style={{ ['--guest-progress' as string]: `${distanceProgress}%` }}
             />
             <div className="mt-3 flex items-center justify-between gap-2">
-              <span className="rounded-full bg-[#182629] px-3 py-1.5 text-xs font-bold text-[#BACBC9]">
+              <span className="rounded-full bg-[#BACBC9]/10 px-2.5 py-1.5 text-xs font-bold text-[#BACBC9]">
                 1 Min
               </span>
-              <span className="rounded-full bg-[#70FF00] px-3 py-1.5 text-xs font-bold text-[#0F191B]">
+              <span className="rounded-full bg-[#70FF00]/10 px-2.5 py-1.5 text-xs font-bold text-[#70FF00]">
                 [{distanceMiles} Miles]
               </span>
-              <span className="rounded-full bg-[#182629] px-3 py-1.5 text-xs font-bold text-[#BACBC9]">
+              <span className="rounded-full bg-[#BACBC9]/10 px-2.5 py-1.5 text-xs font-bold text-[#BACBC9]">
                 {maxMiles} Max
               </span>
             </div>
@@ -231,41 +218,19 @@ export function GuestSessionPage() {
             <p className="mt-1 text-sm text-[#BACBC9]/80">
               What style of route suits today?
             </p>
-            <input
-              type="range"
-              min={0}
-              max={terrains.length - 1}
-              step={1}
-              value={terrainIndex}
-              onChange={(event) => {
-                const next = terrains[Number(event.target.value)]
-                if (next) setGuestSession({ terrain: next })
-              }}
-              aria-label="Terrain"
-              className="guest-param-slider mt-4 w-full"
-              style={{ ['--guest-progress' as string]: `${terrainProgress}%` }}
+            <SegmentedPillRow
+              ariaLabel="Terrain"
+              value={
+                (terrains as readonly string[]).includes(guestSession.terrain)
+                  ? guestSession.terrain
+                  : terrains[0]
+              }
+              options={terrains.map((terrain) => ({
+                id: terrain,
+                label: terrain,
+              }))}
+              onChange={(terrain) => setGuestSession({ terrain })}
             />
-            <div className="mt-3 flex flex-wrap gap-2">
-              {terrains.map((terrain) => {
-                const active = guestSession.terrain === terrain
-                return (
-                  <button
-                    key={terrain}
-                    type="button"
-                    tabIndex={0}
-                    aria-pressed={active}
-                    onClick={() => setGuestSession({ terrain })}
-                    className={`h-8 rounded-full border px-3 text-xs font-bold tracking-[-0.01em] ${
-                      active
-                        ? 'border-[#70FF00] bg-[#182629] text-[#70FF00]'
-                        : 'border-transparent bg-[#182629] text-[#BACBC9]'
-                    }`}
-                  >
-                    {terrain}
-                  </button>
-                )
-              })}
-            </div>
           </section>
 
           <section>
@@ -275,51 +240,22 @@ export function GuestSessionPage() {
             <p className="mt-1 text-sm text-[#BACBC9]/80">
               How much time do you have?
             </p>
-            <input
-              type="range"
-              min={0}
-              max={durations.length - 1}
-              step={1}
-              value={durationIndex}
-              onChange={(event) => {
-                const next = durations[Number(event.target.value)]
-                if (next) {
-                  setGuestSession({
-                    durationLabel: next.label,
-                    durationHours: next.hours,
-                  })
-                }
+            <SegmentedPillRow
+              ariaLabel="Estimated duration"
+              value={durationValue}
+              options={DURATION_OPTIONS.map((option) => ({
+                id: option.label,
+                label: option.label,
+              }))}
+              onChange={(label) => {
+                const next = DURATION_OPTIONS.find((item) => item.label === label)
+                if (!next) return
+                setGuestSession({
+                  durationLabel: next.label,
+                  durationHours: next.hours,
+                })
               }}
-              aria-label="Estimated duration"
-              className="guest-param-slider mt-4 w-full"
-              style={{ ['--guest-progress' as string]: `${durationProgress}%` }}
             />
-            <div className="mt-3 flex flex-wrap gap-2">
-              {durations.map((option) => {
-                const active = guestSession.durationLabel === option.label
-                return (
-                  <button
-                    key={option.label}
-                    type="button"
-                    tabIndex={0}
-                    aria-pressed={active}
-                    onClick={() =>
-                      setGuestSession({
-                        durationLabel: option.label,
-                        durationHours: option.hours,
-                      })
-                    }
-                    className={`h-8 rounded-full border px-3 text-xs font-bold tracking-[-0.01em] ${
-                      active
-                        ? 'border-[#70FF00] bg-[#182629] text-[#70FF00]'
-                        : 'border-transparent bg-[#182629] text-[#BACBC9]'
-                    }`}
-                  >
-                    {option.label}
-                  </button>
-                )
-              })}
-            </div>
           </section>
         </div>
 
@@ -337,57 +273,6 @@ export function GuestSessionPage() {
           Ready
         </PressableButton>
       </div>
-
-      <AnimatePresence>
-        {exitOpen ? (
-          <motion.div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="guest-exit-title"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 z-[80] flex flex-col bg-[#0F1918] px-5 pb-8 pt-[65px]"
-          >
-            <div className="flex justify-end">
-              <ClosePillButton onClick={() => setExitOpen(false)} />
-            </div>
-            <div className="flex flex-1 flex-col items-center justify-center text-center">
-              <h2
-                id="guest-exit-title"
-                className="font-display text-2xl font-bold uppercase tracking-[-0.02em] text-[#BACBC9]"
-              >
-                Exit Setup
-              </h2>
-              <p className="mt-2 max-w-[280px] font-sans text-base text-[#BACBC9]">
-                Leave guest setup and return to the welcome screen?
-              </p>
-            </div>
-            <div className="flex flex-col gap-3">
-              <PressableButton
-                onClick={handleConfirmExit}
-                className="rounded-[4px] border-0"
-                style={{
-                  height: 52,
-                  borderRadius: 4,
-                  backgroundColor: '#FF3B30',
-                  color: '#0F191B',
-                }}
-              >
-                Exit
-              </PressableButton>
-              <button
-                type="button"
-                tabIndex={0}
-                onClick={() => setExitOpen(false)}
-                className="px-5 py-3 font-sans text-base font-bold text-[#BACBC9] underline underline-offset-2"
-              >
-                Keep going
-              </button>
-            </div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
     </div>
   )
 }

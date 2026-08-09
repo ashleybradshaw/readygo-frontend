@@ -4,8 +4,8 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ClosePillButton } from '../components/ui/ClosePillButton'
 import { PressableButton } from '../components/ui/PressableButton'
+import { SegmentedPillRow } from '../components/ui/SegmentedPillRow'
 import { ToggleSwitch } from '../components/ui/ToggleSwitch'
-import { CancelProfileModal } from '../components/onboarding/CancelProfileModal'
 import { formatWeatherLine } from '../lib/session'
 import {
   type PreferredTime,
@@ -17,6 +17,13 @@ import activityRun from '../assets/guest/activity-run.png'
 const TRAINING_OPTIONS: PreferredTime[] = ['Morning', 'Afternoon', 'Evening']
 const CYCLE_TERRAINS = ['Paved', 'Rolling', 'Climbs', 'Off Road'] as const
 const RUN_TERRAINS = ['Flat', 'Trail', 'Hills', 'Mixed'] as const
+
+const DURATION_OPTIONS = [
+  { label: '20/30 Mins', hours: 0.5 },
+  { label: '1 Hour', hours: 1 },
+  { label: '1.5 Hours', hours: 1.5 },
+  { label: '2+ Hours', hours: 2 },
+] as const
 
 export function UserProfileBuilderPage() {
   const navigate = useNavigate()
@@ -35,7 +42,6 @@ export function UserProfileBuilderPage() {
   const resetProfileDraft = useReadyGoStore((state) => state.resetProfileDraft)
 
   const [step, setStep] = useState<1 | 2>(1)
-  const [cancelOpen, setCancelOpen] = useState(false)
 
   const isCycle = draft.activityType === 'Cycle'
   const terrains = isCycle ? CYCLE_TERRAINS : RUN_TERRAINS
@@ -45,16 +51,8 @@ export function UserProfileBuilderPage() {
     maxMiles,
     Math.max(minMiles, guestSession.distanceMiles || (isCycle ? 15 : 5)),
   )
-  const terrainIndex = Math.max(
-    0,
-    terrains.findIndex((item) => item === guestSession.terrain),
-  )
-  const trainingIndex = Math.max(
-    0,
-    TRAINING_OPTIONS.findIndex(
-      (item) => item === (draft.preferences.preferredTimes[0] ?? 'Afternoon'),
-    ),
-  )
+  const trainingValue =
+    draft.preferences.preferredTimes[0] ?? ('Afternoon' as PreferredTime)
 
   const backgroundSrc = useMemo(
     () => (isCycle ? activityCycle : activityRun),
@@ -63,12 +61,10 @@ export function UserProfileBuilderPage() {
 
   const distanceProgress =
     ((distanceMiles - minMiles) / (maxMiles - minMiles)) * 100
-  const trainingProgress =
-    TRAINING_OPTIONS.length > 1
-      ? (trainingIndex / (TRAINING_OPTIONS.length - 1)) * 100
-      : 0
-  const terrainProgress =
-    terrains.length > 1 ? (terrainIndex / (terrains.length - 1)) * 100 : 0
+
+  const durationValue =
+    DURATION_OPTIONS.find((item) => item.label === guestSession.durationLabel)
+      ?.label ?? DURATION_OPTIONS[1].label
 
   const handleActivityToggle = (toCycle: boolean) => {
     const nextType = toCycle ? 'Cycle' : 'Run'
@@ -83,6 +79,8 @@ export function UserProfileBuilderPage() {
     const name =
       draft.name.trim() ||
       (isCycle ? 'Cycle Profile One' : 'Run Profile One')
+    const durationHours =
+      DURATION_OPTIONS.find((item) => item.label === durationValue)?.hours ?? 1
     completeProfileSetup({
       id: editingProfileId ?? crypto.randomUUID(),
       name,
@@ -90,11 +88,11 @@ export function UserProfileBuilderPage() {
       timesUsed: 0,
       preferences: {
         ...draft.preferences,
-        preferredTimes: [TRAINING_OPTIONS[trainingIndex]],
+        preferredTimes: [trainingValue],
         sessionDuration:
-          distanceMiles <= 5
+          durationHours <= 0.5
             ? 'Under an hour'
-            : distanceMiles <= 15
+            : durationHours <= 1.5
               ? 'Under two hours'
               : 'Under three hours',
       },
@@ -102,7 +100,10 @@ export function UserProfileBuilderPage() {
     navigate('/setup/gathering', { replace: true })
   }
 
-  const handleClose = () => setCancelOpen(true)
+  const handleClose = () => {
+    resetProfileDraft()
+    navigate('/user/basecamp', { replace: true })
+  }
 
   return (
     <div className="relative flex h-full flex-col overflow-hidden bg-[#0F1918]">
@@ -171,7 +172,10 @@ export function UserProfileBuilderPage() {
                       isCycle ? 'text-[#BACBC9]' : 'text-[#70FF00]'
                     }`}
                   >
-                    <Footprints className="h-5 w-5" aria-hidden="true" />
+                    <Footprints
+                      className={`h-5 w-5 ${isCycle ? 'text-[#BACBC9]' : 'text-[#70FF00]'}`}
+                      aria-hidden="true"
+                    />
                     Run
                   </button>
                   <button
@@ -184,7 +188,10 @@ export function UserProfileBuilderPage() {
                       isCycle ? 'text-[#70FF00]' : 'text-[#BACBC9]'
                     }`}
                   >
-                    <Bike className="h-5 w-5" aria-hidden="true" />
+                    <Bike
+                      className={`h-5 w-5 ${isCycle ? 'text-[#70FF00]' : 'text-[#BACBC9]'}`}
+                      aria-hidden="true"
+                    />
                     Cycle
                   </button>
                 </div>
@@ -203,43 +210,19 @@ export function UserProfileBuilderPage() {
                 <p className="mt-1 text-center text-sm text-[#BACBC9]/80">
                   Choose your best window in your day
                 </p>
-                <input
-                  type="range"
-                  min={0}
-                  max={TRAINING_OPTIONS.length - 1}
-                  step={1}
-                  value={trainingIndex}
-                  onChange={(event) => {
-                    const next = TRAINING_OPTIONS[Number(event.target.value)]
-                    updateDraftPreferences({ preferredTimes: [next] })
-                  }}
-                  aria-label="Preferred training time"
-                  className="guest-param-slider mt-4 w-full"
-                  style={{
-                    ['--guest-progress' as string]: `${trainingProgress}%`,
-                  }}
+                <SegmentedPillRow
+                  ariaLabel="Preferred training time"
+                  value={trainingValue}
+                  options={TRAINING_OPTIONS.map((option) => ({
+                    id: option,
+                    label: option,
+                  }))}
+                  onChange={(next) =>
+                    updateDraftPreferences({
+                      preferredTimes: [next as PreferredTime],
+                    })
+                  }
                 />
-                <div className="mt-3 flex justify-between gap-2">
-                  {TRAINING_OPTIONS.map((option, index) => {
-                    const active = index === trainingIndex
-                    return (
-                      <button
-                        key={option}
-                        type="button"
-                        onClick={() =>
-                          updateDraftPreferences({ preferredTimes: [option] })
-                        }
-                        className={`h-8 rounded-[4px] px-3 text-xs font-medium ${
-                          active
-                            ? 'bg-[#70FF00]/15 text-[#70FF00]'
-                            : 'bg-[#182629] text-[#BACBC9]'
-                        }`}
-                      >
-                        {option}
-                      </button>
-                    )
-                  })}
-                </div>
               </section>
 
               <section>
@@ -267,16 +250,43 @@ export function UserProfileBuilderPage() {
                   }}
                 />
                 <div className="mt-3 flex items-center justify-between gap-2">
-                  <span className="rounded-[4px] bg-[#182629] px-3 py-1.5 text-xs font-bold text-[#BACBC9]">
+                  <span className="rounded-full bg-[#BACBC9]/10 px-2.5 py-1.5 text-xs font-bold text-[#BACBC9]">
                     1 Min
                   </span>
-                  <span className="rounded-[4px] bg-[#70FF00]/15 px-3 py-1.5 text-xs font-bold text-[#70FF00]">
-                    [{distanceMiles}Miles]
+                  <span className="rounded-full bg-[#70FF00]/10 px-2.5 py-1.5 text-xs font-bold text-[#70FF00]">
+                    [{distanceMiles} Miles]
                   </span>
-                  <span className="rounded-[4px] bg-[#182629] px-3 py-1.5 text-xs font-bold text-[#BACBC9]">
+                  <span className="rounded-full bg-[#BACBC9]/10 px-2.5 py-1.5 text-xs font-bold text-[#BACBC9]">
                     {maxMiles} Max
                   </span>
                 </div>
+              </section>
+
+              <section>
+                <h2 className="text-center text-lg font-bold uppercase tracking-[-0.01em] text-[#BACBC9]">
+                  Estimated Duration
+                </h2>
+                <p className="mt-1 text-center text-sm text-[#BACBC9]/80">
+                  How much time do you have?
+                </p>
+                <SegmentedPillRow
+                  ariaLabel="Estimated duration"
+                  value={durationValue}
+                  options={DURATION_OPTIONS.map((option) => ({
+                    id: option.label,
+                    label: option.label,
+                  }))}
+                  onChange={(label) => {
+                    const next = DURATION_OPTIONS.find(
+                      (item) => item.label === label,
+                    )
+                    if (!next) return
+                    setGuestSession({
+                      durationLabel: next.label,
+                      durationHours: next.hours,
+                    })
+                  }}
+                />
               </section>
             </motion.div>
           ) : (
@@ -294,42 +304,19 @@ export function UserProfileBuilderPage() {
                 <p className="mt-1 text-center text-sm text-[#BACBC9]/80">
                   What style of route suits today?
                 </p>
-                <input
-                  type="range"
-                  min={0}
-                  max={terrains.length - 1}
-                  step={1}
-                  value={terrainIndex}
-                  onChange={(event) =>
-                    setGuestSession({
-                      terrain: terrains[Number(event.target.value)],
-                    })
+                <SegmentedPillRow
+                  ariaLabel="Terrain"
+                  value={
+                    (terrains as readonly string[]).includes(guestSession.terrain)
+                      ? guestSession.terrain
+                      : terrains[0]
                   }
-                  aria-label="Terrain"
-                  className="guest-param-slider mt-4 w-full"
-                  style={{
-                    ['--guest-progress' as string]: `${terrainProgress}%`,
-                  }}
+                  options={terrains.map((option) => ({
+                    id: option,
+                    label: option,
+                  }))}
+                  onChange={(terrain) => setGuestSession({ terrain })}
                 />
-                <div className="mt-3 flex flex-wrap justify-between gap-2">
-                  {terrains.map((option, index) => {
-                    const active = index === terrainIndex
-                    return (
-                      <button
-                        key={option}
-                        type="button"
-                        onClick={() => setGuestSession({ terrain: option })}
-                        className={`h-8 rounded-[4px] px-3 text-xs font-medium ${
-                          active
-                            ? 'bg-[#70FF00]/15 text-[#70FF00]'
-                            : 'bg-[#182629] text-[#BACBC9]'
-                        }`}
-                      >
-                        {option}
-                      </button>
-                    )
-                  })}
-                </div>
               </section>
 
               <ToggleRow
@@ -420,16 +407,6 @@ export function UserProfileBuilderPage() {
           </PressableButton>
         </div>
       </div>
-
-      <CancelProfileModal
-        open={cancelOpen}
-        onStay={() => setCancelOpen(false)}
-        onCancel={() => {
-          resetProfileDraft()
-          setCancelOpen(false)
-          navigate('/user/basecamp-setup', { replace: true })
-        }}
-      />
     </div>
   )
 }

@@ -187,7 +187,7 @@ export const defaultGuestSessionDraft = (): GuestSessionDraft => ({
   durationLabel: '1 Hour',
 })
 
-interface ReadyGoState {
+export interface ReadyGoState {
   hasSeenIntro: boolean
   hasAcceptedTerms: boolean
   isAuthenticated: boolean
@@ -602,6 +602,8 @@ export const useReadyGoStore = create<ReadyGoState>((set, get) => ({
       notifications: [],
       sessionMenuOpen: false,
       oneTimeSessionHours: 1,
+      chartRange: 'week',
+      activityByRange: seedActivity(),
       weather: defaultWeather(),
     }),
   signOut: () =>
