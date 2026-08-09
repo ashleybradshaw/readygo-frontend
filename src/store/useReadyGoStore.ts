@@ -348,11 +348,23 @@ export const useReadyGoStore = create<ReadyGoState>((set, get) => ({
     set((state) => {
       const guest = state.guestSession
       const activityType = state.profileDraft.activityType
+      const hours = guest.durationHours || state.oneTimeSessionHours
+      const sessionDuration: SessionDuration =
+        hours < 1
+          ? 'Under an hour'
+          : hours < 2
+            ? 'Under two hours'
+            : hours < 3
+              ? 'Under three hours'
+              : hours <= 3
+                ? 'Over three hours'
+                : 'Surprise me'
+
       return {
         isGuest: false,
         isAuthenticated: true,
         isConfigured: false,
-        oneTimeSessionHours: guest.durationHours || state.oneTimeSessionHours,
+        oneTimeSessionHours: hours,
         profileDraft: {
           ...state.profileDraft,
           activityType,
@@ -364,9 +376,7 @@ export const useReadyGoStore = create<ReadyGoState>((set, get) => ({
             usePhoneLocation: guest.locationGranted,
             setCurrentLocation: guest.locationGranted,
             locationSettingsOn: guest.locationGranted,
-            sessionDuration:
-              guest.durationLabel ||
-              state.profileDraft.preferences.sessionDuration,
+            sessionDuration,
           },
         },
         guestSession: defaultGuestSessionDraft(),

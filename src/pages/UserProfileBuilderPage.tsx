@@ -423,8 +423,8 @@ export function UserProfileBuilderPage() {
 
       <CancelProfileModal
         open={cancelOpen}
-        onClose={() => setCancelOpen(false)}
-        onConfirm={() => {
+        onStay={() => setCancelOpen(false)}
+        onCancel={() => {
           resetProfileDraft()
           setCancelOpen(false)
           navigate('/user/basecamp-setup', { replace: true })
