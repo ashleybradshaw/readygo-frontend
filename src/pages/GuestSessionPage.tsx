@@ -1,10 +1,10 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { Bike, PersonStanding } from 'lucide-react'
+import { Bike, Footprints } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PressableButton } from '../components/ui/PressableButton'
 import { ToggleSwitch } from '../components/ui/ToggleSwitch'
-import { SettingsCloseButton } from '../components/settings/SettingsCloseButton'
+import { ClosePillButton } from '../components/ui/ClosePillButton'
 import { formatWeatherLine, buildSessionManifest } from '../lib/session'
 import { useReadyGoStore } from '../store/useReadyGoStore'
 import activityCycle from '../assets/guest/activity-cycle.png'
@@ -149,10 +149,7 @@ export function GuestSessionPage() {
             </p>
           </div>
           <div className="absolute right-0 top-0">
-            <SettingsCloseButton
-              variant="onDark"
-              onClick={() => setExitOpen(true)}
-            />
+            <ClosePillButton onClick={() => setExitOpen(true)} />
           </div>
         </div>
 
@@ -168,7 +165,7 @@ export function GuestSessionPage() {
                 isCycle ? 'text-[#BACBC9]' : 'text-[#70FF00]'
               }`}
             >
-              <PersonStanding size={18} aria-hidden="true" />
+              <Footprints className="h-5 w-5" aria-hidden="true" />
               Run
             </button>
             <button
@@ -181,7 +178,7 @@ export function GuestSessionPage() {
                 isCycle ? 'text-[#70FF00]' : 'text-[#BACBC9]'
               }`}
             >
-              <Bike size={18} aria-hidden="true" />
+              <Bike className="h-5 w-5" aria-hidden="true" />
               Cycle
             </button>
           </div>
@@ -353,10 +350,7 @@ export function GuestSessionPage() {
             className="absolute inset-0 z-[80] flex flex-col bg-[#0F1918] px-5 pb-8 pt-[65px]"
           >
             <div className="flex justify-end">
-              <SettingsCloseButton
-                variant="onDark"
-                onClick={() => setExitOpen(false)}
-              />
+              <ClosePillButton onClick={() => setExitOpen(false)} />
             </div>
             <div className="flex flex-1 flex-col items-center justify-center text-center">
               <h2

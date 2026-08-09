@@ -59,7 +59,7 @@ export function AppHeader({
               onClick={onMenuClick}
               className="absolute right-0 top-0 flex h-[22px] w-10 shrink-0 items-center justify-center rounded-full bg-[#182629] text-[#BACBC9] transition-colors hover:text-white"
             >
-              <MoreHorizontal size={16} strokeWidth={2.25} />
+              <MoreHorizontal className="h-5 w-5" strokeWidth={2.25} />
             </button>
           ) : null}
         </div>

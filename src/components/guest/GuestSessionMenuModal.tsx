@@ -1,5 +1,5 @@
 import { BottomSheet } from '../ui/BottomSheet'
-import { SettingsCloseButton } from '../settings/SettingsCloseButton'
+import { ClosePillButton } from '../ui/ClosePillButton'
 
 interface GuestSessionMenuModalProps {
   open: boolean
@@ -21,42 +21,40 @@ export function GuestSessionMenuModal({
           <h2 className="font-display text-2xl font-bold uppercase tracking-[-0.02em]">
             Session
           </h2>
-          <SettingsCloseButton variant="onDark" onClick={onClose} />
+          <ClosePillButton onClick={onClose} />
         </div>
 
-        <div className="rounded-[12px] border border-[#BACBC9]/20 p-2">
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              tabIndex={0}
-              aria-label="Share map"
-              onClick={onShareMap}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                  event.preventDefault()
-                  onShareMap()
-                }
-              }}
-              className="rounded-full bg-[#BACBC9] px-3 py-3 text-sm font-bold tracking-[-0.01em] text-[#0F1918]"
-            >
-              Share map
-            </button>
-            <button
-              type="button"
-              tabIndex={0}
-              aria-label="Cancel session"
-              onClick={onCancelSession}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                  event.preventDefault()
-                  onCancelSession()
-                }
-              }}
-              className="rounded-full bg-[#3B0000] px-3 py-3 text-sm font-bold tracking-[-0.01em] text-[#FF3B30]"
-            >
-              Cancel session
-            </button>
-          </div>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            tabIndex={0}
+            aria-label="Share map"
+            onClick={onShareMap}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                onShareMap()
+              }
+            }}
+            className="h-8 rounded-full bg-[#BACBC9] px-3 text-xs font-medium text-[#0F1918]"
+          >
+            Share map
+          </button>
+          <button
+            type="button"
+            tabIndex={0}
+            aria-label="Cancel session"
+            onClick={onCancelSession}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                onCancelSession()
+              }
+            }}
+            className="h-8 rounded-full bg-[#3B0000] px-3 text-xs font-medium text-[#FF3B30]"
+          >
+            Cancel session
+          </button>
         </div>
       </div>
     </BottomSheet>

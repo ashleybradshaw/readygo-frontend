@@ -1,4 +1,4 @@
-import closePill from '../../assets/ui/close-pill.png'
+import { X } from 'lucide-react'
 
 interface ClosePillButtonProps {
   onClick: () => void
@@ -23,14 +23,9 @@ export const ClosePillButton = ({
           onClick()
         }
       }}
-      className={`inline-flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-[8px] ${className}`}
+      className={`inline-flex shrink-0 items-center justify-center rounded-full bg-[#182629] p-1.5 text-[#BACBC9] ${className}`}
     >
-      <img
-        src={closePill}
-        alt=""
-        aria-hidden="true"
-        className="size-full object-cover"
-      />
+      <X className="h-5 w-5" strokeWidth={2.25} aria-hidden="true" />
     </button>
   )
 }

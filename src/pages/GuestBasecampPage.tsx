@@ -1,4 +1,4 @@
-import { Home, MapPinned, Settings } from 'lucide-react'
+import { MapPinned } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { GuestWeatherHeader } from '../components/guest/GuestWeatherHeader'
@@ -195,7 +195,7 @@ export function GuestBasecampPage() {
         </section>
       </div>
 
-      <div className="px-5 pb-3">
+      <div className="px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
         <PressableButton
           onClick={handleReady}
           className="rounded-[4px] border-0"
@@ -210,31 +210,6 @@ export function GuestBasecampPage() {
           Ready
         </PressableButton>
       </div>
-
-      <nav
-        aria-label="Guest navigation"
-        className="flex items-center justify-around border-t border-[#182629] px-6 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3"
-      >
-        <button
-          type="button"
-          tabIndex={0}
-          aria-current="page"
-          className="inline-flex flex-col items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-[#70FF00]"
-        >
-          <Home size={18} aria-hidden="true" />
-          Basecamp
-        </button>
-        <button
-          type="button"
-          tabIndex={0}
-          aria-label="Settings"
-          onClick={() => navigate('/auth/terms')}
-          className="inline-flex flex-col items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-[#829695]"
-        >
-          <Settings size={18} aria-hidden="true" />
-          Settings
-        </button>
-      </nav>
 
       <GuestBasecampMenuModal
         open={menuOpen}

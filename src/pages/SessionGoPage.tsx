@@ -1,4 +1,4 @@
-import { Bike, MapPinned, PersonStanding } from 'lucide-react'
+import { Bike, Footprints, Map, MapPinned, Minus, Plus, Shuffle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppHeader } from '../components/AppHeader'
@@ -23,7 +23,6 @@ export function SessionGoPage() {
     (state) => state.saveCompletedSession,
   )
   const isGuest = useReadyGoStore((state) => state.isGuest)
-  const exitGuestMode = useReadyGoStore((state) => state.exitGuestMode)
   const [mapOpen, setMapOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [savedOpen, setSavedOpen] = useState(false)
@@ -38,7 +37,7 @@ export function SessionGoPage() {
   if (!session || !currentProfile) return null
 
   const ActivityIcon =
-    currentProfile.activityType === 'Cycle' ? Bike : PersonStanding
+    currentProfile.activityType === 'Cycle' ? Bike : Footprints
 
   const handleRebuild = (direction: 'shorter' | 'longer' | 'remix') => {
     setRebuilding(true)
@@ -69,15 +68,14 @@ export function SessionGoPage() {
     setMenuOpen(false)
     clearSession()
     if (isGuest) {
-      exitGuestMode()
-      navigate('/welcome', { replace: true })
+      navigate('/guest/basecamp', { replace: true })
       return
     }
     navigate('/', { replace: true })
   }
 
   const modifierClass =
-    'inline-flex h-8 items-center justify-center rounded-[4px] bg-[#BACBC9] px-3 text-xs font-medium tracking-[-0.01em] text-[#0F1918]'
+    'inline-flex h-8 items-center justify-center gap-1.5 rounded-[4px] bg-[#BACBC9] px-3 text-xs font-medium tracking-[-0.01em] text-[#0F1918]'
 
   return (
     <div className="relative flex h-full flex-col bg-[#0F1918]">
@@ -98,8 +96,7 @@ export function SessionGoPage() {
           <div className="mt-3 flex items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-2">
               <ActivityIcon
-                size={18}
-                className="shrink-0 text-[#70FF00]"
+                className="h-5 w-5 shrink-0 text-[#70FF00]"
                 aria-hidden="true"
               />
               <p className="truncate text-sm font-bold tracking-[-0.01em] text-[#BACBC9]">
@@ -111,7 +108,10 @@ export function SessionGoPage() {
               tabIndex={0}
               aria-label="Switch profile"
               onClick={() =>
-                showSuccessToast('Profile locked', 'Finish or cancel this session to switch.')
+                showSuccessToast(
+                  'Profile locked',
+                  'Finish or cancel this session to switch.',
+                )
               }
               className="inline-flex h-8 shrink-0 items-center justify-center rounded-[4px] bg-[#F5F7F7] px-4 text-xs font-medium text-[#0F1918]"
             >
@@ -165,6 +165,7 @@ export function SessionGoPage() {
               onClick={() => handleRebuild('shorter')}
               className={modifierClass}
             >
+              <Minus className="h-4 w-4" aria-hidden="true" />
               Make shorter
             </button>
             <button
@@ -174,6 +175,7 @@ export function SessionGoPage() {
               onClick={() => handleRebuild('longer')}
               className={modifierClass}
             >
+              <Plus className="h-4 w-4" aria-hidden="true" />
               Make longer
             </button>
             <button
@@ -183,6 +185,7 @@ export function SessionGoPage() {
               onClick={() => handleRebuild('remix')}
               className={modifierClass}
             >
+              <Shuffle className="h-4 w-4" aria-hidden="true" />
               Remix
             </button>
             <button
@@ -192,6 +195,7 @@ export function SessionGoPage() {
               onClick={() => setMapOpen(true)}
               className={modifierClass}
             >
+              <Map className="h-4 w-4" aria-hidden="true" />
               View Map
             </button>
           </div>
@@ -245,7 +249,7 @@ export function SessionGoPage() {
         onBasecamp={() => {
           setSavedOpen(false)
           clearSession()
-          navigate('/', { replace: true })
+          navigate(isGuest ? '/guest/basecamp' : '/', { replace: true })
         }}
       />
       <GlobalLoadingScreen

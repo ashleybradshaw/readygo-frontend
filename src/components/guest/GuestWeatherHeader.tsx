@@ -49,7 +49,7 @@ export function GuestWeatherHeader({
             }}
             className="mt-0.5 flex h-[22px] w-10 shrink-0 items-center justify-center rounded-full bg-[#182629] text-[#BACBC9]"
           >
-            <MoreHorizontal size={16} strokeWidth={2.25} aria-hidden="true" />
+            <MoreHorizontal className="h-5 w-5" strokeWidth={2.25} aria-hidden="true" />
           </button>
         ) : null}
       </div>

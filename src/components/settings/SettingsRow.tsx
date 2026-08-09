@@ -66,9 +66,8 @@ export const SettingsRow = ({
         {label}
       </span>
       <ChevronRight
-        size={24}
+        className={`h-5 w-5 shrink-0 ${palette.chevron}`}
         strokeWidth={1.75}
-        className={`shrink-0 ${palette.chevron}`}
         aria-hidden="true"
       />
     </button>

@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { createPortal } from 'react-dom'
 import { PressableButton } from '../ui/PressableButton'
-import { SettingsCloseButton } from '../settings/SettingsCloseButton'
+import { ClosePillButton } from '../ui/ClosePillButton'
 import {
   GridFeatureIcon,
   ListCardIcon,
@@ -56,7 +56,7 @@ export function ProfileInstructionsModal({
           className="absolute inset-0 z-[80] flex flex-col bg-[#0F1918] px-5 pb-8 pt-[max(2.5rem,env(safe-area-inset-top))]"
         >
           <div className="mb-6 flex justify-end">
-            <SettingsCloseButton variant="onDark" onClick={onClose} />
+            <ClosePillButton onClick={onClose} />
           </div>
 
           <div className="mb-6 flex flex-col gap-[5px] uppercase text-[#BACBC9]">

@@ -1,4 +1,4 @@
-import { Bike, List, Network, PersonStanding } from 'lucide-react'
+import { Bike, List, Network, Footprints } from 'lucide-react'
 import type { ReadyGoProfile } from '../../store/useReadyGoStore'
 
 interface ProfileOverviewCardProps {
@@ -15,7 +15,7 @@ export function ProfileOverviewCard({
   onActivate,
 }: ProfileOverviewCardProps) {
   const ActivityIcon =
-    profile.activityType === 'Cycle' ? Bike : PersonStanding
+    profile.activityType === 'Cycle' ? Bike : Footprints
 
   const handleActivate = () => {
     if (isActive || !onActivate) return
@@ -51,8 +51,7 @@ export function ProfileOverviewCard({
       <div className="flex items-start justify-between gap-4">
         <div className="flex min-w-0 items-center gap-2">
           <ActivityIcon
-            size={18}
-            className="shrink-0 text-[#70FF00]"
+            className="h-5 w-5 shrink-0 text-[#70FF00]"
             aria-hidden="true"
           />
           <p className="truncate text-sm font-bold tracking-[-0.01em] text-[#BACBC9]">

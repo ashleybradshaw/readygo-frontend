@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { Bike, ChevronLeft, ChevronRight, PersonStanding } from 'lucide-react'
+import { Bike, ChevronLeft, ChevronRight, Footprints } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ClosePillButton } from '../components/ui/ClosePillButton'
@@ -171,7 +171,7 @@ export function UserProfileBuilderPage() {
                       isCycle ? 'text-[#BACBC9]' : 'text-[#70FF00]'
                     }`}
                   >
-                    <PersonStanding size={18} aria-hidden="true" />
+                    <Footprints className="h-5 w-5" aria-hidden="true" />
                     Run
                   </button>
                   <button
@@ -184,7 +184,7 @@ export function UserProfileBuilderPage() {
                       isCycle ? 'text-[#70FF00]' : 'text-[#BACBC9]'
                     }`}
                   >
-                    <Bike size={18} aria-hidden="true" />
+                    <Bike className="h-5 w-5" aria-hidden="true" />
                     Cycle
                   </button>
                 </div>

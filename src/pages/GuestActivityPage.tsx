@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { BottomSheet } from '../components/ui/BottomSheet'
 import { PressableButton } from '../components/ui/PressableButton'
-import { SettingsCloseButton } from '../components/settings/SettingsCloseButton'
+import { ClosePillButton } from '../components/ui/ClosePillButton'
 import { useReadyGoStore } from '../store/useReadyGoStore'
 import activityDefault from '../assets/guest/activity-default.png'
 import activityCycle from '../assets/guest/activity-cycle.png'
@@ -202,10 +202,7 @@ export function GuestActivityPage() {
             <h2 className="font-display text-2xl font-bold uppercase tracking-[-0.02em]">
               Location
             </h2>
-            <SettingsCloseButton
-              variant="onLight"
-              onClick={() => setFaqOpen(false)}
-            />
+            <ClosePillButton onClick={() => setFaqOpen(false)} />
           </div>
           <p className="font-sans text-base leading-relaxed">
             ReadyGo uses your location to build routes that actually start where

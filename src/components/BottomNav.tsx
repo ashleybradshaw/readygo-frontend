@@ -75,10 +75,9 @@ export function BottomNav() {
                 />
               ) : null}
               <Icon
-                size={24}
+                className="relative z-10 h-5 w-5"
                 strokeWidth={1.75}
                 color={isActive ? ACTIVE : INACTIVE}
-                className="relative z-10"
                 aria-hidden="true"
               />
             </span>

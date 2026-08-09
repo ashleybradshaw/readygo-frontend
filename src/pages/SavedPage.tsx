@@ -5,7 +5,7 @@ import {
   Info,
   MapPinned,
   Network,
-  PersonStanding,
+  Footprints,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -201,11 +201,10 @@ export function SavedPage({ initialTab }: SavedPageProps) {
                 <div className="mt-3 flex items-center justify-between gap-3 border-b border-[#2D3739] pb-3">
                   <div className="flex min-w-0 items-center gap-2">
                     {profile.activityType === 'Cycle' ? (
-                      <Bike size={16} className="text-[#70FF00]" aria-hidden="true" />
+                      <Bike className="h-5 w-5 text-[#70FF00]" aria-hidden="true" />
                     ) : (
-                      <PersonStanding
-                        size={16}
-                        className="text-[#70FF00]"
+                      <Footprints
+                        className="h-5 w-5 text-[#70FF00]"
                         aria-hidden="true"
                       />
                     )}

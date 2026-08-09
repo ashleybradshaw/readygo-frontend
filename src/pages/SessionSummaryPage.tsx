@@ -1,4 +1,4 @@
-import { Award, Bike, MapPinned, Network, PersonStanding, X } from 'lucide-react'
+import { Award, Bike, MapPinned, Network, Footprints, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PressableButton } from '../components/ui/PressableButton'
@@ -51,7 +51,7 @@ export function SessionSummaryPage() {
   const ActivityIcon =
     (currentProfile?.activityType ?? session.activityType) === 'Cycle'
       ? Bike
-      : PersonStanding
+      : Footprints
 
   const goBasecamp = () => {
     clearSession()
@@ -85,8 +85,7 @@ export function SessionSummaryPage() {
           <div className="mt-3 flex items-center justify-between gap-3 border-b border-[#39484A] pb-3">
             <div className="flex min-w-0 items-center gap-2">
               <ActivityIcon
-                size={16}
-                className="shrink-0 text-[#70FF00]"
+                className="h-5 w-5 shrink-0 text-[#70FF00]"
                 aria-hidden="true"
               />
               <p className="truncate text-xs font-bold text-[#BACBC9]">

@@ -20,8 +20,8 @@ export const AuthCloseButton = ({
         onClick()
       }
     }}
-    className="absolute right-6 top-7 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-[#182629] text-[#BACBC9]"
+    className="absolute right-6 top-7 z-10 inline-flex items-center justify-center rounded-full bg-[#182629] p-1.5 text-[#BACBC9]"
   >
-    <X size={16} strokeWidth={2.25} aria-hidden="true" />
+    <X className="h-5 w-5" strokeWidth={2.25} aria-hidden="true" />
   </button>
 )

@@ -1,4 +1,4 @@
-import { MapPinned } from 'lucide-react'
+import { Map, MapPinned, Minus, Plus, Shuffle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { GuestWeatherHeader } from '../components/guest/GuestWeatherHeader'
@@ -54,7 +54,7 @@ export function GuestSessionReadyPage() {
   }
 
   const modifierClass =
-    'inline-flex h-9 items-center justify-center rounded-full bg-[#BACBC9] px-3 text-xs font-bold tracking-[-0.01em] text-[#0F1918]'
+    'inline-flex h-8 items-center justify-center gap-1.5 rounded-full bg-[#BACBC9] px-3 text-xs font-bold tracking-[-0.01em] text-[#0F1918]'
 
   return (
     <div className="relative flex h-full flex-col bg-[#0F1918]">
@@ -109,6 +109,7 @@ export function GuestSessionReadyPage() {
               onClick={() => handleRebuild('shorter')}
               className={modifierClass}
             >
+              <Minus className="h-4 w-4" aria-hidden="true" />
               Make shorter
             </button>
             <button
@@ -118,6 +119,7 @@ export function GuestSessionReadyPage() {
               onClick={() => handleRebuild('longer')}
               className={modifierClass}
             >
+              <Plus className="h-4 w-4" aria-hidden="true" />
               Make longer
             </button>
             <button
@@ -127,6 +129,7 @@ export function GuestSessionReadyPage() {
               onClick={() => handleRebuild('remix')}
               className={modifierClass}
             >
+              <Shuffle className="h-4 w-4" aria-hidden="true" />
               Remix
             </button>
             <button
@@ -136,6 +139,7 @@ export function GuestSessionReadyPage() {
               onClick={() => navigate('/guest/map-preview')}
               className={modifierClass}
             >
+              <Map className="h-4 w-4" aria-hidden="true" />
               View Map
             </button>
           </div>

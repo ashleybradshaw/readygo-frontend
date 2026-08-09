@@ -1,7 +1,7 @@
 import { Lock } from 'lucide-react'
 import { BottomSheet } from '../ui/BottomSheet'
 import { PressableButton } from '../ui/PressableButton'
-import { SettingsCloseButton } from '../settings/SettingsCloseButton'
+import { ClosePillButton } from '../ui/ClosePillButton'
 import { useReadyGoStore } from '../../store/useReadyGoStore'
 
 const HOUR_PRESETS = [1, 2, 3, 4] as const
@@ -31,7 +31,7 @@ export function GuestBasecampMenuModal({
           <h2 className="font-display text-xl font-bold uppercase tracking-[-0.02em]">
             Profile Options
           </h2>
-          <SettingsCloseButton variant="onDark" onClick={onClose} />
+          <ClosePillButton onClick={onClose} />
         </div>
 
         <div className="grid grid-cols-2 gap-2">
