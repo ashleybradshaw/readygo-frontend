@@ -73,7 +73,7 @@ export function BottomNav() {
   return (
     <LayoutGroup>
       <nav
-        className="fixed bottom-4 left-1/2 z-50 flex w-[calc(100%-2rem)] max-w-md -translate-x-1/2 items-center justify-around rounded-full border border-[#2D3739] bg-[#182629]/90 p-2 shadow-xl backdrop-blur-md"
+        className="absolute bottom-4 left-4 right-4 z-50 mx-auto flex max-w-[calc(100%-2rem)] items-center justify-around rounded-full border border-[#2D3739] bg-[#182629]/95 p-2 shadow-2xl backdrop-blur-md"
         aria-label="Primary"
       >
         {visibleTabs.map((tab) => {
@@ -102,16 +102,16 @@ export function BottomNav() {
                 }
               }}
               whileTap={{ scale: 0.94 }}
-              className={`relative flex min-w-0 flex-1 flex-col items-center gap-0.5 rounded-full px-3 py-2 transition-colors ${
+              className={`relative z-10 flex min-w-0 flex-1 flex-col items-center gap-0.5 rounded-full px-3 py-2 transition-colors ${
                 isActive
-                  ? 'text-[#70FF00]'
-                  : 'text-[#BACBC9]/60 hover:text-white'
+                  ? 'font-bold text-white'
+                  : 'text-[#BACBC9]/50 hover:text-white'
               }`}
             >
               {isActive ? (
                 <motion.div
                   layoutId="activeNavPill"
-                  className="absolute inset-0 rounded-full border border-[#70FF00]/40 bg-[#70FF00]/15 shadow-[0_0_14px_rgba(112,255,0,0.3)]"
+                  className="absolute inset-0 rounded-full border border-[#BACBC9]/40 bg-[#BACBC9]/15 shadow-[0_0_12px_rgba(186,203,201,0.2)]"
                   transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                   aria-hidden="true"
                 />
@@ -121,11 +121,7 @@ export function BottomNav() {
                 strokeWidth={1.75}
                 aria-hidden="true"
               />
-              <span
-                className={`relative z-10 text-center text-xs uppercase leading-5 tracking-[-1px] ${
-                  isActive ? 'font-semibold' : 'font-bold'
-                }`}
-              >
+              <span className="relative z-10 text-center text-xs uppercase leading-5 tracking-[-1px] font-bold">
                 {label}
               </span>
             </motion.button>

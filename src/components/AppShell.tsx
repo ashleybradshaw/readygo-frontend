@@ -43,7 +43,7 @@ export function AppShell() {
     location.pathname === '/user/basecamp-empty'
 
   return (
-    <div className="relative flex h-full min-h-0 flex-col bg-rg-base-alt">
+    <div className="relative flex h-full min-h-0 flex-col overflow-hidden bg-rg-base-alt">
       {isSettings ? (
         <div className="shrink-0 pt-[max(1.25rem,env(safe-area-inset-top))]" />
       ) : (

@@ -23,7 +23,7 @@ export function UserBasecampSetupPage() {
     navigate(getCreateProfilePath({ guestSession, profileDraft }))
   }
   return (
-    <div className="relative flex h-full flex-col bg-[#0F1918]">
+    <div className="relative flex h-full flex-col overflow-hidden bg-[#0F1918]">
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-5 pb-28 pt-[max(2.5rem,env(safe-area-inset-top))]">
         <div className="mb-6 flex justify-center">
           <ReadyGoWordmark />

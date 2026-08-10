@@ -85,7 +85,7 @@ export function GuestBasecampPage() {
   }
 
   return (
-    <div className="relative flex h-full flex-col bg-[#0F1918]">
+    <div className="relative flex h-full flex-col overflow-hidden bg-[#0F1918]">
       <GuestWeatherHeader
         dryHours={preview?.weatherStableHours ?? 3}
         onMenuClick={() => setMenuOpen(true)}
