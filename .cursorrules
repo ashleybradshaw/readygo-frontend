@@ -13,3 +13,10 @@
 - Setup Cards: `w-full bg-[#182629]/40 border border-[#2D3739]/60 rounded-[4px] p-4 mb-[10px] flex flex-col items-start`.
 - Pill Rows: `flex flex-wrap justify-start items-center gap-[10px] w-full mt-2`.
 - Active Pill: `border-[#70FF00] text-[#70FF00] bg-[#70FF00]/10 font-bold`.
+
+## 4. SETTINGS HUB & SAVED
+- Settings Hub: No top-right close icon (bottom nav owns exit). Individual card rows: `w-full bg-[#182629]/60 hover:bg-[#182629] border border-[#2D3739]/60 rounded-[4px] mb-[5px] p-4 flex justify-between items-center`.
+- Section Headers: `text-xs font-bold text-white uppercase tracking-wider mb-2 mt-4`.
+- Color Lock: Delete all my data `#FBBC05` (amber). Delete my account `#FF3B3B` (danger red).
+- Child settings forms (handle/password): Top-left `<ArrowLeftCircle className="w-6 h-6 text-[#BACBC9]" />` back to `/settings`.
+- Saved Hub titles: `{count} / SAVED SESSIONS` or `{count} / SAVED PROFILES` (no bracket/max-cap copy). No modal close X inside the SAVED tab.
