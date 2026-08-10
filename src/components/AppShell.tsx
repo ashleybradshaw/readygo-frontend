@@ -62,11 +62,7 @@ export function AppShell() {
           }
         />
       )}
-      <main
-        className={`min-h-0 flex-1 overflow-y-auto pb-4 ${
-          isSettings ? 'px-5' : 'px-5'
-        }`}
-      >
+      <main className="min-h-0 flex-1 overflow-y-auto px-5 pb-28">
         <Outlet />
       </main>
       <BottomNav />

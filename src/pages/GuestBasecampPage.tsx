@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { GuestWeatherHeader } from '../components/guest/GuestWeatherHeader'
 import { GuestBasecampMenuModal } from '../components/guest/GuestBasecampMenuModal'
+import { BottomNav } from '../components/BottomNav'
 import { PressableButton } from '../components/ui/PressableButton'
 import { formatDuration } from '../lib/session'
 import { showSuccessToast } from '../components/overlays/NotificationHost'
@@ -90,7 +91,7 @@ export function GuestBasecampPage() {
         onMenuClick={() => setMenuOpen(true)}
       />
 
-      <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-5 pb-4">
+      <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-5 pb-28">
         <section className="rounded-[4px] bg-[#182629] p-4">
           <h2 className="text-base font-bold tracking-[-0.01em] text-[#BACBC9]">
             {preview?.title ?? 'Your next route'}
@@ -217,6 +218,7 @@ export function GuestBasecampPage() {
         onEditProfile={handleEditProfile}
         onSave={handleSaveMenu}
       />
+      <BottomNav />
     </div>
   )
 }

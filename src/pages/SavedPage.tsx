@@ -49,7 +49,7 @@ export function SavedPage({ initialTab }: SavedPageProps) {
 
   return (
     <div className="relative flex h-full flex-col bg-[#0F1918]">
-      <div className="flex min-h-0 flex-1 flex-col gap-4 px-5 pt-[max(2.5rem,env(safe-area-inset-top))] pb-4">
+      <div className="flex min-h-0 flex-1 flex-col gap-4 px-5 pt-[max(2.5rem,env(safe-area-inset-top))] pb-28">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-bold uppercase leading-8 tracking-[-0.02em] text-[#BACBC9]">
