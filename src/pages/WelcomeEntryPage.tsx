@@ -36,8 +36,8 @@ export function WelcomeEntryPage() {
         </p>
       </div>
 
-      <div className="flex min-h-[50vh] flex-1 flex-col justify-between bg-[#0F1918] px-6 pt-8 pb-5">
-        <div className="mx-auto flex w-full max-w-[360px] flex-col items-center text-center">
+      <div className="flex min-h-[50vh] flex-1 flex-col bg-[#0F1918] px-6 pt-8 pb-6">
+        <div className="mx-auto flex w-full max-w-[360px] flex-1 flex-col items-center text-center">
           <h1 className="font-display text-2xl font-bold uppercase tracking-[-0.02em] text-[#BACBC9]">
             Nice meeting you
           </h1>
@@ -55,44 +55,46 @@ export function WelcomeEntryPage() {
             <span className="font-bold text-white">Everything is free.</span>
           </p>
 
-          <div className="grid w-full grid-cols-2 gap-3">
-            <PressableButton
-              onClick={handleGuest}
-              className="rounded-[4px] border border-[#2D3739] bg-transparent"
-              style={{
-                height: 52,
-                borderRadius: 4,
-                color: '#BACBC9',
-                backgroundColor: 'transparent',
-              }}
-            >
-              Guest
-            </PressableButton>
-            <PressableButton
-              onClick={handleSignup}
-              className="rounded-[4px] border-0"
-              style={{
-                height: 52,
-                borderRadius: 4,
-                backgroundColor: '#BACBC9',
-                color: '#0F1918',
-                fontWeight: 600,
-              }}
-            >
-              Signup
-            </PressableButton>
+          <div className="flex w-full flex-col items-center gap-4 mt-auto">
+            <div className="grid w-full grid-cols-2 gap-3">
+              <PressableButton
+                onClick={handleGuest}
+                className="rounded-[4px] border border-[#2D3739] bg-transparent"
+                style={{
+                  height: 52,
+                  borderRadius: 4,
+                  color: '#BACBC9',
+                  backgroundColor: 'transparent',
+                }}
+              >
+                Guest
+              </PressableButton>
+              <PressableButton
+                onClick={handleSignup}
+                className="rounded-[4px] border-0"
+                style={{
+                  height: 52,
+                  borderRadius: 4,
+                  backgroundColor: '#BACBC9',
+                  color: '#0F1918',
+                  fontWeight: 600,
+                }}
+              >
+                Signup
+              </PressableButton>
+            </div>
+
+            <p className="pb-2 text-center text-sm text-[#BACBC9]">
+              Already have an account?{' '}
+              <Link
+                to="/auth/login"
+                className="font-bold underline underline-offset-2"
+              >
+                Sign in
+              </Link>
+            </p>
           </div>
         </div>
-
-        <p className="mx-auto text-center font-sans text-sm tracking-[-0.01em] text-[#BACBC9]">
-          Already have an account?{' '}
-          <Link
-            to="/auth/login"
-            className="font-bold underline underline-offset-2"
-          >
-            Sign in
-          </Link>
-        </p>
       </div>
     </div>
   )

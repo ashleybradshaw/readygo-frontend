@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { AuthCloseButton } from '../components/auth/AuthCloseButton'
+import { ArrowLeft } from 'lucide-react'
 import { PressableButton } from '../components/ui/PressableButton'
 import { TextField } from '../components/ui/TextField'
 import { KeyFieldIcon } from '../components/ui/AuthIcons'
@@ -47,9 +47,23 @@ export function VerificationCodePage() {
 
   return (
     <div className="relative flex h-full flex-col overflow-y-auto bg-[#0F1918] px-5 pb-8 pt-[max(3.5rem,env(safe-area-inset-top))]">
-      <AuthCloseButton onClick={() => navigate('/auth/create')} />
+      <button
+        type="button"
+        tabIndex={0}
+        aria-label="Back to create account"
+        onClick={() => navigate('/auth/create')}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault()
+            navigate('/auth/create')
+          }
+        }}
+        className="absolute top-6 left-6 z-20 cursor-pointer text-[#BACBC9]/60 hover:text-white"
+      >
+        <ArrowLeft className="h-6 w-6" strokeWidth={2.25} aria-hidden="true" />
+      </button>
 
-      <div className="mb-8 flex flex-col gap-2.5 pr-10">
+      <div className="mb-8 flex flex-col gap-2.5">
         <div className="flex flex-col gap-[5px] uppercase">
           <h1 className="font-display text-2xl font-bold leading-8 tracking-[-0.02em] text-[#BACBC9]">
             Verification Code

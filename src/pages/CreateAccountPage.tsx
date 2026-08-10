@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { X } from 'lucide-react'
 import { PressableButton } from '../components/ui/PressableButton'
 import { TextField } from '../components/ui/TextField'
 import { OAuthButton } from '../components/ui/OAuthButtons'
@@ -39,6 +40,22 @@ export function CreateAccountPage() {
 
   return (
     <div className="relative flex h-full flex-col overflow-y-auto bg-[#0F1918] px-5 pb-8 pt-[max(3.5rem,env(safe-area-inset-top))]">
+      <button
+        type="button"
+        tabIndex={0}
+        aria-label="Close"
+        onClick={() => navigate('/welcome')}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault()
+            navigate('/welcome')
+          }
+        }}
+        className="absolute top-6 right-6 z-20 cursor-pointer text-[#BACBC9]/60 hover:text-white"
+      >
+        <X className="h-6 w-6" strokeWidth={2.25} aria-hidden="true" />
+      </button>
+
       <div className="mb-6 flex flex-col gap-[5px] uppercase">
         <h1 className="font-display text-2xl font-bold leading-8 tracking-[-0.02em] text-[#BACBC9]">
           Create Account
@@ -116,7 +133,7 @@ export function CreateAccountPage() {
         </ul>
       </div>
 
-      <div className="mt-auto flex flex-col gap-4 pt-8">
+      <div className="mt-auto flex flex-col items-center gap-4 pt-8 pb-6">
         <PressableButton
           variant="cta"
           disabled={!canSubmit}
@@ -126,7 +143,7 @@ export function CreateAccountPage() {
         >
           Create account
         </PressableButton>
-        <p className="text-center font-sans text-base leading-6 tracking-[-0.01em] text-[#BACBC9]">
+        <p className="pb-2 text-center text-sm text-[#BACBC9]">
           Already have an account?{' '}
           <Link
             to="/auth/login"

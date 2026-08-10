@@ -37,6 +37,7 @@ export function UserProfileBuilderPage() {
   const completeProfileSetup = useReadyGoStore(
     (state) => state.completeProfileSetup,
   )
+  const isAuthenticated = useReadyGoStore((state) => state.isAuthenticated)
   const editingProfileId = useReadyGoStore((state) => state.editingProfileId)
   const resetProfileDraft = useReadyGoStore((state) => state.resetProfileDraft)
 
@@ -104,7 +105,11 @@ export function UserProfileBuilderPage() {
 
   const handleClose = () => {
     resetProfileDraft()
-    navigate('/user/basecamp', { replace: true })
+    if (isAuthenticated) {
+      navigate('/user/basecamp', { replace: true })
+      return
+    }
+    navigate('/welcome', { replace: true })
   }
 
   return (

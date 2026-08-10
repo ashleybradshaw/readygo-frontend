@@ -20,6 +20,7 @@ export function UserLocationActivityPage() {
   )
   const guestSession = useReadyGoStore((state) => state.guestSession)
   const setGuestSession = useReadyGoStore((state) => state.setGuestSession)
+  const isAuthenticated = useReadyGoStore((state) => state.isAuthenticated)
 
   const [activity, setActivity] = useState<ActivityChoice>(() =>
     guestSession.activitySelected
@@ -73,6 +74,14 @@ export function UserLocationActivityPage() {
     navigate('/user/profile-builder')
   }
 
+  const handleClose = () => {
+    if (isAuthenticated) {
+      navigate('/user/basecamp')
+      return
+    }
+    navigate('/welcome')
+  }
+
   const activityButtonClass = (optionId: 'Cycle' | 'Run') => {
     const active = activity === optionId
     if (active) {
@@ -118,11 +127,11 @@ export function UserLocationActivityPage() {
         type="button"
         tabIndex={0}
         aria-label="Close"
-        onClick={() => navigate('/welcome')}
+        onClick={handleClose}
         onKeyDown={(event) => {
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault()
-            navigate('/welcome')
+            handleClose()
           }
         }}
         className="absolute top-6 right-6 z-20 cursor-pointer text-[#BACBC9]/60 hover:text-white"

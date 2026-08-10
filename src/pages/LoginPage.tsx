@@ -121,7 +121,7 @@ export function LoginPage() {
         </div>
       </div>
 
-      <div className="mt-auto flex flex-col gap-0 pt-8">
+      <div className="mt-auto flex flex-col pt-8">
         <PressableButton
           variant="cta"
           disabled={!isValidEmail(email) || password.length < 1}
@@ -153,15 +153,17 @@ export function LoginPage() {
           </OAuthButton>
         </div>
 
-        <p className="mt-6 text-center font-sans text-base leading-6 tracking-[-0.01em] text-[#BACBC9]">
-          Don&apos;t have an account?{' '}
-          <Link
-            to="/auth/terms"
-            className="font-bold underline underline-offset-2"
-          >
-            Sign up
-          </Link>
-        </p>
+        <div className="mt-6 flex flex-col items-center gap-4 pb-6">
+          <p className="pb-2 text-center text-sm text-[#BACBC9]">
+            Don&apos;t have an account?{' '}
+            <Link
+              to="/auth/terms"
+              className="font-bold underline underline-offset-2"
+            >
+              Sign up
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   )
