@@ -29,14 +29,14 @@ export function WelcomeEntryPage() {
           draggable={false}
         />
         <p
-          className="absolute top-[28%] left-1/2 -translate-x-1/2 font-display text-3xl font-black uppercase tracking-widest text-white/90"
+          className="absolute top-[28%] left-1/2 -translate-x-1/2 font-display text-3xl font-black uppercase tracking-widest text-[#FF3B3B]"
           aria-hidden="true"
         >
           Ready
         </p>
       </div>
 
-      <div className="flex min-h-[50vh] flex-1 flex-col justify-between bg-[#0F1918] px-6 py-8">
+      <div className="flex min-h-[50vh] flex-1 flex-col justify-between bg-[#0F1918] px-6 pt-8 pb-5">
         <div className="mx-auto flex w-full max-w-[360px] flex-col items-center text-center">
           <h1 className="font-display text-2xl font-bold uppercase tracking-[-0.02em] text-[#BACBC9]">
             Nice meeting you
@@ -84,7 +84,7 @@ export function WelcomeEntryPage() {
           </div>
         </div>
 
-        <p className="mx-auto mt-6 text-center font-sans text-sm tracking-[-0.01em] text-[#BACBC9]">
+        <p className="mx-auto text-center font-sans text-sm tracking-[-0.01em] text-[#BACBC9]">
           Already have an account?{' '}
           <Link
             to="/auth/login"
