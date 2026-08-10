@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ClosePillButton } from '../components/ui/ClosePillButton'
+import { ArrowLeftCircle } from 'lucide-react'
 import { PressableButton } from '../components/ui/PressableButton'
 import { useReadyGoStore } from '../store/useReadyGoStore'
 
@@ -10,22 +10,39 @@ export function DeleteAccountPage() {
   const [confirmation, setConfirmation] = useState('')
   const canDelete = confirmation.trim() === 'DELETE'
 
+  const handleBack = () => {
+    navigate('/settings')
+  }
+
   return (
-    <div className="flex h-full flex-col bg-[#0F1918] px-5 pt-[max(2.5rem,env(safe-area-inset-top))] pb-8">
-      <div className="mb-6 flex items-start justify-between gap-4">
-        <div>
-          <h1 className="font-display text-2xl font-bold uppercase leading-8 tracking-[-0.02em] text-[#BACBC9]">
-            Account
-          </h1>
-          <p className="mt-1 font-sans text-lg font-bold uppercase tracking-[-0.01em] text-[#BACBC9]">
-            Delete All My Data?
-          </p>
-        </div>
-        <ClosePillButton onClick={() => navigate('/settings')} />
+    <div className="relative flex h-full flex-col bg-[#0F1918] px-5 pt-[max(2.5rem,env(safe-area-inset-top))] pb-8">
+      <button
+        type="button"
+        tabIndex={0}
+        aria-label="Back to settings"
+        onClick={handleBack}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault()
+            handleBack()
+          }
+        }}
+        className="absolute top-6 right-6 z-20 cursor-pointer text-[#BACBC9] hover:text-white"
+      >
+        <ArrowLeftCircle className="h-6 w-6" aria-hidden="true" />
+      </button>
+
+      <div className="mb-6 pr-10">
+        <h2 className="text-xl font-black tracking-wide text-white uppercase">
+          ACCOUNT
+        </h2>
+        <p className="mt-1 text-xs font-bold text-[#BACBC9] uppercase">
+          DELETE MY ACCOUNT?
+        </p>
       </div>
 
       <p className="font-sans text-sm font-bold uppercase leading-5 tracking-[-0.01em] text-[#BACBC9]">
-        We get it – life moves on. Deleting your account remves everything
+        We get it – life moves on. Deleting your account removes everything
         permanently. We&apos;ll send a confirmation to your email.
       </p>
 

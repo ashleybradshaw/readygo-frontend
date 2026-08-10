@@ -126,10 +126,10 @@ export function SavedPage({ initialTab }: SavedPageProps) {
                     const loaded = loadSavedRoute(session.id)
                     if (loaded) navigate('/user/session-ready')
                   }}
-                  className="rounded-[4px] border-0"
+                  className="rounded-full border-0"
                   style={{
                     height: 40,
-                    borderRadius: 4,
+                    borderRadius: 9999,
                     backgroundColor: '#70FF00',
                     color: '#0F1918',
                     fontWeight: 700,
@@ -142,10 +142,10 @@ export function SavedPage({ initialTab }: SavedPageProps) {
                     loadSavedRoute(session.id)
                     setMapOpen(true)
                   }}
-                  className="rounded-[4px] border-0"
+                  className="rounded-full border-0"
                   style={{
                     height: 40,
-                    borderRadius: 4,
+                    borderRadius: 9999,
                     backgroundColor: '#BACBC9',
                     color: '#0F1918',
                     fontWeight: 700,
@@ -159,10 +159,10 @@ export function SavedPage({ initialTab }: SavedPageProps) {
                   deleteSavedRoute(session.id)
                   setSessionIndex((value) => Math.max(0, value - 1))
                 }}
-                className="rounded-[4px] border-0"
+                className="rounded-full border-0"
                 style={{
                   height: 40,
-                  borderRadius: 4,
+                  borderRadius: 9999,
                   backgroundColor: '#3B0000',
                   color: '#FF3B30',
                   fontWeight: 700,
@@ -251,10 +251,10 @@ export function SavedPage({ initialTab }: SavedPageProps) {
                       `${profile.name} is now current.`,
                     )
                   }}
-                  className="rounded-[4px] border-0"
+                  className="rounded-full border-0"
                   style={{
                     height: 40,
-                    borderRadius: 4,
+                    borderRadius: 9999,
                     backgroundColor:
                       currentProfile?.id === profile.id ? '#84BCA4' : '#BACBC9',
                     color: '#0F1918',
@@ -269,10 +269,10 @@ export function SavedPage({ initialTab }: SavedPageProps) {
                   onClick={() => {
                     showSuccessToast('Map', 'Open a saved session to view the map.')
                   }}
-                  className="rounded-[4px] border-0"
+                  className="rounded-full border-0"
                   style={{
                     height: 40,
-                    borderRadius: 4,
+                    borderRadius: 9999,
                     backgroundColor: '#BACBC9',
                     color: '#0F1918',
                     fontWeight: 700,
@@ -286,10 +286,10 @@ export function SavedPage({ initialTab }: SavedPageProps) {
                   deleteProfile(profile.id)
                   setProfileIndex((value) => Math.max(0, value - 1))
                 }}
-                className="rounded-[4px] border-0"
+                className="rounded-full border-0"
                 style={{
                   height: 40,
-                  borderRadius: 4,
+                  borderRadius: 9999,
                   backgroundColor: '#3B0000',
                   color: '#FF3B30',
                   fontWeight: 700,
@@ -346,10 +346,10 @@ const SavedTabSwitcher = ({
   active: 'sessions' | 'profiles'
   onChange: (tab: 'sessions' | 'profiles') => void
 }) => (
-  <div className="relative mx-auto flex w-full max-w-[280px] rounded-full bg-[#BACBC9] p-1">
+  <div className="relative mx-auto flex w-full max-w-[280px] rounded-full border border-[#2D3739] bg-[#0F191B] p-1">
     <span
       aria-hidden="true"
-      className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-full bg-[#182629] transition-transform duration-300 ease-out ${
+      className={`absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-full bg-[#BACBC9] transition-transform duration-300 ease-out ${
         active === 'profiles' ? 'translate-x-[calc(100%+4px)]' : 'translate-x-0'
       }`}
     />
@@ -374,8 +374,8 @@ const SavedTabSwitcher = ({
           }}
           className={`relative z-10 flex-1 cursor-pointer rounded-full px-5 py-2.5 font-sans text-xs font-bold uppercase tracking-[-0.01em] transition-colors duration-300 ${
             isActive
-              ? 'text-[#BACBC9]'
-              : 'bg-transparent text-[#0F1918]'
+              ? 'text-[#0F191B]'
+              : 'bg-transparent text-[#BACBC9]'
           }`}
         >
           {tab.label}
