@@ -1,9 +1,8 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { X } from 'lucide-react'
-import { BottomSheet } from '../components/ui/BottomSheet'
+import { LocationInfoSheet } from '../components/onboarding/LocationInfoSheet'
 import { PressableButton } from '../components/ui/PressableButton'
-import { ClosePillButton } from '../components/ui/ClosePillButton'
 import { useReadyGoStore } from '../store/useReadyGoStore'
 import bgDual from '../assets/intro/bg-dual.png'
 import bgCycling from '../assets/intro/bg-cycling.png'
@@ -133,11 +132,13 @@ export function GuestActivityPage() {
       </button>
 
       <div className="relative z-10 flex h-full flex-col">
-        <header className="flex shrink-0 items-center justify-center px-4 pt-[22%]">
-          <h1 className="text-center font-display text-xl font-bold uppercase tracking-[-0.02em] text-[#BACBC9]">
-            Set
-          </h1>
-        </header>
+        <p
+          className="absolute top-[28%] left-1/2 -translate-x-1/2 font-display text-3xl font-black uppercase tracking-widest text-white/90"
+          aria-hidden="true"
+        >
+          Set
+        </p>
+        <h1 className="sr-only">Set</h1>
 
         <div className="mt-auto bg-gradient-to-t from-[#0F1918] via-[#0F1918]/90 to-transparent px-4 pb-8 pt-12">
           <p className="mb-4 text-center font-sans text-sm leading-relaxed text-[#BACBC9]">
@@ -228,27 +229,7 @@ export function GuestActivityPage() {
         </div>
       </div>
 
-      <BottomSheet open={faqOpen} onClose={() => setFaqOpen(false)} tone="light">
-        <div className="flex flex-col gap-4 pb-2 pt-1 text-[#0F191B]">
-          <div className="flex items-start justify-between gap-3">
-            <h2 className="font-display text-2xl font-bold uppercase tracking-[-0.02em]">
-              Location
-            </h2>
-            <ClosePillButton onClick={() => setFaqOpen(false)} />
-          </div>
-          <p className="font-sans text-base leading-relaxed">
-            ReadyGo uses your location to build routes that actually start where
-            you are — not somewhere nearby. Right here.
-          </p>
-          <p className="font-sans text-base leading-relaxed">
-            Not a fan of sharing location? No bother — you can set a home
-            postcode in your profile instead once you sign up.
-          </p>
-          <PressableButton variant="cta" onClick={() => setFaqOpen(false)}>
-            Got it
-          </PressableButton>
-        </div>
-      </BottomSheet>
+      <LocationInfoSheet open={faqOpen} onClose={() => setFaqOpen(false)} />
     </div>
   )
 }
