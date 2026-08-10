@@ -1,7 +1,15 @@
-# READYGO FRONTEND DESIGN SYSTEM RULES
+# READYGO FRONTEND DESIGN SYSTEM & UI ARCHITECTURE RULES
 
-- **Capsule Activity Switches:** Use custom `w-12 h-6` track. Active state is solid `#70FF00` (Lime) for BOTH Run and Cycle positions.
-- **CTA Stack Rhythm:** Primary CTAs -> 20px gap -> Ghost Text CTA -> 24px bottom container padding.
-- **Hero Watermarks:** `READY` (`#FF3B3B`) and `SET` (`#FFFFFF`) positioned at `top-[28%]` inside hero overlay frames.
-- **Modals & Cards:** Dark theme `bg-[#182629] border border-[#2D3739] text-[#BACBC9] rounded-[16px]`.
-- **Close Icons:** Positioned `absolute top-6 right-6 z-20 text-[#BACBC9]/60 hover:text-white`.
+## 1. TOGGLE SWITCH STANDARDS
+- Binary Selection Switch (`BinaryToggle`): Used for non-OFF choices (Run/Cycle, Loop/Point-to-Point). Track `60x18px`, Knob `24px` (#BACBC9 left, #7CFF00 right).
+- Boolean ON/OFF Switch (`BooleanToggle`): Used for feature toggles. Track `60x18px`, Knob `24px` (#BACBC9 OFF, #7CFF00 ON).
+
+## 2. MODAL & OVERLAY SHEET ARCHITECTURE
+- Backdrop: `fixed inset-0 bg-black/70 backdrop-blur-md z-[100] flex flex-col justify-end`.
+- Sheet: `w-full max-w-md mx-auto bg-[#182629] border-t border-[#2D3739] rounded-t-[24px] p-6 text-[#BACBC9] shadow-2xl relative z-[101]`.
+- Top-Right Close Icon: `<XCircle className="w-6 h-6 text-[#BACBC9]/60 hover:text-white cursor-pointer absolute top-6 right-6 z-[102]"/>`.
+
+## 3. CONTAINER & PILL SPACING
+- Setup Cards: `w-full bg-[#182629]/40 border border-[#2D3739]/60 rounded-[4px] p-4 mb-[10px] flex flex-col items-start`.
+- Pill Rows: `flex flex-wrap justify-start items-center gap-[10px] w-full mt-2`.
+- Active Pill: `border-[#70FF00] text-[#70FF00] bg-[#70FF00]/10 font-bold`.

@@ -3,11 +3,12 @@ import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ActivitySelectorBar } from '../components/ui/ActivitySelectorBar'
+import { DistanceSlider } from '../components/ui/DistanceSlider'
 import { MultiSelectPillRow } from '../components/ui/MultiSelectPillRow'
 import { PressableButton } from '../components/ui/PressableButton'
 import { SegmentedPillRow } from '../components/ui/SegmentedPillRow'
 import { SetupSection } from '../components/ui/SetupSection'
-import { ToggleSwitch } from '../components/ui/ToggleSwitch'
+import { BinaryToggle, BooleanToggle } from '../components/common/Toggle'
 import { formatWeatherLine } from '../lib/session'
 import {
   type PreferredTime,
@@ -68,9 +69,6 @@ export function UserProfileBuilderPage() {
     () => (isCycle ? activityCycle : activityRun),
     [isCycle],
   )
-
-  const distanceProgress =
-    ((distanceMiles - minMiles) / (maxMiles - minMiles)) * 100
 
   const durationValue =
     DURATION_OPTIONS.find((item) => item.label === guestSession.durationLabel)
@@ -209,39 +207,11 @@ export function UserProfileBuilderPage() {
                 />
               </SetupSection>
 
-              <SetupSection
-                title="Distance"
-                subtitle="How far do you want to go?"
-              >
-                <input
-                  type="range"
-                  min={minMiles}
-                  max={maxMiles}
-                  step={1}
-                  value={distanceMiles}
-                  onChange={(event) =>
-                    setGuestSession({
-                      distanceMiles: Number(event.target.value),
-                    })
-                  }
-                  aria-label="Distance in miles"
-                  className="guest-param-slider mt-2 w-full"
-                  style={{
-                    ['--guest-progress' as string]: `${distanceProgress}%`,
-                  }}
-                />
-                <div className="mt-3 flex items-center justify-start gap-[10px]">
-                  <span className="rounded-full border border-[#2D3739] bg-[#0F191B]/60 px-2.5 py-1.5 text-xs font-medium text-[#BACBC9]">
-                    1 Min
-                  </span>
-                  <span className="rounded-full border border-[#70FF00] bg-[#70FF00]/10 px-2.5 py-1.5 text-xs font-bold text-[#70FF00]">
-                    [{distanceMiles} Miles]
-                  </span>
-                  <span className="rounded-full border border-[#2D3739] bg-[#0F191B]/60 px-2.5 py-1.5 text-xs font-medium text-[#BACBC9]">
-                    {maxMiles} Max
-                  </span>
-                </div>
-              </SetupSection>
+              <DistanceSlider
+                maxMiles={maxMiles}
+                value={distanceMiles}
+                onChange={(miles) => setGuestSession({ distanceMiles: miles })}
+              />
 
               <SetupSection
                 title="Estimated Duration"
@@ -438,12 +408,14 @@ const ToggleRow = ({
   checked,
   onChange,
   highlight = false,
+  binary = false,
 }: {
   leftLabel: string
   rightLabel?: string
   checked: boolean
   onChange: (checked: boolean) => void
   highlight?: boolean
+  binary?: boolean
 }) => (
   <div className="flex items-center justify-between gap-3 py-1">
     <div className="flex min-w-0 items-center gap-3">
@@ -470,10 +442,18 @@ const ToggleRow = ({
         </span>
       ) : null}
     </div>
-    <ToggleSwitch
-      label={rightLabel ? `${leftLabel} or ${rightLabel}` : leftLabel}
-      checked={checked}
-      onChange={onChange}
-    />
+    {binary || rightLabel ? (
+      <BinaryToggle
+        label={rightLabel ? `${leftLabel} or ${rightLabel}` : leftLabel}
+        checked={checked}
+        onChange={onChange}
+      />
+    ) : (
+      <BooleanToggle
+        label={leftLabel}
+        checked={checked}
+        onChange={onChange}
+      />
+    )}
   </div>
 )
