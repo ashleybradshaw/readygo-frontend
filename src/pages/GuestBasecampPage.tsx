@@ -62,8 +62,8 @@ export function GuestBasecampPage() {
       durationHours: oneTimeSessionHours,
       durationLabel:
         oneTimeSessionHours === 1
-          ? '1 Hour'
-          : `${oneTimeSessionHours} Hours`,
+          ? '1 Hr'
+          : `${oneTimeSessionHours} Hr`,
     })
     navigate('/guest/session')
   }

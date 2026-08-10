@@ -30,10 +30,18 @@ const PREFERRED_WEATHER: WeatherChoice[] = [
 
 const DURATION_OPTIONS = [
   { label: '20-30 Min', hours: 0.5 },
-  { label: '1 Hour', hours: 1 },
-  { label: '1.5 Hours', hours: 1.5 },
-  { label: '2+ Hours', hours: 2 },
+  { label: '1 Hr', hours: 1 },
+  { label: '1.5 Hr', hours: 1.5 },
+  { label: '2+ Hr', hours: 2 },
 ] as const
+
+const resolveDurationLabel = (label: string) => {
+  if (label === '1 Hour') return '1 Hr'
+  if (label === '1.5 Hours') return '1.5 Hr'
+  if (label === '2+ Hours') return '2+ Hr'
+  if (label === '20/30 Mins') return '20-30 Min'
+  return label
+}
 
 export function UserProfileBuilderPage() {
   const navigate = useNavigate()
@@ -71,11 +79,9 @@ export function UserProfileBuilderPage() {
   )
 
   const durationValue =
-    DURATION_OPTIONS.find((item) => item.label === guestSession.durationLabel)
-      ?.label ??
-    (guestSession.durationLabel === '20/30 Mins'
-      ? '20-30 Min'
-      : DURATION_OPTIONS[1].label)
+    DURATION_OPTIONS.find(
+      (item) => item.label === resolveDurationLabel(guestSession.durationLabel),
+    )?.label ?? DURATION_OPTIONS[1].label
 
   const handleActivityToggle = (toCycle: boolean) => {
     const nextType = toCycle ? 'Cycle' : 'Run'
@@ -285,53 +291,57 @@ export function UserProfileBuilderPage() {
                 />
               </SetupSection>
 
-              <div className="mb-[10px] flex w-full flex-col gap-1 rounded-[4px] border border-[#2D3739]/60 bg-[#182629]/40 p-4">
-                <ToggleRow
-                  leftLabel="Loop"
-                  rightLabel="Point-to-Point"
-                  checked={draft.preferences.loopOrSingleDestination}
-                  onChange={(checked) =>
-                    updateDraftPreferences({ loopOrSingleDestination: checked })
-                  }
-                />
+              <div className="mb-[10px] w-full rounded-[4px] border border-[#2D3739]/60 bg-[#182629]/40 p-4">
+                <div className="flex w-full flex-col gap-[14px] py-1">
+                  <ToggleRow
+                    leftLabel="Loop"
+                    rightLabel="Point-to-Point"
+                    checked={draft.preferences.loopOrSingleDestination}
+                    onChange={(checked) =>
+                      updateDraftPreferences({
+                        loopOrSingleDestination: checked,
+                      })
+                    }
+                  />
 
-                {isCycle ? (
-                  <>
-                    <ToggleRow
-                      leftLabel="Avoid Heavy Traffic"
-                      checked={draft.preferences.showTraffic}
-                      onChange={(checked) =>
-                        updateDraftPreferences({ showTraffic: checked })
-                      }
-                    />
-                    <ToggleRow
-                      leftLabel="Prefer Bike Paths"
-                      checked={draft.preferences.preferBikePaths}
-                      highlight
-                      onChange={(checked) =>
-                        updateDraftPreferences({ preferBikePaths: checked })
-                      }
-                    />
-                  </>
-                ) : (
-                  <>
-                    <ToggleRow
-                      leftLabel="Parks"
-                      checked={draft.preferences.preferParks}
-                      highlight
-                      onChange={(checked) =>
-                        updateDraftPreferences({ preferParks: checked })
-                      }
-                    />
-                    <ToggleRow
-                      leftLabel="Trails"
-                      checked={draft.preferences.preferTrails}
-                      onChange={(checked) =>
-                        updateDraftPreferences({ preferTrails: checked })
-                      }
-                    />
-                  </>
-                )}
+                  {isCycle ? (
+                    <>
+                      <ToggleRow
+                        leftLabel="Avoid Heavy Traffic"
+                        checked={draft.preferences.showTraffic}
+                        onChange={(checked) =>
+                          updateDraftPreferences({ showTraffic: checked })
+                        }
+                      />
+                      <ToggleRow
+                        leftLabel="Prefer Bike Paths"
+                        checked={draft.preferences.preferBikePaths}
+                        highlight
+                        onChange={(checked) =>
+                          updateDraftPreferences({ preferBikePaths: checked })
+                        }
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <ToggleRow
+                        leftLabel="Parks"
+                        checked={draft.preferences.preferParks}
+                        highlight
+                        onChange={(checked) =>
+                          updateDraftPreferences({ preferParks: checked })
+                        }
+                      />
+                      <ToggleRow
+                        leftLabel="Trails"
+                        checked={draft.preferences.preferTrails}
+                        onChange={(checked) =>
+                          updateDraftPreferences({ preferTrails: checked })
+                        }
+                      />
+                    </>
+                  )}
+                </div>
               </div>
             </motion.div>
           )}

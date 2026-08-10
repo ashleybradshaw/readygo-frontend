@@ -12,6 +12,7 @@ export const DistanceSlider = ({
   onChange,
 }: DistanceSliderProps) => {
   const progress = ((value - minMiles) / (maxMiles - minMiles)) * 100
+  const badgeLabel = value === 1 ? '1 Mile' : `[${value} Miles]`
 
   return (
     <section className="mb-[10px] flex w-full flex-col items-start rounded-[4px] border border-[#2D3739]/60 bg-[#182629]/40 p-4 text-left">
@@ -20,7 +21,7 @@ export const DistanceSlider = ({
           Distance
         </h4>
         <span className="rounded-full border border-[#70FF00]/40 bg-[#70FF00]/15 px-3 py-1 text-xs font-bold text-[#70FF00]">
-          [{value} Miles]
+          {badgeLabel}
         </span>
       </div>
       <p className="mt-1 text-xs text-[#BACBC9]/70">How far do you want to go?</p>
@@ -35,7 +36,7 @@ export const DistanceSlider = ({
         className="guest-param-slider mt-3 w-full"
         style={{ ['--guest-progress' as string]: `${progress}%` }}
       />
-      <div className="mt-2 flex w-full items-center justify-between">
+      <div className="mt-2.5 flex w-full items-center justify-between">
         <span className="text-[11px] text-[#BACBC9]/50">1 Mile</span>
         <span className="text-[11px] text-[#BACBC9]/50">{maxMiles} Max</span>
       </div>

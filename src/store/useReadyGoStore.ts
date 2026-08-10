@@ -192,7 +192,7 @@ export const defaultGuestSessionDraft = (): GuestSessionDraft => ({
   distanceMiles: 10,
   terrain: 'Paved',
   durationHours: 1,
-  durationLabel: '1 Hour',
+  durationLabel: '1 Hr',
 })
 
 export interface ReadyGoState {

@@ -16,10 +16,18 @@ const RUN_TERRAINS = ['Flat', 'Trail', 'Hills', 'Mixed'] as const
 
 const DURATION_OPTIONS = [
   { label: '20-30 Min', hours: 0.5 },
-  { label: '1 Hour', hours: 1 },
-  { label: '1.5 Hours', hours: 1.5 },
-  { label: '2+ Hours', hours: 2 },
+  { label: '1 Hr', hours: 1 },
+  { label: '1.5 Hr', hours: 1.5 },
+  { label: '2+ Hr', hours: 2 },
 ] as const
+
+const resolveDurationLabel = (label: string) => {
+  if (label === '1 Hour') return '1 Hr'
+  if (label === '1.5 Hours') return '1.5 Hr'
+  if (label === '2+ Hours') return '2+ Hr'
+  if (label === '20/30 Mins') return '20-30 Min'
+  return label
+}
 
 export function GuestSessionPage() {
   const navigate = useNavigate()
@@ -105,11 +113,9 @@ export function GuestSessionPage() {
   }
 
   const durationValue =
-    DURATION_OPTIONS.find((item) => item.label === guestSession.durationLabel)
-      ?.label ??
-    (guestSession.durationLabel === '20/30 Mins'
-      ? '20-30 Min'
-      : DURATION_OPTIONS[0].label)
+    DURATION_OPTIONS.find(
+      (item) => item.label === resolveDurationLabel(guestSession.durationLabel),
+    )?.label ?? DURATION_OPTIONS[0].label
 
   return (
     <div className="relative flex h-full flex-col overflow-hidden bg-[#0F1918]">

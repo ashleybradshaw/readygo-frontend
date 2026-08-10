@@ -47,7 +47,7 @@ export function UserLocationActivityPage() {
       activitySelected: true,
       terrain: next === 'Cycle' ? 'Paved' : 'Flat',
       durationHours: next === 'Cycle' ? 1 : 0.5,
-      durationLabel: next === 'Cycle' ? '1 Hour' : '20-30 Min',
+      durationLabel: next === 'Cycle' ? '1 Hr' : '20-30 Min',
       distanceMiles: next === 'Cycle' ? 15 : 5,
     })
   }
