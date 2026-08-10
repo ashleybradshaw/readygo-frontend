@@ -1,19 +1,17 @@
-import { motion } from 'framer-motion'
-
 interface ToggleSwitchProps {
   checked: boolean
   onChange: (checked: boolean) => void
   label: string
-  /** Keep the lime track in both positions (e.g. Run/Cycle selector). */
+  /** Keep the lime track tint in both positions (e.g. Run/Cycle selector). */
   alwaysOn?: boolean
 }
 
-export function ToggleSwitch({
+export const ToggleSwitch = ({
   checked,
   onChange,
   label,
   alwaysOn = false,
-}: ToggleSwitchProps) {
+}: ToggleSwitchProps) => {
   const trackOn = alwaysOn || checked
 
   return (
@@ -22,17 +20,25 @@ export function ToggleSwitch({
       role="switch"
       aria-checked={checked}
       aria-label={label}
+      tabIndex={0}
       onClick={() => onChange(!checked)}
-      className={`relative h-[31px] w-[51px] shrink-0 rounded-full p-[2px] transition-colors ${
-        trackOn ? 'bg-[#70FF00]' : 'bg-[#263336]'
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          onChange(!checked)
+        }
+      }}
+      className={`flex h-6 w-12 shrink-0 cursor-pointer items-center rounded-full border border-[#2D3739] p-1 transition-colors duration-200 ${
+        trackOn ? 'bg-[#70FF00]/20' : 'bg-[#182629]'
       }`}
     >
-      <motion.span
-        layout
-        transition={{ type: 'spring', stiffness: 520, damping: 34 }}
-        className={`block size-[27px] rounded-full shadow-[0_1px_2px_rgba(0,0,0,0.25)] ${
-          checked ? 'ml-auto' : ''
-        } ${trackOn ? 'bg-white' : 'bg-[#829695]'}`}
+      <span
+        aria-hidden="true"
+        className={`h-4 w-5 rounded-full transition-transform duration-200 ease-in-out ${
+          checked
+            ? 'translate-x-5 bg-[#70FF00]'
+            : 'translate-x-0 bg-[#BACBC9]/40'
+        }`}
       />
     </button>
   )

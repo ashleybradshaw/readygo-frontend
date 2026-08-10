@@ -37,7 +37,7 @@ export const SegmentedPillRow = ({
               onChange(option.id)
             }
           }}
-          className={`inline-flex h-8 min-w-0 flex-1 items-center justify-center rounded-full border px-2.5 text-xs font-bold tracking-[-0.01em] transition-colors ${
+          className={`inline-flex h-8 min-w-0 flex-1 items-center justify-center whitespace-nowrap rounded-full border px-2.5 text-xs font-bold tracking-[-0.01em] transition-colors ${
             active
               ? 'border-[#70FF00] bg-[#70FF00]/10 text-[#70FF00]'
               : 'border-transparent bg-[#BACBC9]/10 text-[#BACBC9]'

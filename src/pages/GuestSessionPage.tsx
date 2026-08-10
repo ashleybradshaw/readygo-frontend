@@ -1,10 +1,9 @@
-import { Bike, Footprints } from 'lucide-react'
+import { Bike, Footprints, X } from 'lucide-react'
 import { useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PressableButton } from '../components/ui/PressableButton'
 import { SegmentedPillRow } from '../components/ui/SegmentedPillRow'
 import { ToggleSwitch } from '../components/ui/ToggleSwitch'
-import { ClosePillButton } from '../components/ui/ClosePillButton'
 import { formatWeatherLine, buildSessionManifest } from '../lib/session'
 import { useReadyGoStore } from '../store/useReadyGoStore'
 import activityCycle from '../assets/guest/activity-cycle.png'
@@ -14,7 +13,7 @@ const CYCLE_TERRAINS = ['Paved', 'Rolling', 'Climbs', 'Off Road'] as const
 const RUN_TERRAINS = ['Flat', 'Trail', 'Hills', 'Mixed'] as const
 
 const DURATION_OPTIONS = [
-  { label: '20/30 Mins', hours: 0.5 },
+  { label: '20-30 Min', hours: 0.5 },
   { label: '1 Hour', hours: 1 },
   { label: '1.5 Hours', hours: 1.5 },
   { label: '2+ Hours', hours: 2 },
@@ -63,7 +62,7 @@ export function GuestSessionPage() {
     setGuestSession({
       terrain: nextType === 'Cycle' ? 'Paved' : 'Flat',
       durationHours: 0.5,
-      durationLabel: '20/30 Mins',
+      durationLabel: '20-30 Min',
       distanceMiles: nextType === 'Cycle' ? 15 : 5,
     })
   }
@@ -107,7 +106,10 @@ export function GuestSessionPage() {
 
   const durationValue =
     DURATION_OPTIONS.find((item) => item.label === guestSession.durationLabel)
-      ?.label ?? DURATION_OPTIONS[0].label
+      ?.label ??
+    (guestSession.durationLabel === '20/30 Mins'
+      ? '20-30 Min'
+      : DURATION_OPTIONS[0].label)
 
   return (
     <div className="relative flex h-full flex-col overflow-hidden bg-[#0F1918]">
@@ -119,19 +121,30 @@ export function GuestSessionPage() {
       />
       <div className="absolute inset-0 bg-[#0F1918]/80" />
 
+      <button
+        type="button"
+        tabIndex={0}
+        aria-label="Close"
+        onClick={handleExit}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault()
+            handleExit()
+          }
+        }}
+        className="absolute top-4 right-4 z-20 cursor-pointer text-[#BACBC9]/60 hover:text-white"
+      >
+        <X className="h-5 w-5" strokeWidth={2.25} aria-hidden="true" />
+      </button>
+
       <div className="relative z-10 flex h-full flex-col px-4 pb-6 pt-[max(2rem,env(safe-area-inset-top))]">
-        <div className="relative mb-5">
-          <div className="px-10 text-center">
-            <p className="truncate text-sm font-bold tracking-[-0.01em] text-[#BACBC9]">
-              {formatWeatherLine(weather)}
-            </p>
-            <p className="mt-1 text-xs font-bold tracking-[-0.01em] text-[#BACBC9]/80">
-              Dry for the next [{weather.temperatureC > 8 ? 3 : 2}] Hrs
-            </p>
-          </div>
-          <div className="absolute right-0 top-0">
-            <ClosePillButton onClick={handleExit} />
-          </div>
+        <div className="mb-5 text-center">
+          <p className="truncate text-sm font-bold tracking-[-0.01em] text-[#BACBC9]">
+            {formatWeatherLine(weather)}
+          </p>
+          <p className="mt-1 text-xs font-bold tracking-[-0.01em] text-[#BACBC9]/80">
+            Dry for the next [{weather.temperatureC > 8 ? 3 : 2}] Hrs
+          </p>
         </div>
 
         <div className="mb-5 flex items-center justify-between gap-3">

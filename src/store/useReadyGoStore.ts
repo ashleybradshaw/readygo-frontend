@@ -56,6 +56,8 @@ export interface ProfilePreferences {
   showTraffic: boolean
   loopOrSingleDestination: boolean
   preferBikePaths: boolean
+  preferParks: boolean
+  preferTrails: boolean
   sessionDuration: SessionDuration
 }
 
@@ -154,6 +156,8 @@ export const defaultPreferences = (): ProfilePreferences => ({
   showTraffic: false,
   loopOrSingleDestination: false,
   preferBikePaths: true,
+  preferParks: true,
+  preferTrails: false,
   sessionDuration: 'Under an hour',
 })
 

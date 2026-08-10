@@ -1,8 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { Bike, ChevronLeft, ChevronRight, Footprints } from 'lucide-react'
+import { Bike, ChevronLeft, ChevronRight, Footprints, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ClosePillButton } from '../components/ui/ClosePillButton'
 import { PressableButton } from '../components/ui/PressableButton'
 import { SegmentedPillRow } from '../components/ui/SegmentedPillRow'
 import { ToggleSwitch } from '../components/ui/ToggleSwitch'
@@ -19,7 +18,7 @@ const CYCLE_TERRAINS = ['Paved', 'Rolling', 'Climbs', 'Off Road'] as const
 const RUN_TERRAINS = ['Flat', 'Trail', 'Hills', 'Mixed'] as const
 
 const DURATION_OPTIONS = [
-  { label: '20/30 Mins', hours: 0.5 },
+  { label: '20-30 Min', hours: 0.5 },
   { label: '1 Hour', hours: 1 },
   { label: '1.5 Hours', hours: 1.5 },
   { label: '2+ Hours', hours: 2 },
@@ -64,7 +63,10 @@ export function UserProfileBuilderPage() {
 
   const durationValue =
     DURATION_OPTIONS.find((item) => item.label === guestSession.durationLabel)
-      ?.label ?? DURATION_OPTIONS[1].label
+      ?.label ??
+    (guestSession.durationLabel === '20/30 Mins'
+      ? '20-30 Min'
+      : DURATION_OPTIONS[1].label)
 
   const handleActivityToggle = (toCycle: boolean) => {
     const nextType = toCycle ? 'Cycle' : 'Run'
@@ -115,24 +117,35 @@ export function UserProfileBuilderPage() {
       />
       <div className="absolute inset-0 bg-[#0F1918]/80" />
 
+      <button
+        type="button"
+        tabIndex={0}
+        aria-label="Close"
+        onClick={handleClose}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault()
+            handleClose()
+          }
+        }}
+        className="absolute top-4 right-4 z-20 cursor-pointer text-[#BACBC9]/60 hover:text-white"
+      >
+        <X className="h-5 w-5" strokeWidth={2.25} aria-hidden="true" />
+      </button>
+
       <div className="relative z-10 flex h-full flex-col px-5 pb-6 pt-[max(2rem,env(safe-area-inset-top))]">
-        <div className="relative mb-4">
-          <div className="pr-10 text-center">
-            <h1 className="font-display text-2xl font-bold uppercase tracking-[-0.02em] text-[#BACBC9]">
-              {step === 1 ? 'Create Profile' : 'Route Preferences'}
-            </h1>
-            <p className="mt-1 text-sm font-bold text-[#BACBC9]">
-              {step === 1
-                ? 'Step 1 of 2 · Baseline & Activity'
-                : 'Step 2 of 2 · Terrain & Navigation Rules'}
-            </p>
-            <p className="mt-1 text-xs font-bold text-[#BACBC9]/80">
-              {formatWeatherLine(weather)}
-            </p>
-          </div>
-          <div className="absolute right-0 top-0">
-            <ClosePillButton onClick={handleClose} />
-          </div>
+        <div className="mb-4 text-center">
+          <h1 className="font-display text-2xl font-bold uppercase tracking-[-0.02em] text-[#BACBC9]">
+            {step === 1 ? 'Create Profile' : 'Route Preferences'}
+          </h1>
+          <p className="mt-1 text-sm font-bold text-[#BACBC9]">
+            {step === 1
+              ? 'Step 1 of 2 · Baseline & Activity'
+              : 'Step 2 of 2 · Terrain & Navigation Rules'}
+          </p>
+          <p className="mt-1 text-xs font-bold text-[#BACBC9]/80">
+            {formatWeatherLine(weather)}
+          </p>
         </div>
 
         <AnimatePresence mode="wait">
@@ -327,21 +340,44 @@ export function UserProfileBuilderPage() {
                   updateDraftPreferences({ loopOrSingleDestination: checked })
                 }
               />
-              <ToggleRow
-                leftLabel="Avoid Heavy Traffic"
-                checked={draft.preferences.showTraffic}
-                onChange={(checked) =>
-                  updateDraftPreferences({ showTraffic: checked })
-                }
-              />
-              <ToggleRow
-                leftLabel="Prefer Bike Paths"
-                checked={draft.preferences.preferBikePaths}
-                highlight
-                onChange={(checked) =>
-                  updateDraftPreferences({ preferBikePaths: checked })
-                }
-              />
+
+              {isCycle ? (
+                <>
+                  <ToggleRow
+                    leftLabel="Avoid Heavy Traffic"
+                    checked={draft.preferences.showTraffic}
+                    onChange={(checked) =>
+                      updateDraftPreferences({ showTraffic: checked })
+                    }
+                  />
+                  <ToggleRow
+                    leftLabel="Prefer Bike Paths"
+                    checked={draft.preferences.preferBikePaths}
+                    highlight
+                    onChange={(checked) =>
+                      updateDraftPreferences({ preferBikePaths: checked })
+                    }
+                  />
+                </>
+              ) : (
+                <>
+                  <ToggleRow
+                    leftLabel="Parks"
+                    checked={draft.preferences.preferParks}
+                    highlight
+                    onChange={(checked) =>
+                      updateDraftPreferences({ preferParks: checked })
+                    }
+                  />
+                  <ToggleRow
+                    leftLabel="Trails"
+                    checked={draft.preferences.preferTrails}
+                    onChange={(checked) =>
+                      updateDraftPreferences({ preferTrails: checked })
+                    }
+                  />
+                </>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
