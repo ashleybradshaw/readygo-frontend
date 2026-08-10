@@ -1,10 +1,10 @@
-import { Bike, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import { useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { ActivitySelectorBar } from '../components/ui/ActivitySelectorBar'
 import { PressableButton } from '../components/ui/PressableButton'
-import { RunShoeIcon } from '../components/ui/RunShoeIcon'
 import { SegmentedPillRow } from '../components/ui/SegmentedPillRow'
-import { ToggleSwitch } from '../components/ui/ToggleSwitch'
+import { SetupSection } from '../components/ui/SetupSection'
 import { formatWeatherLine, buildSessionManifest } from '../lib/session'
 import { useReadyGoStore } from '../store/useReadyGoStore'
 import activityCycle from '../assets/guest/activity-cycle.png'
@@ -40,6 +40,7 @@ export function GuestSessionPage() {
   const minMiles = 1
   const maxMiles = isCycle ? 60 : 20
   const terrains = isCycle ? CYCLE_TERRAINS : RUN_TERRAINS
+  const dryHours = weather.temperatureC > 8 ? 3 : 2
 
   const distanceMiles = Math.min(
     maxMiles,
@@ -139,65 +140,28 @@ export function GuestSessionPage() {
       </button>
 
       <div className="relative z-10 flex h-full flex-col px-4 pb-6 pt-[max(2rem,env(safe-area-inset-top))]">
-        <div className="mb-5 text-center">
-          <p className="truncate text-sm font-bold tracking-[-0.01em] text-[#BACBC9]">
+        <div className="mb-4 text-left">
+          <h2 className="text-2xl font-black tracking-wide text-white uppercase">
+            Guest Profile
+          </h2>
+          <p className="mt-1 truncate text-sm font-bold tracking-[-0.01em] text-[#BACBC9]">
             {formatWeatherLine(weather)}
           </p>
           <p className="mt-1 text-xs font-bold tracking-[-0.01em] text-[#BACBC9]/80">
-            Dry for the next [{weather.temperatureC > 8 ? 3 : 2}] Hrs
+            Dry for the next [{dryHours}] Hrs
           </p>
         </div>
 
-        <div className="mb-5 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-5">
-            <button
-              type="button"
-              tabIndex={0}
-              aria-pressed={!isCycle}
-              aria-label="Run"
-              onClick={() => handleActivityToggle(false)}
-              className={`inline-flex items-center gap-1.5 text-sm font-bold tracking-[-0.01em] ${
-                isCycle ? 'text-[#BACBC9]' : 'text-[#70FF00]'
-              }`}
-            >
-              <RunShoeIcon
-                className={`h-5 w-5 ${isCycle ? 'text-[#BACBC9]' : 'text-[#70FF00]'}`}
-              />
-              Run
-            </button>
-            <button
-              type="button"
-              tabIndex={0}
-              aria-pressed={isCycle}
-              aria-label="Cycle"
-              onClick={() => handleActivityToggle(true)}
-              className={`inline-flex items-center gap-1.5 text-sm font-bold tracking-[-0.01em] ${
-                isCycle ? 'text-[#70FF00]' : 'text-[#BACBC9]'
-              }`}
-            >
-              <Bike
-                className={`h-5 w-5 ${isCycle ? 'text-[#70FF00]' : 'text-[#BACBC9]'}`}
-                aria-hidden="true"
-              />
-              Cycle
-            </button>
-          </div>
-          <ToggleSwitch
-            label="Toggle cycling or running"
-            checked={isCycle}
-            onChange={handleActivityToggle}
-            alwaysOn
-          />
-        </div>
+        <ActivitySelectorBar
+          isCycle={isCycle}
+          onChange={handleActivityToggle}
+        />
 
-        <div className="min-h-0 flex-1 space-y-6 overflow-y-auto pb-4">
-          <section>
-            <h2 className="font-display text-base font-bold uppercase tracking-[-0.01em] text-[#BACBC9]">
-              Distance
-            </h2>
-            <p className="mt-1 text-sm text-[#BACBC9]/80">
-              How far do you want to go?
-            </p>
+        <div className="min-h-0 flex-1 overflow-y-auto pb-4">
+          <SetupSection
+            title="Distance"
+            subtitle="How far do you want to go?"
+          >
             <input
               type="range"
               min={minMiles}
@@ -208,51 +172,26 @@ export function GuestSessionPage() {
                 setGuestSession({ distanceMiles: Number(event.target.value) })
               }
               aria-label="Distance in miles"
-              className="guest-param-slider mt-4 w-full"
+              className="guest-param-slider mt-2 w-full"
               style={{ ['--guest-progress' as string]: `${distanceProgress}%` }}
             />
-            <div className="mt-3 flex items-center justify-center gap-[10px]">
-              <span className="rounded-full bg-[#BACBC9]/10 px-2.5 py-1.5 text-xs font-bold text-[#BACBC9]">
+            <div className="mt-3 flex items-center justify-start gap-[10px]">
+              <span className="rounded-full border border-[#2D3739] bg-[#0F191B]/60 px-2.5 py-1.5 text-xs font-medium text-[#BACBC9]">
                 1 Min
               </span>
-              <span className="rounded-full bg-[#70FF00]/10 px-2.5 py-1.5 text-xs font-bold text-[#70FF00]">
+              <span className="rounded-full border border-[#70FF00] bg-[#70FF00]/10 px-2.5 py-1.5 text-xs font-bold text-[#70FF00]">
                 [{distanceMiles} Miles]
               </span>
-              <span className="rounded-full bg-[#BACBC9]/10 px-2.5 py-1.5 text-xs font-bold text-[#BACBC9]">
+              <span className="rounded-full border border-[#2D3739] bg-[#0F191B]/60 px-2.5 py-1.5 text-xs font-medium text-[#BACBC9]">
                 {maxMiles} Max
               </span>
             </div>
-          </section>
+          </SetupSection>
 
-          <section>
-            <h2 className="font-display text-base font-bold uppercase tracking-[-0.01em] text-[#BACBC9]">
-              Terrain
-            </h2>
-            <p className="mt-1 text-sm text-[#BACBC9]/80">
-              What style of route suits today?
-            </p>
-            <SegmentedPillRow
-              ariaLabel="Terrain"
-              value={
-                (terrains as readonly string[]).includes(guestSession.terrain)
-                  ? guestSession.terrain
-                  : terrains[0]
-              }
-              options={terrains.map((terrain) => ({
-                id: terrain,
-                label: terrain,
-              }))}
-              onChange={(terrain) => setGuestSession({ terrain })}
-            />
-          </section>
-
-          <section>
-            <h2 className="font-display text-base font-bold uppercase tracking-[-0.01em] text-[#BACBC9]">
-              Estimated Duration
-            </h2>
-            <p className="mt-1 text-sm text-[#BACBC9]/80">
-              How much time do you have?
-            </p>
+          <SetupSection
+            title="Estimated Duration"
+            subtitle="How much time do you have?"
+          >
             <SegmentedPillRow
               ariaLabel="Estimated duration"
               value={durationValue}
@@ -269,7 +208,26 @@ export function GuestSessionPage() {
                 })
               }}
             />
-          </section>
+          </SetupSection>
+
+          <SetupSection
+            title="Terrain"
+            subtitle="What style of route suits you?"
+          >
+            <SegmentedPillRow
+              ariaLabel="Terrain"
+              value={
+                (terrains as readonly string[]).includes(guestSession.terrain)
+                  ? guestSession.terrain
+                  : terrains[0]
+              }
+              options={terrains.map((terrain) => ({
+                id: terrain,
+                label: terrain,
+              }))}
+              onChange={(terrain) => setGuestSession({ terrain })}
+            />
+          </SetupSection>
         </div>
 
         <PressableButton

@@ -1,11 +1,12 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { Bike, ChevronLeft, ChevronRight, X } from 'lucide-react'
+import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { PressableButton } from '../components/ui/PressableButton'
+import { ActivitySelectorBar } from '../components/ui/ActivitySelectorBar'
 import { MultiSelectPillRow } from '../components/ui/MultiSelectPillRow'
-import { RunShoeIcon } from '../components/ui/RunShoeIcon'
+import { PressableButton } from '../components/ui/PressableButton'
 import { SegmentedPillRow } from '../components/ui/SegmentedPillRow'
+import { SetupSection } from '../components/ui/SetupSection'
 import { ToggleSwitch } from '../components/ui/ToggleSwitch'
 import { formatWeatherLine } from '../lib/session'
 import {
@@ -148,8 +149,8 @@ export function UserProfileBuilderPage() {
       </button>
 
       <div className="relative z-10 flex h-full flex-col px-5 pb-6 pt-[max(2rem,env(safe-area-inset-top))]">
-        <div className="mb-4 text-center">
-          <h1 className="font-display text-2xl font-bold uppercase tracking-[-0.02em] text-[#BACBC9]">
+        <div className="mb-4 text-left">
+          <h1 className="text-2xl font-black tracking-wide text-white uppercase">
             {step === 1 ? 'Create Profile' : 'Route Preferences'}
           </h1>
           <p className="mt-1 text-sm font-bold text-[#BACBC9]">
@@ -169,73 +170,30 @@ export function UserProfileBuilderPage() {
               initial={{ opacity: 0, x: 24 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -24 }}
-              className="min-h-0 flex-1 space-y-5 overflow-y-auto pb-4"
+              className="min-h-0 flex-1 overflow-y-auto pb-4"
             >
-              <label className="block">
-                <span className="mb-2 block text-sm font-bold text-[#BACBC9]">
-                  Profile Name
-                </span>
+              <ActivitySelectorBar
+                isCycle={isCycle}
+                onChange={handleActivityToggle}
+              />
+
+              <label className="mb-[10px] block">
                 <input
                   type="text"
                   value={draft.name}
                   onChange={(event) =>
                     updateProfileDraft({ name: event.target.value })
                   }
-                  placeholder="Weekend Long Ride"
+                  placeholder="Name your profile."
                   aria-label="Profile name"
                   className="h-[54px] w-full rounded-[4px] border border-[#2D3739] bg-[#182629]/80 px-4 text-base font-bold text-[#BACBC9] outline-none placeholder:text-[#BACBC9]/50"
                 />
               </label>
 
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-5">
-                  <button
-                    type="button"
-                    tabIndex={0}
-                    aria-pressed={!isCycle}
-                    aria-label="Run"
-                    onClick={() => handleActivityToggle(false)}
-                    className={`inline-flex items-center gap-1.5 text-sm font-bold ${
-                      isCycle ? 'text-[#BACBC9]' : 'text-[#70FF00]'
-                    }`}
-                  >
-                    <RunShoeIcon
-                      className={`h-5 w-5 ${isCycle ? 'text-[#BACBC9]' : 'text-[#70FF00]'}`}
-                    />
-                    Run
-                  </button>
-                  <button
-                    type="button"
-                    tabIndex={0}
-                    aria-pressed={isCycle}
-                    aria-label="Cycle"
-                    onClick={() => handleActivityToggle(true)}
-                    className={`inline-flex items-center gap-1.5 text-sm font-bold ${
-                      isCycle ? 'text-[#70FF00]' : 'text-[#BACBC9]'
-                    }`}
-                  >
-                    <Bike
-                      className={`h-5 w-5 ${isCycle ? 'text-[#70FF00]' : 'text-[#BACBC9]'}`}
-                      aria-hidden="true"
-                    />
-                    Cycle
-                  </button>
-                </div>
-                <ToggleSwitch
-                  label="Toggle cycling or running"
-                  checked={isCycle}
-                  onChange={handleActivityToggle}
-                  alwaysOn
-                />
-              </div>
-
-              <section>
-                <h2 className="text-center text-lg font-bold uppercase tracking-[-0.01em] text-[#BACBC9]">
-                  Preferred Training
-                </h2>
-                <p className="mt-1 text-center text-sm text-[#BACBC9]/80">
-                  Choose your best window in your day
-                </p>
+              <SetupSection
+                title="Preferred Training"
+                subtitle="Choose your best window in your day"
+              >
                 <SegmentedPillRow
                   ariaLabel="Preferred training time"
                   value={trainingValue}
@@ -249,15 +207,12 @@ export function UserProfileBuilderPage() {
                     })
                   }
                 />
-              </section>
+              </SetupSection>
 
-              <section>
-                <h2 className="text-center text-lg font-bold uppercase tracking-[-0.01em] text-[#BACBC9]">
-                  Distance
-                </h2>
-                <p className="mt-1 text-center text-sm text-[#BACBC9]/80">
-                  How far do you want to go?
-                </p>
+              <SetupSection
+                title="Distance"
+                subtitle="How far do you want to go?"
+              >
                 <input
                   type="range"
                   min={minMiles}
@@ -270,31 +225,28 @@ export function UserProfileBuilderPage() {
                     })
                   }
                   aria-label="Distance in miles"
-                  className="guest-param-slider mt-4 w-full"
+                  className="guest-param-slider mt-2 w-full"
                   style={{
                     ['--guest-progress' as string]: `${distanceProgress}%`,
                   }}
                 />
-                <div className="mt-3 flex items-center justify-center gap-[10px]">
-                  <span className="rounded-full bg-[#BACBC9]/10 px-2.5 py-1.5 text-xs font-bold text-[#BACBC9]">
+                <div className="mt-3 flex items-center justify-start gap-[10px]">
+                  <span className="rounded-full border border-[#2D3739] bg-[#0F191B]/60 px-2.5 py-1.5 text-xs font-medium text-[#BACBC9]">
                     1 Min
                   </span>
-                  <span className="rounded-full bg-[#70FF00]/10 px-2.5 py-1.5 text-xs font-bold text-[#70FF00]">
+                  <span className="rounded-full border border-[#70FF00] bg-[#70FF00]/10 px-2.5 py-1.5 text-xs font-bold text-[#70FF00]">
                     [{distanceMiles} Miles]
                   </span>
-                  <span className="rounded-full bg-[#BACBC9]/10 px-2.5 py-1.5 text-xs font-bold text-[#BACBC9]">
+                  <span className="rounded-full border border-[#2D3739] bg-[#0F191B]/60 px-2.5 py-1.5 text-xs font-medium text-[#BACBC9]">
                     {maxMiles} Max
                   </span>
                 </div>
-              </section>
+              </SetupSection>
 
-              <section>
-                <h2 className="text-center text-lg font-bold uppercase tracking-[-0.01em] text-[#BACBC9]">
-                  Estimated Duration
-                </h2>
-                <p className="mt-1 text-center text-sm text-[#BACBC9]/80">
-                  How much time do you have?
-                </p>
+              <SetupSection
+                title="Estimated Duration"
+                subtitle="How much time do you have?"
+              >
                 <SegmentedPillRow
                   ariaLabel="Estimated duration"
                   value={durationValue}
@@ -313,7 +265,7 @@ export function UserProfileBuilderPage() {
                     })
                   }}
                 />
-              </section>
+              </SetupSection>
             </motion.div>
           ) : (
             <motion.div
@@ -321,19 +273,18 @@ export function UserProfileBuilderPage() {
               initial={{ opacity: 0, x: 24 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -24 }}
-              className="min-h-0 flex-1 space-y-5 overflow-y-auto pb-4"
+              className="min-h-0 flex-1 overflow-y-auto pb-4"
             >
-              <section>
-                <h2 className="text-center text-lg font-bold uppercase tracking-[-0.01em] text-[#BACBC9]">
-                  Terrain
-                </h2>
-                <p className="mt-1 text-center text-sm text-[#BACBC9]/80">
-                  What style of route suits today?
-                </p>
+              <SetupSection
+                title="Terrain"
+                subtitle="What style of route suits today?"
+              >
                 <SegmentedPillRow
                   ariaLabel="Terrain"
                   value={
-                    (terrains as readonly string[]).includes(guestSession.terrain)
+                    (terrains as readonly string[]).includes(
+                      guestSession.terrain,
+                    )
                       ? guestSession.terrain
                       : terrains[0]
                   }
@@ -343,15 +294,12 @@ export function UserProfileBuilderPage() {
                   }))}
                   onChange={(terrain) => setGuestSession({ terrain })}
                 />
-              </section>
+              </SetupSection>
 
-              <section>
-                <h4 className="mb-1 text-xs font-bold tracking-wider text-[#BACBC9] uppercase">
-                  Preferred Weather
-                </h4>
-                <p className="mb-3 text-xs text-[#BACBC9]/70">
-                  Select as many as you like.
-                </p>
+              <SetupSection
+                title="Preferred Weather"
+                subtitle="Select as many as you like."
+              >
                 <MultiSelectPillRow
                   ariaLabel="Preferred weather"
                   values={draft.preferences.weatherChoices}
@@ -365,54 +313,56 @@ export function UserProfileBuilderPage() {
                     })
                   }
                 />
-              </section>
+              </SetupSection>
 
-              <ToggleRow
-                leftLabel="Loop"
-                rightLabel="Point-to-Point"
-                checked={draft.preferences.loopOrSingleDestination}
-                onChange={(checked) =>
-                  updateDraftPreferences({ loopOrSingleDestination: checked })
-                }
-              />
+              <div className="mb-[10px] flex w-full flex-col gap-1 rounded-[4px] border border-[#2D3739]/60 bg-[#182629]/40 p-4">
+                <ToggleRow
+                  leftLabel="Loop"
+                  rightLabel="Point-to-Point"
+                  checked={draft.preferences.loopOrSingleDestination}
+                  onChange={(checked) =>
+                    updateDraftPreferences({ loopOrSingleDestination: checked })
+                  }
+                />
 
-              {isCycle ? (
-                <>
-                  <ToggleRow
-                    leftLabel="Avoid Heavy Traffic"
-                    checked={draft.preferences.showTraffic}
-                    onChange={(checked) =>
-                      updateDraftPreferences({ showTraffic: checked })
-                    }
-                  />
-                  <ToggleRow
-                    leftLabel="Prefer Bike Paths"
-                    checked={draft.preferences.preferBikePaths}
-                    highlight
-                    onChange={(checked) =>
-                      updateDraftPreferences({ preferBikePaths: checked })
-                    }
-                  />
-                </>
-              ) : (
-                <>
-                  <ToggleRow
-                    leftLabel="Parks"
-                    checked={draft.preferences.preferParks}
-                    highlight
-                    onChange={(checked) =>
-                      updateDraftPreferences({ preferParks: checked })
-                    }
-                  />
-                  <ToggleRow
-                    leftLabel="Trails"
-                    checked={draft.preferences.preferTrails}
-                    onChange={(checked) =>
-                      updateDraftPreferences({ preferTrails: checked })
-                    }
-                  />
-                </>
-              )}
+                {isCycle ? (
+                  <>
+                    <ToggleRow
+                      leftLabel="Avoid Heavy Traffic"
+                      checked={draft.preferences.showTraffic}
+                      onChange={(checked) =>
+                        updateDraftPreferences({ showTraffic: checked })
+                      }
+                    />
+                    <ToggleRow
+                      leftLabel="Prefer Bike Paths"
+                      checked={draft.preferences.preferBikePaths}
+                      highlight
+                      onChange={(checked) =>
+                        updateDraftPreferences({ preferBikePaths: checked })
+                      }
+                    />
+                  </>
+                ) : (
+                  <>
+                    <ToggleRow
+                      leftLabel="Parks"
+                      checked={draft.preferences.preferParks}
+                      highlight
+                      onChange={(checked) =>
+                        updateDraftPreferences({ preferParks: checked })
+                      }
+                    />
+                    <ToggleRow
+                      leftLabel="Trails"
+                      checked={draft.preferences.preferTrails}
+                      onChange={(checked) =>
+                        updateDraftPreferences({ preferTrails: checked })
+                      }
+                    />
+                  </>
+                )}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

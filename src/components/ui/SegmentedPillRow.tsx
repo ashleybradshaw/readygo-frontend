@@ -19,7 +19,7 @@ export const SegmentedPillRow = ({
   <div
     role="group"
     aria-label={ariaLabel}
-    className="mt-3 flex w-full flex-wrap items-center justify-center gap-[10px]"
+    className="mt-2 flex w-full flex-wrap items-center justify-start gap-[10px]"
   >
     {options.map((option) => {
       const active = value === option.id
@@ -37,10 +37,10 @@ export const SegmentedPillRow = ({
               onChange(option.id)
             }
           }}
-          className={`inline-flex h-8 shrink-0 items-center justify-center whitespace-nowrap rounded-full border px-2.5 text-xs font-bold tracking-[-0.01em] transition-colors ${
+          className={`inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full border px-4 py-1.5 text-xs transition-colors ${
             active
-              ? 'border-[#70FF00] bg-[#70FF00]/10 text-[#70FF00]'
-              : 'border-transparent bg-[#BACBC9]/10 text-[#BACBC9]'
+              ? 'border-[#70FF00] bg-[#70FF00]/10 font-bold text-[#70FF00]'
+              : 'border-[#2D3739] bg-[#0F191B]/60 font-medium text-[#BACBC9]'
           }`}
         >
           {option.label}
