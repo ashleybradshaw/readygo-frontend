@@ -1,5 +1,6 @@
+import { AnimatePresence, motion } from 'framer-motion'
 import { Cloud, CloudRain, Sun } from 'lucide-react'
-import { BottomSheet } from '../ui/BottomSheet'
+import { createPortal } from 'react-dom'
 import { ClosePillButton } from '../ui/ClosePillButton'
 import { PressableButton } from '../ui/PressableButton'
 import type { SmartDay } from './SmartWindowBar'
@@ -148,81 +149,133 @@ export const WeatherForecastModal = ({
   const primeSlot = slots.find((slot) => slot.tone === 'prime') ?? slots[0]
   const primeWindow = `Prime Window: ${primeSlot.timeRange.replace(' · ', ' – ')}`
 
-  return (
-    <BottomSheet open={open} onClose={onClose} tone="dark">
-      <div className="flex flex-col gap-5 pb-2 pt-1 text-[#BACBC9]">
-        <div className="flex items-start justify-between gap-3">
-          <h2 className="font-display text-xl font-bold uppercase tracking-[-0.02em]">
-            Weather Forecast.
-          </h2>
-          <ClosePillButton onClick={onClose} />
-        </div>
+  const frame =
+    typeof document !== 'undefined'
+      ? document.querySelector('[data-device-frame]')
+      : null
 
-        <div className="text-center">
-          <p className="text-sm font-bold uppercase tracking-wide text-[#BACBC9]/80">
-            {day.dayName} · {location}
-          </p>
-          <p className="mt-1 text-xs font-bold text-[#BACBC9]/70">
-            {primeWindow}
-          </p>
-        </div>
-
-        <div className="space-y-4">
-          {slots.map((slot) => (
-            <div key={slot.label} className="space-y-2">
-              <div className="flex flex-wrap items-center gap-2">
-                <span
-                  className={`inline-flex h-8 items-center rounded-[4px] px-3 text-xs font-medium ${badgeClass(slot.tone)}`}
-                >
-                  {slot.label}
-                </span>
-                <span className="inline-flex h-8 items-center rounded-[4px] bg-[#182629] px-3 text-xs font-medium text-[#BACBC9]">
-                  {slot.timeRange}
-                </span>
-                <span className="inline-flex h-8 items-center rounded-[4px] bg-[#182629] px-3 text-xs font-medium text-[#BACBC9]">
-                  {slot.tempC}°
-                </span>
-                <span className="inline-flex size-8 items-center justify-center rounded-[4px] bg-[#182629] text-[#BACBC9]">
-                  <SlotIcon icon={slot.icon} />
-                </span>
-              </div>
-              <span className="inline-flex h-8 items-center rounded-[4px] bg-[#182629] px-3 text-xs font-medium text-[#BACBC9]">
-                {slot.detail}
-              </span>
+  const overlay = (
+    <AnimatePresence>
+      {open ? (
+        <div className="absolute inset-0 z-[100] flex flex-col justify-end bg-black/70 backdrop-blur-md">
+          <motion.button
+            type="button"
+            aria-label="Dismiss weather forecast"
+            tabIndex={0}
+            className="absolute inset-0"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                onClose()
+              }
+            }}
+          />
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="weather-forecast-title"
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', damping: 28, stiffness: 280 }}
+            drag="y"
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={0.12}
+            onDragEnd={(_, info) => {
+              if (info.offset.y > 120 || info.velocity.y > 600) onClose()
+            }}
+            className="relative z-[101] mx-auto w-full max-w-md rounded-t-[24px] border-t border-[#2D3739] bg-[#182629] p-6 text-[#BACBC9] shadow-2xl"
+          >
+            <div className="mb-4 flex justify-center">
+              <div className="h-1 w-10 rounded-full bg-[#BACBC9]/35" />
             </div>
-          ))}
-        </div>
 
-        <div className="border-t border-[#2D3739] pt-4 text-center">
-          <p className="text-xs font-bold uppercase tracking-wide text-[#BACBC9]/70">
-            Kit Suggestion
-          </p>
-          <div className="mt-3 flex flex-wrap justify-center gap-2">
-            {kits.map((kit) => (
-              <span
-                key={kit}
-                className="inline-flex h-8 items-center rounded-[4px] bg-[#182629] px-3 text-xs font-medium text-[#BACBC9]"
+            <div className="flex max-h-[min(78vh,640px)] flex-col gap-5 overflow-y-auto pb-2 pt-1">
+              <div className="flex items-start justify-between gap-3">
+                <h2
+                  id="weather-forecast-title"
+                  className="font-display text-xl font-bold uppercase tracking-[-0.02em]"
+                >
+                  Weather Forecast.
+                </h2>
+                <ClosePillButton onClick={onClose} />
+              </div>
+
+              <div className="text-center">
+                <p className="text-sm font-bold uppercase tracking-wide text-[#BACBC9]/80">
+                  {day.dayName} · {location}
+                </p>
+                <p className="mt-1 text-xs font-bold text-[#BACBC9]/70">
+                  {primeWindow}
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                {slots.map((slot) => (
+                  <div key={slot.label} className="space-y-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span
+                        className={`inline-flex h-8 items-center rounded-[4px] px-3 text-xs font-medium ${badgeClass(slot.tone)}`}
+                      >
+                        {slot.label}
+                      </span>
+                      <span className="inline-flex h-8 items-center rounded-[4px] bg-[#0F1918] px-3 text-xs font-medium text-[#BACBC9]">
+                        {slot.timeRange}
+                      </span>
+                      <span className="inline-flex h-8 items-center rounded-[4px] bg-[#0F1918] px-3 text-xs font-medium text-[#BACBC9]">
+                        {slot.tempC}°
+                      </span>
+                      <span className="inline-flex size-8 items-center justify-center rounded-[4px] bg-[#0F1918] text-[#BACBC9]">
+                        <SlotIcon icon={slot.icon} />
+                      </span>
+                    </div>
+                    <span className="inline-flex h-8 items-center rounded-[4px] bg-[#0F1918] px-3 text-xs font-medium text-[#BACBC9]">
+                      {slot.detail}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="border-t border-[#2D3739] pt-4 text-center">
+                <p className="text-xs font-bold uppercase tracking-wide text-[#BACBC9]/70">
+                  Kit Suggestion
+                </p>
+                <div className="mt-3 flex flex-wrap justify-center gap-2">
+                  {kits.map((kit) => (
+                    <span
+                      key={kit}
+                      className="inline-flex h-8 items-center rounded-[4px] bg-[#0F1918] px-3 text-xs font-medium text-[#BACBC9]"
+                    >
+                      {kit}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <PressableButton
+                onClick={() => onGenerateRoute(day)}
+                className="rounded-[4px] border-0"
+                style={{
+                  height: 52,
+                  borderRadius: 4,
+                  backgroundColor: '#F5F7F7',
+                  color: '#0F1918',
+                  fontWeight: 700,
+                }}
               >
-                {kit}
-              </span>
-            ))}
-          </div>
+                Generate Route
+              </PressableButton>
+            </div>
+          </motion.div>
         </div>
-
-        <PressableButton
-          onClick={() => onGenerateRoute(day)}
-          className="rounded-[4px] border-0"
-          style={{
-            height: 52,
-            borderRadius: 4,
-            backgroundColor: '#F5F7F7',
-            color: '#0F1918',
-            fontWeight: 700,
-          }}
-        >
-          Generate Route
-        </PressableButton>
-      </div>
-    </BottomSheet>
+      ) : null}
+    </AnimatePresence>
   )
+
+  if (!frame) return overlay
+  return createPortal(overlay, frame)
 }
