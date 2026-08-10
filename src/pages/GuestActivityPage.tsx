@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { X } from 'lucide-react'
 import { BottomSheet } from '../components/ui/BottomSheet'
 import { PressableButton } from '../components/ui/PressableButton'
 import { ClosePillButton } from '../components/ui/ClosePillButton'
@@ -115,8 +116,24 @@ export function GuestActivityPage() {
         draggable={false}
       />
 
+      <button
+        type="button"
+        tabIndex={0}
+        aria-label="Close"
+        onClick={() => navigate('/welcome')}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault()
+            navigate('/welcome')
+          }
+        }}
+        className="absolute top-6 right-6 z-20 cursor-pointer text-[#BACBC9]/60 hover:text-white"
+      >
+        <X className="h-6 w-6" strokeWidth={2.25} aria-hidden="true" />
+      </button>
+
       <div className="relative z-10 flex h-full flex-col">
-        <header className="shrink-0 px-4 pt-[max(2.5rem,env(safe-area-inset-top))]">
+        <header className="flex shrink-0 items-center justify-center px-4 pt-[22%]">
           <h1 className="text-center font-display text-xl font-bold uppercase tracking-[-0.02em] text-[#BACBC9]">
             Set
           </h1>
