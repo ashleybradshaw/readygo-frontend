@@ -6,39 +6,25 @@ interface SettingsRowProps {
   onClick?: () => void
   icon?: ReactNode
   tone?: 'default' | 'data' | 'danger'
-  index?: number
-  totalLength?: number
-}
-
-const resolveRadius = (index: number, totalLength: number) => {
-  if (totalLength <= 1) return 'rounded-[4px]'
-  if (index === 0) return 'rounded-t-[4px] rounded-b-none'
-  if (index === totalLength - 1) return 'rounded-b-[4px] rounded-t-none'
-  return 'rounded-none'
 }
 
 export const SettingsRow = ({
   label,
   onClick,
   tone = 'default',
-  index = 0,
-  totalLength = 1,
 }: SettingsRowProps) => {
-  const radius = resolveRadius(index, totalLength)
-  const showTopBorder = index > 0
-
   const tones = {
     default: {
       text: 'text-[#BACBC9]',
       chevron: 'text-[#BACBC9]/50',
     },
     data: {
-      text: 'text-[#C5A059]',
-      chevron: 'text-[#C5A059]',
+      text: 'text-[#FBBC05]',
+      chevron: 'text-[#FBBC05]',
     },
     danger: {
-      text: 'text-[#FF3B30]',
-      chevron: 'text-[#FF3B30]',
+      text: 'text-[#FF3B3B]',
+      chevron: 'text-[#FF3B3B]',
     },
   }
 
@@ -56,9 +42,7 @@ export const SettingsRow = ({
         }
       }}
       aria-label={label}
-      className={`flex h-11 w-full items-center gap-3 bg-[#182629] px-4 text-left ${radius} ${
-        showTopBorder ? 'border-t border-[#2D3739]/50' : ''
-      }`}
+      className="mb-[5px] flex w-full cursor-pointer items-center justify-between rounded-[4px] border border-[#2D3739]/60 bg-[#182629]/60 p-4 text-left transition-colors hover:bg-[#182629]"
     >
       <span
         className={`min-w-0 flex-1 font-sans text-sm font-bold tracking-[-0.01em] ${palette.text}`}

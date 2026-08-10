@@ -44,6 +44,7 @@ import { SessionSummaryPage } from './pages/SessionSummaryPage'
 import { DeleteDataPage } from './pages/DeleteDataPage'
 import { DeleteAccountPage } from './pages/DeleteAccountPage'
 import { ChangeHandlePage } from './pages/ChangeHandlePage'
+import { ChangePasswordPage } from './pages/ChangePasswordPage'
 import { LogoutPage } from './pages/LogoutPage'
 import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage'
 
@@ -164,6 +165,10 @@ export default function App() {
               <Route
                 path="/settings/change-handle"
                 element={<ChangeHandlePage />}
+              />
+              <Route
+                path="/settings/change-password"
+                element={<ChangePasswordPage />}
               />
               <Route path="/settings/logout" element={<LogoutPage />} />
               <Route

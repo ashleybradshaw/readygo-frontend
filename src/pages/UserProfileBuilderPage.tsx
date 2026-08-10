@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { ActivitySelectorBar } from '../components/ui/ActivitySelectorBar'
 import { DistanceSlider } from '../components/ui/DistanceSlider'
 import { MultiSelectPillRow } from '../components/ui/MultiSelectPillRow'
@@ -43,8 +43,15 @@ const resolveDurationLabel = (label: string) => {
   return label
 }
 
+type ProfileBuilderLocationState = {
+  returnTo?: string
+}
+
 export function UserProfileBuilderPage() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const returnTo =
+    (location.state as ProfileBuilderLocationState | null)?.returnTo
   const weather = useReadyGoStore((state) => state.weather)
   const draft = useReadyGoStore((state) => state.profileDraft)
   const guestSession = useReadyGoStore((state) => state.guestSession)
@@ -119,6 +126,10 @@ export function UserProfileBuilderPage() {
 
   const handleClose = () => {
     resetProfileDraft()
+    if (returnTo) {
+      navigate(returnTo, { replace: true })
+      return
+    }
     if (isAuthenticated) {
       navigate('/user/basecamp', { replace: true })
       return

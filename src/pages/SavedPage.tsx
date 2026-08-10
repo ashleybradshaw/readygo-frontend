@@ -9,7 +9,6 @@ import {
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PressableButton } from '../components/ui/PressableButton'
-import { ClosePillButton } from '../components/ui/ClosePillButton'
 import { BottomNav } from '../components/BottomNav'
 import { RunShoeIcon } from '../components/ui/RunShoeIcon'
 import { ViewMapModal } from '../components/session/ViewMapModal'
@@ -50,18 +49,15 @@ export function SavedPage({ initialTab }: SavedPageProps) {
   return (
     <div className="relative flex h-full flex-col overflow-hidden bg-[#0F1918]">
       <div className="flex min-h-0 flex-1 flex-col gap-4 px-5 pt-[max(2.5rem,env(safe-area-inset-top))] pb-28">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="font-display text-2xl font-bold uppercase leading-8 tracking-[-0.02em] text-[#BACBC9]">
-            {isSessions ? 'Saved Sessions' : 'Saved Profiles'}
-          </h1>
-          <p className="mt-1 font-sans text-sm font-bold uppercase tracking-[-0.01em] text-[#BACBC9]/80">
-            {isSessions
-              ? `[${savedRoutes.length}]/20 – Saved Routes.`
-              : `[${savedProfiles.length}]/5 – Saved Profiles.`}
-          </p>
-        </div>
-        <ClosePillButton onClick={() => navigate('/settings')} />
+      <div>
+        <h1 className="font-display text-2xl font-bold uppercase leading-8 tracking-[-0.02em] text-[#BACBC9]">
+          {isSessions ? 'Saved Sessions' : 'Saved Profiles'}
+        </h1>
+        <p className="mt-1 font-sans text-sm font-bold uppercase tracking-[-0.01em] text-[#BACBC9]/80">
+          {isSessions
+            ? `${savedRoutes.length} / SAVED SESSIONS`
+            : `${savedProfiles.length} / SAVED PROFILES`}
+        </p>
       </div>
 
       <SavedTabSwitcher
@@ -350,7 +346,13 @@ const SavedTabSwitcher = ({
   active: 'sessions' | 'profiles'
   onChange: (tab: 'sessions' | 'profiles') => void
 }) => (
-  <div className="mx-auto flex w-full max-w-[280px] rounded-full bg-[#BACBC9] p-1">
+  <div className="relative mx-auto flex w-full max-w-[280px] rounded-full bg-[#BACBC9] p-1">
+    <span
+      aria-hidden="true"
+      className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-full bg-[#182629] transition-transform duration-300 ease-out ${
+        active === 'profiles' ? 'translate-x-[calc(100%+4px)]' : 'translate-x-0'
+      }`}
+    />
     {([
       { id: 'sessions', label: 'Sessions' },
       { id: 'profiles', label: 'Profiles' },
@@ -360,12 +362,19 @@ const SavedTabSwitcher = ({
         <button
           key={tab.id}
           type="button"
+          tabIndex={0}
           aria-label={tab.label}
           aria-pressed={isActive}
           onClick={() => onChange(tab.id)}
-          className={`flex-1 rounded-full px-5 py-2.5 font-sans text-xs font-bold uppercase tracking-[-0.01em] transition-colors ${
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault()
+              onChange(tab.id)
+            }
+          }}
+          className={`relative z-10 flex-1 cursor-pointer rounded-full px-5 py-2.5 font-sans text-xs font-bold uppercase tracking-[-0.01em] transition-colors duration-300 ${
             isActive
-              ? 'bg-[#182629] text-[#BACBC9]'
+              ? 'text-[#BACBC9]'
               : 'bg-transparent text-[#0F1918]'
           }`}
         >

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { X } from 'lucide-react'
 import { LocationInfoSheet } from '../components/onboarding/LocationInfoSheet'
 import { PressableButton } from '../components/ui/PressableButton'
@@ -10,8 +10,15 @@ import bgRunning from '../assets/intro/bg-running.png'
 
 type ActivityChoice = 'Cycle' | 'Run' | null
 
+type LocationActivityState = {
+  returnTo?: string
+}
+
 export function UserLocationActivityPage() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const returnTo =
+    (location.state as LocationActivityState | null)?.returnTo
   const weather = useReadyGoStore((state) => state.weather)
   const setWeather = useReadyGoStore((state) => state.setWeather)
   const updateProfileDraft = useReadyGoStore((state) => state.updateProfileDraft)
@@ -71,10 +78,16 @@ export function UserLocationActivityPage() {
 
   const handleContinue = () => {
     if (!canContinue) return
-    navigate('/user/profile-builder')
+    navigate('/user/profile-builder', {
+      state: returnTo ? { returnTo } : undefined,
+    })
   }
 
   const handleClose = () => {
+    if (returnTo) {
+      navigate(returnTo)
+      return
+    }
     if (isAuthenticated) {
       navigate('/user/basecamp')
       return

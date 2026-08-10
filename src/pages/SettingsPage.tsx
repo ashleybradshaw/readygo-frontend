@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { SettingsRow } from '../components/settings/SettingsRow'
-import { ClosePillButton } from '../components/ui/ClosePillButton'
 import { FeedbackIssueSheet } from '../components/settings/FeedbackIssueSheet'
 import { showSuccessToast } from '../components/overlays/NotificationHost'
 import { useReadyGoStore } from '../store/useReadyGoStore'
@@ -20,16 +19,16 @@ const SettingsSection = ({
   title: string
   rows: RowConfig[]
 }) => (
-  <section className="mb-6">
-    <p className="mb-2 font-sans text-sm font-bold text-[#BACBC9]">{title}</p>
-    <div className="overflow-hidden rounded-[4px] border border-[#2D3739]">
-      {rows.map((row, index) => (
+  <section>
+    <p className="mt-4 mb-2 text-xs font-bold tracking-wider text-white uppercase">
+      {title}
+    </p>
+    <div className="flex w-full flex-col">
+      {rows.map((row) => (
         <SettingsRow
           key={row.label}
           label={row.label}
           tone={row.tone}
-          index={index}
-          totalLength={rows.length}
           onClick={row.onClick}
         />
       ))}
@@ -41,7 +40,6 @@ export function SettingsPage() {
   const navigate = useNavigate()
   const setSavedTab = useReadyGoStore((state) => state.setSavedTab)
   const resetProfileDraft = useReadyGoStore((state) => state.resetProfileDraft)
-  const authMethod = useReadyGoStore((state) => state.authMethod)
   const [feedbackOpen, setFeedbackOpen] = useState(false)
 
   const handleShareApp = async () => {
@@ -73,7 +71,7 @@ export function SettingsPage() {
         const state = useReadyGoStore.getState()
         const destination = getCreateProfilePath(state)
         resetProfileDraft()
-        navigate(destination)
+        navigate(destination, { state: { returnTo: '/settings' } })
       },
     },
     {
@@ -94,14 +92,10 @@ export function SettingsPage() {
       label: 'Change handle',
       onClick: () => navigate('/settings/change-handle'),
     },
-    ...(authMethod === 'email'
-      ? [
-          {
-            label: 'Change password',
-            onClick: () => navigate('/auth/reset-password'),
-          } satisfies RowConfig,
-        ]
-      : []),
+    {
+      label: 'Change password',
+      onClick: () => navigate('/settings/change-password'),
+    },
     {
       label: 'Rate the App',
       onClick: handleRateApp,
@@ -120,16 +114,13 @@ export function SettingsPage() {
 
   return (
     <div className="flex h-full flex-col overflow-y-auto bg-[#0F1918] pt-2 pb-4">
-      <div className="mb-6 flex items-start justify-between gap-4">
-        <div>
-          <h1 className="font-display text-2xl font-bold uppercase leading-8 tracking-[-0.02em] text-[#BACBC9]">
-            Settings
-          </h1>
-          <p className="mt-1 font-sans text-xs font-bold uppercase tracking-[-0.01em] text-[#BACBC9]/60">
-            Version 1.0.0 (10)
-          </p>
-        </div>
-        <ClosePillButton onClick={() => navigate('/user/basecamp')} />
+      <div className="mb-2">
+        <h1 className="font-display text-2xl leading-8 font-bold tracking-[-0.02em] text-[#BACBC9] uppercase">
+          Settings
+        </h1>
+        <p className="mt-1 font-sans text-xs font-bold tracking-[-0.01em] text-[#BACBC9]/60 uppercase">
+          Version 1.0.0 (10)
+        </p>
       </div>
 
       <SettingsSection title="General" rows={generalRows} />
