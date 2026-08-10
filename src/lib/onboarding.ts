@@ -94,6 +94,10 @@ const DURATION_LABELS: Record<string, string> = {
 }
 
 const WEATHER_LABELS: Record<string, string> = {
+  Sunshine: 'Sunshine',
+  Dry: 'Dry',
+  Wet: 'Wet',
+  'Rain/Snow': 'Rain/Snow',
   'Only sunshine': 'Only Sunshine',
   'Only when dry': "Only When It's Dry",
   'Bit of drizzle': 'A Bit Of Drizzle Is Fine',

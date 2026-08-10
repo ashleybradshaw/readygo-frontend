@@ -1,7 +1,8 @@
-import { Bike, Footprints, X } from 'lucide-react'
+import { Bike, X } from 'lucide-react'
 import { useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PressableButton } from '../components/ui/PressableButton'
+import { RunShoeIcon } from '../components/ui/RunShoeIcon'
 import { SegmentedPillRow } from '../components/ui/SegmentedPillRow'
 import { ToggleSwitch } from '../components/ui/ToggleSwitch'
 import { formatWeatherLine, buildSessionManifest } from '../lib/session'
@@ -159,9 +160,8 @@ export function GuestSessionPage() {
                 isCycle ? 'text-[#BACBC9]' : 'text-[#70FF00]'
               }`}
             >
-              <Footprints
+              <RunShoeIcon
                 className={`h-5 w-5 ${isCycle ? 'text-[#BACBC9]' : 'text-[#70FF00]'}`}
-                aria-hidden="true"
               />
               Run
             </button>
@@ -211,7 +211,7 @@ export function GuestSessionPage() {
               className="guest-param-slider mt-4 w-full"
               style={{ ['--guest-progress' as string]: `${distanceProgress}%` }}
             />
-            <div className="mt-3 flex items-center justify-between gap-2">
+            <div className="mt-3 flex items-center justify-center gap-[10px]">
               <span className="rounded-full bg-[#BACBC9]/10 px-2.5 py-1.5 text-xs font-bold text-[#BACBC9]">
                 1 Min
               </span>

@@ -170,7 +170,7 @@
   appearance: none;
   height: 10px;
   border-radius: 999px;
-  background: transparent;
+  background: #0f191b;
   outline: none;
 }
 
@@ -181,8 +181,8 @@
     90deg,
     #70ff00 0%,
     #70ff00 var(--guest-progress, 0%),
-    #4f6163 var(--guest-progress, 0%),
-    #4f6163 100%
+    #0f191b var(--guest-progress, 0%),
+    #0f191b 100%
   );
 }
 
@@ -200,7 +200,7 @@
 .guest-param-slider::-moz-range-track {
   height: 10px;
   border-radius: 999px;
-  background: #4f6163;
+  background: #0f191b;
 }
 
 .guest-param-slider::-moz-range-progress {

@@ -10,6 +10,10 @@ export type FitnessLevel =
   | 'Redline pace'
   | 'Yellow jersey'
 export type WeatherChoice =
+  | 'Sunshine'
+  | 'Dry'
+  | 'Wet'
+  | 'Rain/Snow'
   | 'Only sunshine'
   | 'Only when dry'
   | 'Bit of drizzle'

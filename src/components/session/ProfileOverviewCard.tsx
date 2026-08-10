@@ -1,5 +1,6 @@
-import { Bike, List, Network, Footprints } from 'lucide-react'
+import { Bike, List, Network } from 'lucide-react'
 import type { ReadyGoProfile } from '../../store/useReadyGoStore'
+import { RunShoeIcon } from '../ui/RunShoeIcon'
 
 interface ProfileOverviewCardProps {
   profile: ReadyGoProfile
@@ -15,7 +16,7 @@ export function ProfileOverviewCard({
   onActivate,
 }: ProfileOverviewCardProps) {
   const ActivityIcon =
-    profile.activityType === 'Cycle' ? Bike : Footprints
+    profile.activityType === 'Cycle' ? Bike : RunShoeIcon
 
   const handleActivate = () => {
     if (isActive || !onActivate) return

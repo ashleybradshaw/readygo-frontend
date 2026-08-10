@@ -1,13 +1,16 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { Bike, ChevronLeft, ChevronRight, Footprints, X } from 'lucide-react'
+import { Bike, ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PressableButton } from '../components/ui/PressableButton'
+import { MultiSelectPillRow } from '../components/ui/MultiSelectPillRow'
+import { RunShoeIcon } from '../components/ui/RunShoeIcon'
 import { SegmentedPillRow } from '../components/ui/SegmentedPillRow'
 import { ToggleSwitch } from '../components/ui/ToggleSwitch'
 import { formatWeatherLine } from '../lib/session'
 import {
   type PreferredTime,
+  type WeatherChoice,
   useReadyGoStore,
 } from '../store/useReadyGoStore'
 import activityCycle from '../assets/guest/activity-cycle.png'
@@ -16,6 +19,12 @@ import activityRun from '../assets/guest/activity-run.png'
 const TRAINING_OPTIONS: PreferredTime[] = ['Morning', 'Afternoon', 'Evening']
 const CYCLE_TERRAINS = ['Paved', 'Rolling', 'Climbs', 'Off Road'] as const
 const RUN_TERRAINS = ['Flat', 'Trail', 'Hills', 'Mixed'] as const
+const PREFERRED_WEATHER: WeatherChoice[] = [
+  'Sunshine',
+  'Dry',
+  'Wet',
+  'Rain/Snow',
+]
 
 const DURATION_OPTIONS = [
   { label: '20-30 Min', hours: 0.5 },
@@ -190,9 +199,8 @@ export function UserProfileBuilderPage() {
                       isCycle ? 'text-[#BACBC9]' : 'text-[#70FF00]'
                     }`}
                   >
-                    <Footprints
+                    <RunShoeIcon
                       className={`h-5 w-5 ${isCycle ? 'text-[#BACBC9]' : 'text-[#70FF00]'}`}
-                      aria-hidden="true"
                     />
                     Run
                   </button>
@@ -267,7 +275,7 @@ export function UserProfileBuilderPage() {
                     ['--guest-progress' as string]: `${distanceProgress}%`,
                   }}
                 />
-                <div className="mt-3 flex items-center justify-between gap-2">
+                <div className="mt-3 flex items-center justify-center gap-[10px]">
                   <span className="rounded-full bg-[#BACBC9]/10 px-2.5 py-1.5 text-xs font-bold text-[#BACBC9]">
                     1 Min
                   </span>
@@ -334,6 +342,28 @@ export function UserProfileBuilderPage() {
                     label: option,
                   }))}
                   onChange={(terrain) => setGuestSession({ terrain })}
+                />
+              </section>
+
+              <section>
+                <h4 className="mb-1 text-xs font-bold tracking-wider text-[#BACBC9] uppercase">
+                  Preferred Weather
+                </h4>
+                <p className="mb-3 text-xs text-[#BACBC9]/70">
+                  Select as many as you like.
+                </p>
+                <MultiSelectPillRow
+                  ariaLabel="Preferred weather"
+                  values={draft.preferences.weatherChoices}
+                  options={PREFERRED_WEATHER.map((option) => ({
+                    id: option,
+                    label: option,
+                  }))}
+                  onChange={(next) =>
+                    updateDraftPreferences({
+                      weatherChoices: next as WeatherChoice[],
+                    })
+                  }
                 />
               </section>
 

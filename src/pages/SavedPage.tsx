@@ -5,13 +5,13 @@ import {
   Info,
   MapPinned,
   Network,
-  Footprints,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PressableButton } from '../components/ui/PressableButton'
 import { ClosePillButton } from '../components/ui/ClosePillButton'
 import { BottomNav } from '../components/BottomNav'
+import { RunShoeIcon } from '../components/ui/RunShoeIcon'
 import { ViewMapModal } from '../components/session/ViewMapModal'
 import { formatDuration } from '../lib/session'
 import { useReadyGoStore } from '../store/useReadyGoStore'
@@ -203,10 +203,7 @@ export function SavedPage({ initialTab }: SavedPageProps) {
                     {profile.activityType === 'Cycle' ? (
                       <Bike className="h-5 w-5 text-[#70FF00]" aria-hidden="true" />
                     ) : (
-                      <Footprints
-                        className="h-5 w-5 text-[#70FF00]"
-                        aria-hidden="true"
-                      />
+                      <RunShoeIcon className="h-5 w-5 text-[#70FF00]" />
                     )}
                     <p className="truncate text-xs font-bold text-[#BACBC9]">
                       {profile.name}
