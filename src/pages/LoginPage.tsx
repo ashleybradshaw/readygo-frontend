@@ -122,47 +122,54 @@ export function LoginPage() {
       </div>
 
       <div className="mt-auto flex flex-col pt-8">
-        <PressableButton
-          variant="cta"
-          disabled={!isValidEmail(email) || password.length < 1}
-          onClick={() => finishLogin(email.trim())}
-          className="rounded-[4px]"
-          style={{ borderRadius: 4 }}
-        >
-          Login
-        </PressableButton>
-
-        <div className="flex items-center justify-center gap-2.5 py-5">
-          <div className="h-px w-[100px] bg-[#BACBC9]/50" />
-          <span className="font-sans text-base text-[#BACBC9]">Or</span>
-          <div className="h-px w-[100px] bg-[#BACBC9]/50" />
-        </div>
-
-        <div className="flex flex-col gap-5">
-          <OAuthButton
-            provider="apple"
-            onClick={() => finishLogin('apple@readygo.app', 'apple')}
-          >
-            Continue with Apple
-          </OAuthButton>
-          <OAuthButton
-            provider="google"
-            onClick={() => finishLogin('google@readygo.app', 'google')}
-          >
-            Continue with Google
-          </OAuthButton>
-        </div>
-
-        <div className="mt-6 flex flex-col items-center gap-4 pb-6">
-          <p className="pb-2 text-center text-sm text-[#BACBC9]">
-            Don&apos;t have an account?{' '}
-            <Link
-              to="/auth/terms"
-              className="font-bold underline underline-offset-2"
+        <div className="flex w-full flex-col items-center gap-5 pt-4 pb-6">
+          <div className="flex w-full flex-col gap-5">
+            <PressableButton
+              variant="cta"
+              disabled={!isValidEmail(email) || password.length < 1}
+              onClick={() => finishLogin(email.trim())}
+              className="rounded-[4px]"
+              style={{ borderRadius: 4 }}
             >
-              Sign up
-            </Link>
-          </p>
+              Login
+            </PressableButton>
+
+            <div className="flex items-center justify-center gap-2.5">
+              <div className="h-px w-[100px] bg-[#BACBC9]/50" />
+              <span className="font-sans text-base text-[#BACBC9]">Or</span>
+              <div className="h-px w-[100px] bg-[#BACBC9]/50" />
+            </div>
+
+            <OAuthButton
+              provider="apple"
+              onClick={() => finishLogin('apple@readygo.app', 'apple')}
+            >
+              Continue with Apple
+            </OAuthButton>
+            <OAuthButton
+              provider="google"
+              onClick={() => finishLogin('google@readygo.app', 'google')}
+            >
+              Continue with Google
+            </OAuthButton>
+          </div>
+
+          <button
+            type="button"
+            tabIndex={0}
+            aria-label="Don't have an account? Sign up"
+            onClick={() => navigate('/auth/terms')}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                navigate('/auth/terms')
+              }
+            }}
+            className="cursor-pointer py-1 text-sm font-medium text-[#BACBC9] transition-colors hover:text-white"
+          >
+            Don&apos;t have an account?{' '}
+            <span className="font-semibold text-white underline">Sign up</span>
+          </button>
         </div>
       </div>
     </div>

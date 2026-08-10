@@ -1,0 +1,7 @@
+# READYGO FRONTEND DESIGN SYSTEM RULES
+
+- **Capsule Activity Switches:** Use custom `w-12 h-6` track. Active state is solid `#70FF00` (Lime) for BOTH Run and Cycle positions.
+- **CTA Stack Rhythm:** Primary CTAs -> 20px gap -> Ghost Text CTA -> 24px bottom container padding.
+- **Hero Watermarks:** `READY` (`#FF3B3B`) and `SET` (`#FFFFFF`) positioned at `top-[28%]` inside hero overlay frames.
+- **Modals & Cards:** Dark theme `bg-[#182629] border border-[#2D3739] text-[#BACBC9] rounded-[16px]`.
+- **Close Icons:** Positioned `absolute top-6 right-6 z-20 text-[#BACBC9]/60 hover:text-white`.

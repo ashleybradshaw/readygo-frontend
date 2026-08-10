@@ -141,7 +141,7 @@ export function UserLocationActivityPage() {
 
       <div className="relative z-10 flex h-full flex-col">
         <p
-          className="absolute top-[28%] left-1/2 -translate-x-1/2 font-display text-3xl font-black uppercase tracking-widest text-white/90"
+          className="absolute top-[28%] left-1/2 -translate-x-1/2 font-display text-3xl font-black uppercase tracking-widest text-white"
           aria-hidden="true"
         >
           Set

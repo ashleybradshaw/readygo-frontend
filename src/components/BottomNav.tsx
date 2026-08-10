@@ -3,9 +3,6 @@ import { motion } from 'framer-motion'
 import { Home, Trophy, Settings, type LucideIcon } from 'lucide-react'
 import { useReadyGoStore, type ActiveTab } from '../store/useReadyGoStore'
 
-const ACTIVE = '#84BCA4'
-const INACTIVE = '#4F6163'
-
 const tabs: {
   id: ActiveTab
   label: string
@@ -19,7 +16,9 @@ const tabs: {
 
 const isTabActive = (pathname: string, to: string) => {
   if (to === '/user/basecamp') {
-    return pathname === '/user/basecamp'
+    return (
+      pathname === '/user/basecamp' || pathname === '/user/basecamp-empty'
+    )
   }
   if (to === '/settings/saved-sessions') {
     return (
@@ -65,13 +64,21 @@ export function BottomNav() {
               }
             }}
             whileTap={{ scale: 0.92 }}
-            className="flex w-[61px] flex-col items-center gap-0.5 bg-transparent"
+            className={`flex w-[61px] flex-col items-center gap-0.5 bg-transparent transition-colors ${
+              isActive
+                ? 'text-[#70FF00]'
+                : 'text-[#BACBC9]/60 hover:text-white'
+            }`}
           >
-            <span className="relative flex size-10 items-center justify-center">
+            <span
+              className={`relative flex size-10 items-center justify-center rounded-full p-2 ${
+                isActive ? 'bg-[#BACBC9]/15 text-[#70FF00]' : ''
+              }`}
+            >
               {isActive ? (
                 <motion.div
                   layoutId="activeTabPill"
-                  className="absolute inset-0 rounded-full bg-[#84BCA4]/15"
+                  className="absolute inset-0 rounded-full bg-[#BACBC9]/15"
                   transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                   aria-hidden="true"
                 />
@@ -79,13 +86,13 @@ export function BottomNav() {
               <Icon
                 className="relative z-10 h-5 w-5"
                 strokeWidth={1.75}
-                color={isActive ? ACTIVE : INACTIVE}
                 aria-hidden="true"
               />
             </span>
             <span
-              className="text-center text-xs font-bold uppercase leading-5 tracking-[-1px]"
-              style={{ color: isActive ? ACTIVE : INACTIVE }}
+              className={`text-center text-xs uppercase leading-5 tracking-[-1px] ${
+                isActive ? 'font-semibold text-[#70FF00]' : 'font-bold'
+              }`}
             >
               {label}
             </span>

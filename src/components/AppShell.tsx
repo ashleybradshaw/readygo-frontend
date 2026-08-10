@@ -11,6 +11,12 @@ function tabFromPath(pathname: string): ActiveTab {
     return 'saved'
   }
   if (pathname.startsWith('/settings')) return 'settings'
+  if (
+    pathname === '/user/basecamp' ||
+    pathname === '/user/basecamp-empty'
+  ) {
+    return 'basecamp'
+  }
   return 'basecamp'
 }
 
@@ -32,7 +38,9 @@ export function AppShell() {
   }
 
   const isSettings = location.pathname === '/settings'
-  const isBasecamp = location.pathname === '/user/basecamp'
+  const isBasecamp =
+    location.pathname === '/user/basecamp' ||
+    location.pathname === '/user/basecamp-empty'
 
   return (
     <div className="relative flex h-full min-h-0 flex-col bg-rg-base-alt">

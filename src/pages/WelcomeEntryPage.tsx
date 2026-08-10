@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { PressableButton } from '../components/ui/PressableButton'
 import { useReadyGoStore } from '../store/useReadyGoStore'
 import welcomeHero from '../assets/intro/welcome-hero.png.jpg'
@@ -21,7 +21,7 @@ export function WelcomeEntryPage() {
 
   return (
     <div className="relative flex h-full flex-col overflow-hidden bg-[#0F1918]">
-      <div className="relative aspect-[393/330] h-[42vh] max-h-[42vh] w-full shrink-0 overflow-hidden">
+      <div className="relative h-[42vh] w-full shrink-0 overflow-hidden">
         <img
           src={welcomeHero}
           alt=""
@@ -36,15 +36,15 @@ export function WelcomeEntryPage() {
         </p>
       </div>
 
-      <div className="flex min-h-[50vh] flex-1 flex-col bg-[#0F1918] px-6 pt-8 pb-6">
-        <div className="mx-auto flex w-full max-w-[360px] flex-1 flex-col items-center text-center">
+      <div className="flex min-h-0 flex-1 flex-col justify-between bg-[#0F1918] px-6 pt-8">
+        <div className="mx-auto w-full max-w-[360px] text-center">
           <h1 className="font-display text-2xl font-bold uppercase tracking-[-0.02em] text-[#BACBC9]">
             Nice meeting you
           </h1>
           <p className="mt-1 font-display text-sm font-bold uppercase tracking-[-0.01em] text-[#BACBC9]/80">
             Let&apos;s get ready
           </p>
-          <p className="mt-4 mb-8 font-sans text-sm leading-relaxed tracking-[-0.01em] text-[#BACBC9]">
+          <p className="mt-4 font-sans text-sm leading-relaxed tracking-[-0.01em] text-[#BACBC9]">
             Jump straight in as a{' '}
             <span className="font-bold text-white">Guest</span> to generate your
             first instant route. Or tap{' '}
@@ -54,46 +54,53 @@ export function WelcomeEntryPage() {
             and keep track of your history.{' '}
             <span className="font-bold text-white">Everything is free.</span>
           </p>
+        </div>
 
-          <div className="flex w-full flex-col items-center gap-4 mt-auto">
-            <div className="grid w-full grid-cols-2 gap-3">
-              <PressableButton
-                onClick={handleGuest}
-                className="rounded-[4px] border border-[#2D3739] bg-transparent"
-                style={{
-                  height: 52,
-                  borderRadius: 4,
-                  color: '#BACBC9',
-                  backgroundColor: 'transparent',
-                }}
-              >
-                Guest
-              </PressableButton>
-              <PressableButton
-                onClick={handleSignup}
-                className="rounded-[4px] border-0"
-                style={{
-                  height: 52,
-                  borderRadius: 4,
-                  backgroundColor: '#BACBC9',
-                  color: '#0F1918',
-                  fontWeight: 600,
-                }}
-              >
-                Signup
-              </PressableButton>
-            </div>
-
-            <p className="pb-2 text-center text-sm text-[#BACBC9]">
-              Already have an account?{' '}
-              <Link
-                to="/auth/login"
-                className="font-bold underline underline-offset-2"
-              >
-                Sign in
-              </Link>
-            </p>
+        <div className="mx-auto flex w-full max-w-[360px] flex-col items-center gap-5 pt-4 pb-6">
+          <div className="flex w-full gap-3">
+            <PressableButton
+              onClick={handleGuest}
+              className="rounded-[4px] border border-[#2D3739] bg-transparent"
+              style={{
+                height: 52,
+                borderRadius: 4,
+                color: '#BACBC9',
+                backgroundColor: 'transparent',
+              }}
+            >
+              Guest
+            </PressableButton>
+            <PressableButton
+              onClick={handleSignup}
+              className="rounded-[4px] border-0"
+              style={{
+                height: 52,
+                borderRadius: 4,
+                backgroundColor: '#BACBC9',
+                color: '#0F1918',
+                fontWeight: 600,
+              }}
+            >
+              Signup
+            </PressableButton>
           </div>
+
+          <button
+            type="button"
+            tabIndex={0}
+            aria-label="Already have an account? Sign in"
+            onClick={() => navigate('/auth/login')}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                navigate('/auth/login')
+              }
+            }}
+            className="cursor-pointer py-1 text-sm font-medium text-[#BACBC9] transition-colors hover:text-white"
+          >
+            Already have an account?{' '}
+            <span className="font-semibold text-white underline">Sign in</span>
+          </button>
         </div>
       </div>
     </div>

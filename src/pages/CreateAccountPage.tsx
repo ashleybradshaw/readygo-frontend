@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { X } from 'lucide-react'
 import { PressableButton } from '../components/ui/PressableButton'
 import { TextField } from '../components/ui/TextField'
@@ -133,7 +133,7 @@ export function CreateAccountPage() {
         </ul>
       </div>
 
-      <div className="mt-auto flex flex-col items-center gap-4 pt-8 pb-6">
+      <div className="mt-auto flex w-full flex-col items-center gap-5 pt-4 pb-6">
         <PressableButton
           variant="cta"
           disabled={!canSubmit}
@@ -143,15 +143,22 @@ export function CreateAccountPage() {
         >
           Create account
         </PressableButton>
-        <p className="pb-2 text-center text-sm text-[#BACBC9]">
+        <button
+          type="button"
+          tabIndex={0}
+          aria-label="Already have an account? Sign in"
+          onClick={() => navigate('/auth/login')}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault()
+              navigate('/auth/login')
+            }
+          }}
+          className="cursor-pointer py-1 text-sm font-medium text-[#BACBC9] transition-colors hover:text-white"
+        >
           Already have an account?{' '}
-          <Link
-            to="/auth/login"
-            className="font-bold underline underline-offset-2"
-          >
-            Sign in
-          </Link>
-        </p>
+          <span className="font-semibold text-white underline">Sign in</span>
+        </button>
       </div>
     </div>
   )

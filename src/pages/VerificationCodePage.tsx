@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeftCircle } from 'lucide-react'
 import { PressableButton } from '../components/ui/PressableButton'
 import { TextField } from '../components/ui/TextField'
 import { KeyFieldIcon } from '../components/ui/AuthIcons'
@@ -60,7 +60,7 @@ export function VerificationCodePage() {
         }}
         className="absolute top-6 left-6 z-20 cursor-pointer text-[#BACBC9]/60 hover:text-white"
       >
-        <ArrowLeft className="h-6 w-6" strokeWidth={2.25} aria-hidden="true" />
+        <ArrowLeftCircle className="h-6 w-6" aria-hidden="true" />
       </button>
 
       <div className="mb-8 flex flex-col gap-2.5">
